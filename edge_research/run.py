@@ -150,10 +150,6 @@ def mpip_to_df(mpip):
         c_mpip_up_1045, c_mpip_up_1045_pr, c_mpip_up_1045_dt, 
         c_mpip_dn_1045, c_mpip_dn_1045_pr, c_mpip_dn_1045_dt, 
     ]]
-    # df_mpip = df_mpip[[
-    #         c_mpip_up_1030, c_1030_pr, c_mpip_up_1030_pr, c_mpip_up_1030_dt, c_mpip_up_1045, c_1045_pr,c_mpip_up_1045_pr, c_mpip_up_1045_dt,
-    #         c_mpip_dn_1030, c_1030_pr, c_mpip_dn_1030_pr, c_mpip_dn_1030_dt, c_mpip_dn_1045, c_1045_pr,c_mpip_dn_1045_pr, c_mpip_dn_1045_dt,
-    #     ]]
     return df_mpip
 
 
