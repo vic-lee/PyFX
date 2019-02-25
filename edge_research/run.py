@@ -40,7 +40,14 @@ init_mpip = lambda: {
         c_mpip_up_1030_dt: 0,
         c_mpip_up_1045_dt: 0,
         c_mpip_up_1030_pr: 0,
-        c_mpip_up_1045_pr: 0
+        c_mpip_up_1045_pr: 0,
+
+        c_mpip_dn_1030: 0,
+        c_mpip_dn_1045: 0,
+        c_mpip_dn_1030_dt: 0,
+        c_mpip_dn_1045_dt: 0,
+        c_mpip_dn_1030_pr: 0,
+        c_mpip_dn_1045_pr: 0
     }
 
 init_ls = lambda: {
@@ -135,9 +142,18 @@ def ls_to_df(ls):
 
 def mpip_to_df(mpip):
     df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
-    df_mpip = df_mpip[[c_mpip_up_1030, c_1030_pr, \
-        c_mpip_up_1030_pr, c_mpip_up_1030_dt, c_mpip_up_1045, \
-        c_1045_pr,c_mpip_up_1045_pr, c_mpip_up_1045_dt]]
+    df_mpip = df_mpip[[
+        c_1030_pr, 
+        c_mpip_up_1030, c_mpip_up_1030_pr, c_mpip_up_1030_dt, 
+        c_mpip_dn_1030, c_mpip_dn_1030_pr, c_mpip_dn_1030_dt, 
+        c_1045_pr,
+        c_mpip_up_1045, c_mpip_up_1045_pr, c_mpip_up_1045_dt, 
+        c_mpip_dn_1045, c_mpip_dn_1045_pr, c_mpip_dn_1045_dt, 
+    ]]
+    # df_mpip = df_mpip[[
+    #         c_mpip_up_1030, c_1030_pr, c_mpip_up_1030_pr, c_mpip_up_1030_dt, c_mpip_up_1045, c_1045_pr,c_mpip_up_1045_pr, c_mpip_up_1045_dt,
+    #         c_mpip_dn_1030, c_1030_pr, c_mpip_dn_1030_pr, c_mpip_dn_1030_dt, c_mpip_dn_1045, c_1045_pr,c_mpip_dn_1045_pr, c_mpip_dn_1045_dt,
+    #     ]]
     return df_mpip
 
 
@@ -175,7 +191,7 @@ def main():
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
     df_ls = ls_to_df(ls)
-    print(df_mpip)
+    print(df_mpip.head())
     # print(df_ls)
 
     daily_pip = daily_pip_mvmt()
