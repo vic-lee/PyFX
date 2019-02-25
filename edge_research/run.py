@@ -116,12 +116,9 @@ def proc_df():
 
 
 pipmvmt = lambda final, initial: (final - initial) * 10000
-# def pip_mvmt(final, initial):
-    # return (final - initial) * 10000
 
-
-def is_same_date(d1, d2):
-    return (d1.year == d2.year) and (d1.month == d2.month) and (d1.day == d2.day)
+is_same_date = lambda d1, d2: (d1.year == d2.year) \
+    and (d1.month == d2.month) and (d1.day == d2.day)
 
 
 def daily_pip_mvmt():
@@ -137,7 +134,8 @@ def daily_pip_mvmt():
     return pipmvmts
 
 
-days_against_pip_mvmt = lambda df, pipmvmt: df.query('{} < pip & pip < 0'.format(pipmvmt))
+days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
+    '{} < pip & pip < 0'.format(pipmvmt))
 
 
 def pip_mvmt_to_excel(df_pip, mvmts):
