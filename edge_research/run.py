@@ -5,18 +5,18 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 
 
-col_max_pip_1030 = '1030_MAX_PIP'
-col_max_pip_1045 = '1045_MAX_PIP'
-col_max_pip_1030_dt = "1030_DATETIME_MPIP"
-col_max_pip_1045_dt = "1045_DATETIME_MPIP"
-col_max_pip_1030_price = "1030_PRICE_MPIP"
-col_max_pip_1045_price = "1045_PRICE_MPIP"
+c_mpip_1030 = '1030_MAX_PIP'
+c_mpip_1045 = '1045_MAX_PIP'
+c_mpip_1030_dt = "1030_DATETIME_MPIP"
+c_mpip_1045_dt = "1045_DATETIME_MPIP"
+c_mpip_1030_pr = "1030_PRICE_MPIP"
+c_mpip_1045_pr = "1045_PRICE_MPIP"
 
-col_ls_1030 = '1030_LS'
-col_ls_1045 = '1045_LS'
-col_1030_price = '1030_PRICE'
-col_1045_price = '1045_PRICE'
-col_1102_close_price = '1102_CLOSE'
+c_ls_1030 = '1030_LS'
+c_ls_1045 = '1045_LS'
+c_1030_pr = '1030_PRICE'
+c_1045_pr = '1045_PRICE'
+c_1102_pr = '1102_CLOSE'
 
 
 pipmvmt = lambda final, initial: (final - initial) * 10000
@@ -26,6 +26,15 @@ is_same_date = lambda d1, d2: (d1.year == d2.year) \
 
 days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
+
+init_mpip = lambda: { 
+        c_mpip_1030: 0,
+        c_mpip_1045: 0,
+        c_mpip_1030_dt: 0,
+        c_mpip_1045_dt: 0,
+        c_mpip_1030_pr: 0,
+        c_mpip_1045_pr: 0
+    }
 
 def csv_in(fpath):
     df = pd.read_csv(fpath)
@@ -44,79 +53,80 @@ def csv_in(fpath):
 
 
 def proc_df():
-    current_date = None
-    price_1030 = None
-    price_1045 = None
+    cur_date = None
+    p1030 = None
+    p1045 = None
 
     mpip = {}  
-    long_short_tf = {}  
+    ls = {}  
     
     for index, row in mdf.iterrows():
 
-        if index.date() != current_date:
-            # Initialize mpip data and store 10:30 & 10:45 prices.
-            current_date = index.date()
-            mpip[current_date] = {
-                col_max_pip_1030: 0,
-                col_max_pip_1045: 0,
-                col_max_pip_1030_dt: 0,
-                col_max_pip_1045_dt: 0,
-                col_max_pip_1030_price: 0,
-                col_max_pip_1045_price: 0
+        if index.date() != cur_date:
+            cur_date = index.date()
+            mpip[cur_date] = init_mpip()
+            ls[cur_date] = {
+                c_ls_1030: 'N/A',
+                c_ls_1045: 'N/A',
+                c_1030_pr: 'N/A',
+                c_1045_pr: 'N/A',
+                c_1102_pr: 'N/A'
             }
-            long_short_tf[current_date] = {
-                col_ls_1030: 'N/A',
-                col_ls_1045: 'N/A',
-                col_1030_price: 'N/A',
-                col_1045_price: 'N/A',
-                col_1102_close_price: 'N/A'
-            }
-            df_1030_idx = str(current_date) + " 10:30:00"
-            df_1045_idx = str(current_date) + " 10:45:00"
-            price_1030 = df_1030.loc[df_1030_idx]['val']
-            price_1045 = df_1045.loc[df_1045_idx]['val']
-            mpip[current_date][col_1030_price] = price_1030
-            mpip[current_date][col_1045_price] = price_1045
+            df_1030_idx = str(cur_date) + " 10:30:00"
+            df_1045_idx = str(cur_date) + " 10:45:00"
+            p1030 = df_1030.loc[df_1030_idx]['val']
+            p1045 = df_1045.loc[df_1045_idx]['val']
+            mpip[cur_date][c_1030_pr] = p1030
+            mpip[cur_date][c_1045_pr] = p1045
 
         # Record / update daily max pip movement compared to 10:30 & 10:45 prices
-        cur_pip_1030 = round((row['val'] - price_1030) * 10000, 4)
-        cur_pip_1045 = round((row['val'] - price_1045) * 10000, 4)
-        if cur_pip_1030 > mpip[current_date][col_max_pip_1030]:
-            mpip[current_date][col_max_pip_1030] = cur_pip_1030
-            mpip[current_date][col_max_pip_1030_dt] = index
-            mpip[current_date][col_max_pip_1030_price] = row['val']
-        if cur_pip_1045 > mpip[current_date][col_max_pip_1045]:
-            mpip[current_date][col_max_pip_1045] = cur_pip_1045
-            mpip[current_date][col_max_pip_1045_dt] = index
-            mpip[current_date][col_max_pip_1045_price] = row['val']
+        cur_pip_1030 = round((row['val'] - p1030) * 10000, 4)
+        cur_pip_1045 = round((row['val'] - p1045) * 10000, 4)
+        if cur_pip_1030 > mpip[cur_date][c_mpip_1030]:
+            mpip[cur_date][c_mpip_1030] = cur_pip_1030
+            mpip[cur_date][c_mpip_1030_dt] = index
+            mpip[cur_date][c_mpip_1030_pr] = row['val']
+        if cur_pip_1045 > mpip[cur_date][c_mpip_1045]:
+            mpip[cur_date][c_mpip_1045] = cur_pip_1045
+            mpip[cur_date][c_mpip_1045_dt] = index
+            mpip[cur_date][c_mpip_1045_pr] = row['val']
 
-        if str(index) == str(current_date) + " 11:02:00":
-            # Record if the timeframe was long or short compared to 10:30 & 10:45 prices
-            long_short_tf[current_date][col_1030_price] = price_1030
-            long_short_tf[current_date][col_1045_price] = price_1045
-            long_short_tf[current_date][col_1102_close_price] = row['val']
-            if row['val'] > price_1030:
-                long_short_tf[current_date][col_ls_1030] = 'LONG'
-            elif row['val'] < price_1030:
-                long_short_tf[current_date][col_ls_1030] = 'SHORT'
+        if str(index) == str(cur_date) + " 11:02:00":
+            ls[cur_date][c_1030_pr] = p1030
+            ls[cur_date][c_1045_pr] = p1045
+            ls[cur_date][c_1102_pr] = row['val']
+            if row['val'] > p1030:
+                ls[cur_date][c_ls_1030] = 'LONG'
+            elif row['val'] < p1030:
+                ls[cur_date][c_ls_1030] = 'SHORT'
             else:
-                long_short_tf[current_date][col_ls_1030] = 'PAR'
-            if row['val'] > price_1045:
-                long_short_tf[current_date][col_ls_1045] = 'LONG'
-            elif row['val'] < price_1045:
-                long_short_tf[current_date][col_ls_1045] = 'SHORT'
+                ls[cur_date][c_ls_1030] = 'PAR'
+            if row['val'] > p1045:
+                ls[cur_date][c_ls_1045] = 'LONG'
+            elif row['val'] < p1045:
+                ls[cur_date][c_ls_1045] = 'SHORT'
             else:
-                long_short_tf[current_date][col_ls_1045] = 'PAR'
+                ls[cur_date][c_ls_1045] = 'PAR'
     
-    df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
-    df_mpip = df_mpip[[col_max_pip_1030, col_1030_price, col_max_pip_1030_price, col_max_pip_1030_dt,\
-                   col_max_pip_1045, col_1045_price, col_max_pip_1045_price, col_max_pip_1045_dt]]
-    df_mpip[[col_max_pip_1030, col_max_pip_1045]].plot(figsize=(12, 5))
-
-    df_ls = pd.DataFrame.from_dict(long_short_tf, orient='index')
-    df_ls = df_ls[[col_ls_1030, col_1030_price, col_ls_1045, col_1045_price, col_1102_close_price]]
+    df_mpip = mpip_to_df(mpip)
+    print(df_mpip)
+    df_ls = ls_to_df(ls)
+    # df_mpip[[c_mpip_1030, c_mpip_1045]].plot(figsize=(12, 5))
 
     return df_mpip, df_ls
+
+def ls_to_df(ls):
+    df_ls = pd.DataFrame.from_dict(ls, orient='index')
+    df_ls = df_ls[[c_ls_1030, c_1030_pr, \
+        c_ls_1045, c_1045_pr, c_1102_pr]]
+    return df_ls
+
+def mpip_to_df(mpip):
+    df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
+    df_mpip = df_mpip[[c_mpip_1030, c_1030_pr, \
+        c_mpip_1030_pr, c_mpip_1030_dt, c_mpip_1045, \
+        c_1045_pr,c_mpip_1045_pr, c_mpip_1045_dt]]
+    return df_mpip
 
 
 def daily_pip_mvmt():
