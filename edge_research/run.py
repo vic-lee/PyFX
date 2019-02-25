@@ -115,8 +115,9 @@ def proc_df():
     return df_mpip, df_ls
 
 
-def pip_mvmt(final, initial):
-    return (final - initial) * 10000
+pipmvmt = lambda final, initial: (final - initial) * 10000
+# def pip_mvmt(final, initial):
+    # return (final - initial) * 10000
 
 
 def is_same_date(d1, d2):
@@ -129,15 +130,14 @@ def daily_pip_mvmt():
         close_price = row['val']
         open_price = df_1030.loc[str(date.date()) + ' 10:30:00']['val']
         pipmvmts[date.date()] = { 
-            'pip': pip_mvmt(close_price, open_price), 
+            'pip': pipmvmt(close_price, open_price), 
             'open': open_price, 
             'close': close_price
         }
     return pipmvmts
 
 
-def days_against_pip_mvmt(df, pipmvmt):
-    return df.query('{} < pip & pip < 0'.format(pipmvmt))
+days_against_pip_mvmt = lambda df, pipmvmt: df.query('{} < pip & pip < 0'.format(pipmvmt))
 
 
 def pip_mvmt_to_excel(df_pip, mvmts):
