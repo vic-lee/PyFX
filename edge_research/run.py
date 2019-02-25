@@ -5,12 +5,19 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 
 
-c_mpip_1030 = '1030_MAX_PIP'
-c_mpip_1045 = '1045_MAX_PIP'
-c_mpip_1030_dt = "1030_DATETIME_MPIP"
-c_mpip_1045_dt = "1045_DATETIME_MPIP"
-c_mpip_1030_pr = "1030_PRICE_MPIP"
-c_mpip_1045_pr = "1045_PRICE_MPIP"
+c_mpip_up_1030 = 'MAX_PIP_UP_1030'
+c_mpip_up_1045 = 'MAX_PIP_UP_1045'
+c_mpip_up_1030_dt = "MAX_PIP_UP_1030_DATETIME"
+c_mpip_up_1045_dt = "MAX_PIP_UP_1045_DATETIME"
+c_mpip_up_1030_pr = "MAX_PIP_UP_1030_PRICE"
+c_mpip_up_1045_pr = "MAX_PIP_UP_1045_PRICE"
+
+c_mpip_dn_1030 = 'MAX_PIP_DOWN_1030'
+c_mpip_dn_1045 = 'MAX_PIP_DOWN_1045'
+c_mpip_dn_1030_dt = "MAX_PIP_DOWN_1030_DATETIME"
+c_mpip_dn_1045_dt = "MAX_PIP_DOWN_1045_DATETIME"
+c_mpip_dn_1030_pr = "MAX_PIP_DOWN_1030_PRICE"
+c_mpip_dn_1045_pr = "MAX_PIP_DOWN_1045_PRICE"
 
 c_ls_1030 = '1030_LS'
 c_ls_1045 = '1045_LS'
@@ -28,12 +35,12 @@ days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
 
 init_mpip = lambda: { 
-        c_mpip_1030: 0,
-        c_mpip_1045: 0,
-        c_mpip_1030_dt: 0,
-        c_mpip_1045_dt: 0,
-        c_mpip_1030_pr: 0,
-        c_mpip_1045_pr: 0
+        c_mpip_up_1030: 0,
+        c_mpip_up_1045: 0,
+        c_mpip_up_1030_dt: 0,
+        c_mpip_up_1045_dt: 0,
+        c_mpip_up_1030_pr: 0,
+        c_mpip_up_1045_pr: 0
     }
 
 init_ls = lambda: {
@@ -85,14 +92,14 @@ def proc_df():
         cur_pip_1030 = pipmvmt(cur_pr, p1030)
         cur_pip_1045 = pipmvmt(cur_pr, p1045)
 
-        if cur_pip_1030 > mpip[cur_date][c_mpip_1030]:
-            mpip[cur_date][c_mpip_1030] = cur_pip_1030
-            mpip[cur_date][c_mpip_1030_dt] = date_minute
-            mpip[cur_date][c_mpip_1030_pr] = cur_pr
-        if cur_pip_1045 > mpip[cur_date][c_mpip_1045]:
-            mpip[cur_date][c_mpip_1045] = cur_pip_1045
-            mpip[cur_date][c_mpip_1045_dt] = date_minute
-            mpip[cur_date][c_mpip_1045_pr] = cur_pr
+        if cur_pip_1030 > mpip[cur_date][c_mpip_up_1030]:
+            mpip[cur_date][c_mpip_up_1030] = cur_pip_1030
+            mpip[cur_date][c_mpip_up_1030_dt] = date_minute
+            mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
+        if cur_pip_1045 > mpip[cur_date][c_mpip_up_1045]:
+            mpip[cur_date][c_mpip_up_1045] = cur_pip_1045
+            mpip[cur_date][c_mpip_up_1045_dt] = date_minute
+            mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
             handle_ls(p1030, ls, cur_date, p1045, row)
@@ -128,9 +135,9 @@ def ls_to_df(ls):
 
 def mpip_to_df(mpip):
     df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
-    df_mpip = df_mpip[[c_mpip_1030, c_1030_pr, \
-        c_mpip_1030_pr, c_mpip_1030_dt, c_mpip_1045, \
-        c_1045_pr,c_mpip_1045_pr, c_mpip_1045_dt]]
+    df_mpip = df_mpip[[c_mpip_up_1030, c_1030_pr, \
+        c_mpip_up_1030_pr, c_mpip_up_1030_dt, c_mpip_up_1045, \
+        c_1045_pr,c_mpip_up_1045_pr, c_mpip_up_1045_dt]]
     return df_mpip
 
 
@@ -163,13 +170,13 @@ def main():
     df_1045 = df.between_time('10:45', '10:45')
     df_1102 = df.between_time('11:02', '11:02')
 
-    print(mdf)
+    # print(mdf)
 
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
     df_ls = ls_to_df(ls)
     print(df_mpip)
-    print(df_ls)
+    # print(df_ls)
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
