@@ -109,13 +109,8 @@ def proc_df():
                 ls[cur_date][c_ls_1045] = 'SHORT'
             else:
                 ls[cur_date][c_ls_1045] = 'PAR'
-    
-    df_mpip = mpip_to_df(mpip)
-    print(df_mpip)
-    df_ls = ls_to_df(ls)
-    # df_mpip[[c_mpip_1030, c_mpip_1045]].plot(figsize=(12, 5))
 
-    return df_mpip, df_ls
+    return mpip, ls
 
 def ls_to_df(ls):
     df_ls = pd.DataFrame.from_dict(ls, orient='index')
@@ -160,7 +155,11 @@ def main():
     df_1045 = df.between_time('10:45', '10:45')
     df_1102 = df.between_time('11:02', '11:02')
 
-    df_mpip, df_ls = proc_df()
+    mpip, ls = proc_df()
+    df_mpip = mpip_to_df(mpip)
+    df_ls = ls_to_df(ls)
+    print(df_mpip)
+    print(df_ls)
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
