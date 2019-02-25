@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import xlsxwriter
 
+
 col_max_pip_1030 = '1030_MAX_PIP'
 col_max_pip_1045 = '1045_MAX_PIP'
 col_max_pip_1030_dt = "1030_DATETIME_MPIP"
@@ -16,7 +17,6 @@ col_ls_1045 = '1045_LS'
 col_1030_price = '1030_PRICE'
 col_1045_price = '1045_PRICE'
 col_1102_close_price = '1102_CLOSE'
-
 
 
 def csv_in(fpath):
@@ -140,6 +140,14 @@ def days_against_pip_mvmt(df, pipmvmt):
     return df.query('{} < pip & pip < 0'.format(pipmvmt))
 
 
+def pip_mvmt_to_excel(df_pip, mvmts):
+    with pd.ExcelWriter('2018_daily_pip_mvmts.xlsx', engine='xlsxwriter') as writer: 
+        df_pip.to_excel(writer, sheet_name='all_daily_pip_mvmts')
+        for pip_mvmt in mvmts: 
+            df = days_against_pip_mvmt(df_pip, pip_mvmt)
+            df.to_excel(writer, sheet_name='{} pips'.format(pip_mvmt))
+
+
 def main():
     global mdf, df_1030, df_1045, df_1102
     df = csv_in("GBPUSD_2018.csv")
@@ -148,11 +156,10 @@ def main():
     df_1045 = df.between_time('10:45', '10:45')
     df_1102 = df.between_time('11:02', '11:02')
 
-    df_mpip, df_ls = proc_df(mdf, df_1030, df_1045)
+    df_mpip, df_ls = proc_df()
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
-    df_daily_pip
 
     pip_neg3 = days_against_pip_mvmt(df_daily_pip, -3)
     pip_neg4 = days_against_pip_mvmt(df_daily_pip, -4)
@@ -163,16 +170,7 @@ def main():
     print("less than 5 pips: {} days".format(len(pip_neg5)))
     print("less than 6 pips: {} days".format(len(pip_neg6)))
 
-
-    with pd.ExcelWriter('2018_daily_pip_mvmts.xlsx', engine='xlsxwriter') as writer: 
-        df_daily_pip.to_excel(writer, sheet_name='all_daily_pip_mvmts')
-        pip_neg3.to_excel(writer, sheet_name='mvmt -3 pips')
-        pip_neg4.to_excel(writer, sheet_name='mvmt -4 pips')
-        pip_neg5.to_excel(writer, sheet_name='mvmt -5 pips')
-        pip_neg6.to_excel(writer, sheet_name='mvmt -6 pips')
-
-
-
+    pip_mvmt_to_excel(df_daily_pip, [-3, -4, -5, -6])
 
 
 if __name__ == '__main__':
