@@ -19,19 +19,23 @@ col_1045_price = '1045_PRICE'
 col_1102_close_price = '1102_CLOSE'
 
 
+pipmvmt = lambda final, initial: (final - initial) * 10000
+
+is_same_date = lambda d1, d2: (d1.year == d2.year) \
+    and (d1.month == d2.month) and (d1.day == d2.day)
+
+days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
+    '{} < pip & pip < 0'.format(pipmvmt))
+
 def csv_in(fpath):
     df = pd.read_csv(fpath)
 
-    # Process columns
-    # QUESTION about additional columns
     df.columns = ["date", "time", "val", "B", "C", "D", "E"]
     df = df.drop(columns=['B', 'C', 'D', 'E'])
 
-    # Process datetime
-    df['datetime'] = df["date"].map(
-        str) + " " + df["time"]  # create datetime column
+    df['datetime'] = df["date"].map(str) + " " + df["time"] 
     df["datetime"] = pd.to_datetime(df["datetime"])
-    df["date"] = pd.to_datetime(df["date"])  # datetime-ify 'date time' column
+    df["date"] = pd.to_datetime(df["date"]) 
     df = df.set_index('datetime')
     df = df[['date', 'time', 'val']]
     df = df.drop(columns=['time', 'date'])
@@ -115,12 +119,6 @@ def proc_df():
     return df_mpip, df_ls
 
 
-pipmvmt = lambda final, initial: (final - initial) * 10000
-
-is_same_date = lambda d1, d2: (d1.year == d2.year) \
-    and (d1.month == d2.month) and (d1.day == d2.day)
-
-
 def daily_pip_mvmt():
     pipmvmts = {}
     for date, row in df_1102.iterrows():
@@ -132,10 +130,6 @@ def daily_pip_mvmt():
             'close': close_price
         }
     return pipmvmts
-
-
-days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
-    '{} < pip & pip < 0'.format(pipmvmt))
 
 
 def pip_mvmt_to_excel(df_pip, mvmts):
