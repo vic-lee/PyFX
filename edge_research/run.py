@@ -64,14 +64,13 @@ def proc_df():
     cur_date = None
     p1030 = None
     p1045 = None
-
     mpip = {}  
     ls = {}  
     
-    for index, row in mdf.iterrows():
+    for date_minute, row in mdf.iterrows():
 
-        if index.date() != cur_date:
-            cur_date = index.date()
+        if date_minute.date() != cur_date:
+            cur_date = date_minute.date()
             mpip[cur_date] = init_mpip()
             ls[cur_date] = init_ls()
             df_1030_idx = str(cur_date) + " 10:30:00"
@@ -81,42 +80,51 @@ def proc_df():
             mpip[cur_date][c_1030_pr] = p1030
             mpip[cur_date][c_1045_pr] = p1045
 
-        # Record / update daily max pip movement compared to 10:30 & 10:45 prices
-        cur_pip_1030 = round((row['val'] - p1030) * 10000, 4)
-        cur_pip_1045 = round((row['val'] - p1045) * 10000, 4)
+        cur_pr = row['val']
+
+        cur_pip_1030 = pipmvmt(cur_pr, p1030)
+        cur_pip_1045 = pipmvmt(cur_pr, p1045)
+
         if cur_pip_1030 > mpip[cur_date][c_mpip_1030]:
             mpip[cur_date][c_mpip_1030] = cur_pip_1030
-            mpip[cur_date][c_mpip_1030_dt] = index
-            mpip[cur_date][c_mpip_1030_pr] = row['val']
+            mpip[cur_date][c_mpip_1030_dt] = date_minute
+            mpip[cur_date][c_mpip_1030_pr] = cur_pr
         if cur_pip_1045 > mpip[cur_date][c_mpip_1045]:
             mpip[cur_date][c_mpip_1045] = cur_pip_1045
-            mpip[cur_date][c_mpip_1045_dt] = index
-            mpip[cur_date][c_mpip_1045_pr] = row['val']
+            mpip[cur_date][c_mpip_1045_dt] = date_minute
+            mpip[cur_date][c_mpip_1045_pr] = cur_pr
 
-        if str(index) == str(cur_date) + " 11:02:00":
-            ls[cur_date][c_1030_pr] = p1030
-            ls[cur_date][c_1045_pr] = p1045
-            ls[cur_date][c_1102_pr] = row['val']
-            if row['val'] > p1030:
-                ls[cur_date][c_ls_1030] = 'LONG'
-            elif row['val'] < p1030:
-                ls[cur_date][c_ls_1030] = 'SHORT'
-            else:
-                ls[cur_date][c_ls_1030] = 'PAR'
-            if row['val'] > p1045:
-                ls[cur_date][c_ls_1045] = 'LONG'
-            elif row['val'] < p1045:
-                ls[cur_date][c_ls_1045] = 'SHORT'
-            else:
-                ls[cur_date][c_ls_1045] = 'PAR'
+        if str(date_minute) == str(cur_date) + " 11:02:00":
+            handle_ls(p1030, ls, cur_date, p1045, row)
 
     return mpip, ls
+
+
+def handle_ls(p1030, ls, cur_date, p1045, row):
+    p1102 = row['val']
+    ls[cur_date][c_1030_pr] = p1030
+    ls[cur_date][c_1045_pr] = p1045
+    ls[cur_date][c_1102_pr] = p1102
+    if p1102 > p1030:
+        ls[cur_date][c_ls_1030] = 'LONG'
+    elif p1102 < p1030:
+        ls[cur_date][c_ls_1030] = 'SHORT'
+    else:
+        ls[cur_date][c_ls_1030] = 'PAR'
+    if p1102 > p1045:
+        ls[cur_date][c_ls_1045] = 'LONG'
+    elif p1102 < p1045:
+        ls[cur_date][c_ls_1045] = 'SHORT'
+    else:
+        ls[cur_date][c_ls_1045] = 'PAR'
+
 
 def ls_to_df(ls):
     df_ls = pd.DataFrame.from_dict(ls, orient='index')
     df_ls = df_ls[[c_ls_1030, c_1030_pr, \
         c_ls_1045, c_1045_pr, c_1102_pr]]
     return df_ls
+
 
 def mpip_to_df(mpip):
     df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
@@ -154,6 +162,8 @@ def main():
     df_1030 = df.between_time('10:30', '10:30')
     df_1045 = df.between_time('10:45', '10:45')
     df_1102 = df.between_time('11:02', '11:02')
+
+    print(mdf)
 
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
