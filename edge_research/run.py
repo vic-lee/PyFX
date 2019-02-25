@@ -36,6 +36,14 @@ init_mpip = lambda: {
         c_mpip_1045_pr: 0
     }
 
+init_ls = lambda: {
+        c_ls_1030: 'N/A',
+        c_ls_1045: 'N/A',
+        c_1030_pr: 'N/A',
+        c_1045_pr: 'N/A',
+        c_1102_pr: 'N/A'
+    }
+
 def csv_in(fpath):
     df = pd.read_csv(fpath)
 
@@ -65,13 +73,7 @@ def proc_df():
         if index.date() != cur_date:
             cur_date = index.date()
             mpip[cur_date] = init_mpip()
-            ls[cur_date] = {
-                c_ls_1030: 'N/A',
-                c_ls_1045: 'N/A',
-                c_1030_pr: 'N/A',
-                c_1045_pr: 'N/A',
-                c_1102_pr: 'N/A'
-            }
+            ls[cur_date] = init_ls()
             df_1030_idx = str(cur_date) + " 10:30:00"
             df_1045_idx = str(cur_date) + " 10:45:00"
             p1030 = df_1030.loc[df_1030_idx]['val']
