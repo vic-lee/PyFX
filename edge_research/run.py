@@ -6,27 +6,27 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 
 
-c_mpip_up_1030 = 'MAX_PIP_UP_1030'
-c_mpip_up_1045 = 'MAX_PIP_UP_1045'
-c_mpip_up_1030_dt = "MAX_PIP_UP_1030_DATETIME"
-c_mpip_up_1045_dt = "MAX_PIP_UP_1045_DATETIME"
-c_mpip_up_1030_pr = "MAX_PIP_UP_1030_PRICE"
-c_mpip_up_1045_pr = "MAX_PIP_UP_1045_PRICE"
+c_mpip_up_1030 = 'MAX_PIP_UP__1030'
+c_mpip_up_1045 = 'MAX_PIP_UP__1045'
+c_mpip_up_1030_dt = "MAX_PIP_UP__1030_DATETIME"
+c_mpip_up_1045_dt = "MAX_PIP_UP__1045_DATETIME"
+c_mpip_up_1030_pr = "MAX_PIP_UP__1030_PRICE"
+c_mpip_up_1045_pr = "MAX_PIP_UP__1045_PRICE"
 
-c_mpip_dn_1030 = 'MAX_PIP_DOWN_1030'
-c_mpip_dn_1045 = 'MAX_PIP_DOWN_1045'
-c_mpip_dn_1030_dt = "MAX_PIP_DOWN_1030_DATETIME"
-c_mpip_dn_1045_dt = "MAX_PIP_DOWN_1045_DATETIME"
-c_mpip_dn_1030_pr = "MAX_PIP_DOWN_1030_PRICE"
-c_mpip_dn_1045_pr = "MAX_PIP_DOWN_1045_PRICE"
+c_mpip_dn_1030 = 'MAX_PIP_DOWN__1030'
+c_mpip_dn_1045 = 'MAX_PIP_DOWN__1045'
+c_mpip_dn_1030_dt = "MAX_PIP_DOWN__1030_DATETIME"
+c_mpip_dn_1045_dt = "MAX_PIP_DOWN__1045_DATETIME"
+c_mpip_dn_1030_pr = "MAX_PIP_DOWN__1030_PRICE"
+c_mpip_dn_1045_pr = "MAX_PIP_DOWN__1045_PRICE"
 
-c_mpip_up_pdfx = 'MAX_PIP_UP_PRIOR_DAY_FIX'
-c_mpip_up_pdfx_dt = "MAX_PIP_UP_PRIOR_DAY_FIX_DATETIME"
-c_mpip_up_pdfx_pr = "MAX_PIP_UP_PRIOR_DAY_FIX_PRICE"
+c_mpip_up_pdfx = 'MAX_PIP_UP__PRIOR_DAY_FIX'
+c_mpip_up_pdfx_dt = "MAX_PIP_UP__PDFX_DATETIME"
+c_mpip_up_pdfx_pr = "MAX_PIP_UP__PDFX_PRICE"
 
-c_mpip_dn_pdfx = 'MAX_PIP_DOWN_PRIOR_DAY_FIX'
-c_mpip_dn_pdfx_dt = "MAX_PIP_DOWN_PRIOR_DAY_FIX_DATETIME"
-c_mpip_dn_pdfx_pr = "MAX_PIP_DOWN_PRIOR_DAY_FIX_PRICE"
+c_mpip_dn_pdfx = 'MAX_PIP_DOWN__PRIOR_DAY_FIX'
+c_mpip_dn_pdfx_dt = "MAX_PIP_DOWN__PDFX_DATETIME"
+c_mpip_dn_pdfx_pr = "MAX_PIP_DOWN__PDFX_PRICE"
 
 c_ls_1030 = '1030_LS'
 c_ls_1045 = '1045_LS'
@@ -136,7 +136,6 @@ def get_prior_fix(d):
         return fx
 
 
-# get_fix_pr = lambda d: fixdf.loc[d][CP]
 def get_fix_pr(d):
     fx = fixdf.loc[d][CP]
     if np.isnan(fx):
