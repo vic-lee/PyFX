@@ -19,6 +19,14 @@ c_mpip_dn_1045_dt = "MAX_PIP_DOWN_1045_DATETIME"
 c_mpip_dn_1030_pr = "MAX_PIP_DOWN_1030_PRICE"
 c_mpip_dn_1045_pr = "MAX_PIP_DOWN_1045_PRICE"
 
+c_mpip_up_pdfx = 'MAX_PIP_UP_PRIOR_DAY_FIX'
+c_mpip_up_pdfx_dt = "MAX_PIP_UP_PRIOR_DAY_FIX_DATETIME"
+c_mpip_up_pdfx_pr = "MAX_PIP_UP_PRIOR_DAY_FIX_PRICE"
+
+c_mpip_dn_pdfx = 'MAX_PIP_DOWN_PRIOR_DAY_FIX'
+c_mpip_dn_pdfx_dt = "MAX_PIP_DOWN_PRIOR_DAY_FIX_DATETIME"
+c_mpip_dn_pdfx_pr = "MAX_PIP_DOWN_PRIOR_DAY_FIX_PRICE"
+
 c_ls_1030 = '1030_LS'
 c_ls_1045 = '1045_LS'
 c_1030_pr = '1030_PRICE'
@@ -184,7 +192,8 @@ def df_to_xls(df, fname):
     with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
         df.to_excel(writer, sheet_name="max_pip_mvmts")
         sheet = writer.sheets['max_pip_mvmts']
-        sheet.set_column(0, len(df.columns), 18)
+        wide_col = 18
+        sheet.set_column(0, len(df.columns), wide_col)
 
 
 def pip_mvmt_to_excel(df_pip, mvmts):
