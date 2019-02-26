@@ -33,6 +33,8 @@ c_1030_pr = '1030_PRICE'
 c_1045_pr = '1045_PRICE'
 c_1102_pr = '1102_CLOSE'
 
+CP = 'GBP-USD'
+
 
 pipmvmt = lambda final, initial: (final - initial) * 10000
 
@@ -69,6 +71,7 @@ init_ls = lambda: {
         c_1102_pr: 'N/A'
     }
 
+
 def csv_in(fpath):
     df = pd.read_csv(fpath)
 
@@ -82,6 +85,13 @@ def csv_in(fpath):
     df = df[['date', 'time', 'val']]
     df = df.drop(columns=['time', 'date'])
 
+    return df
+
+
+def fix_csv_in(fpath): 
+    df = pd.read_csv(fpath)
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.set_index('datetime')
     return df
 
 
@@ -206,11 +216,13 @@ def pip_mvmt_to_excel(df_pip, fname, mvmts):
 
 def main():
     global mdf, df_1030, df_1045, df_1102
-    df = csv_in("datasrc/GBPUSD_2018.csv")
-    mdf = df.between_time('10:30', '11:02')
-    df_1030 = df.between_time('10:30', '10:30')
-    df_1045 = df.between_time('10:45', '10:45')
-    df_1102 = df.between_time('11:02', '11:02')
+
+    fixdf = fix_csv_in("datasrc/bloomberg_fix_1819.csv")
+    datadf = csv_in("datasrc/GBPUSD_2018.csv")
+    mdf = datadf.between_time('10:30', '11:02')
+    df_1030 = datadf.between_time('10:30', '10:30')
+    df_1045 = datadf.between_time('10:45', '10:45')
+    df_1102 = datadf.between_time('11:02', '11:02')
 
     # print(mdf)
 
