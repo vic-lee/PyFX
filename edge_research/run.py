@@ -20,11 +20,11 @@ c_mpip_dn_1045_dt = "MAX_PIP_DOWN__1045_DATETIME"
 c_mpip_dn_1030_pr = "MAX_PIP_DOWN__1030_PRICE"
 c_mpip_dn_1045_pr = "MAX_PIP_DOWN__1045_PRICE"
 
-c_mpip_up_pdfx = 'MAX_PIP_UP__PRIOR_DAY_FIX'
+c_mpip_up_pdfx = 'MAX_PIP_UP__PDFX'
 c_mpip_up_pdfx_dt = "MAX_PIP_UP__PDFX_DATETIME"
 c_mpip_up_pdfx_pr = "MAX_PIP_UP__PDFX_PRICE"
 
-c_mpip_dn_pdfx = 'MAX_PIP_DOWN__PRIOR_DAY_FIX'
+c_mpip_dn_pdfx = 'MAX_PIP_DOWN__PDFX'
 c_mpip_dn_pdfx_dt = "MAX_PIP_DOWN__PDFX_DATETIME"
 c_mpip_dn_pdfx_pr = "MAX_PIP_DOWN__PDFX_PRICE"
 
@@ -164,7 +164,7 @@ def proc_df():
             p1045 = df_1045.loc[dt1045]['val']
             pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
             fx = get_fix_pr(str(cur_date))
-            print("fix for date {} is {}".format(str(cur_date), fx))
+            # print("fix for date {} is {}".format(str(cur_date), fx))
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx)
             ls[cur_date] = init_ls()
 
@@ -272,7 +272,7 @@ def df_to_xls(df, fname):
     with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
         df.to_excel(writer, sheet_name="max_pip_mvmts")
         sheet = writer.sheets['max_pip_mvmts']
-        wide_col = 18
+        wide_col = 20
         sheet.set_column(0, len(df.columns), wide_col)
 
 
