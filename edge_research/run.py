@@ -151,26 +151,35 @@ def proc_df():
         if pdfx is not None: 
             pippdfx = pipmvmt(cur_pr, pdfx)
 
-        if pip1030 > mpip[cur_date][c_mpip_up_1030]:
-            mpip[cur_date][c_mpip_up_1030] = pip1030
-            mpip[cur_date][c_mpip_up_1030_dt] = date_minute
-            mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
-        if pip1045 > mpip[cur_date][c_mpip_up_1045]:
-            mpip[cur_date][c_mpip_up_1045] = pip1045
-            mpip[cur_date][c_mpip_up_1045_dt] = date_minute
-            mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
+        td = mpip[cur_date]
 
-        if pip1030 < mpip[cur_date][c_mpip_dn_1030]:
-            mpip[cur_date][c_mpip_dn_1030] = pip1030
-            mpip[cur_date][c_mpip_dn_1030_dt] = date_minute
-            mpip[cur_date][c_mpip_dn_1030_pr] = cur_pr
-        if pip1045 < mpip[cur_date][c_mpip_dn_1045]:
-            mpip[cur_date][c_mpip_dn_1045] = pip1045
-            mpip[cur_date][c_mpip_dn_1045_dt] = date_minute
-            mpip[cur_date][c_mpip_dn_1045_pr] = cur_pr
+        if pip1030 > td[c_mpip_up_1030]:
+            td[c_mpip_up_1030] = pip1030
+            td[c_mpip_up_1030_dt] = date_minute
+            td[c_mpip_up_1030_pr] = cur_pr
+        if pip1045 > td[c_mpip_up_1045]:
+            td[c_mpip_up_1045] = pip1045
+            td[c_mpip_up_1045_dt] = date_minute
+            td[c_mpip_up_1045_pr] = cur_pr
+
+        if pip1030 < td[c_mpip_dn_1030]:
+            td[c_mpip_dn_1030] = pip1030
+            td[c_mpip_dn_1030_dt] = date_minute
+            td[c_mpip_dn_1030_pr] = cur_pr
+        if pip1045 < td[c_mpip_dn_1045]:
+            td[c_mpip_dn_1045] = pip1045
+            td[c_mpip_dn_1045_dt] = date_minute
+            td[c_mpip_dn_1045_pr] = cur_pr
         
         if pdfx is not None: 
-            pass
+            if pippdfx > td[c_mpip_up_pdfx]:
+                td[c_mpip_up_pdfx] = pippdfx
+                td[c_mpip_up_pdfx_dt] = dtpdfx
+                td[c_mpip_up_pdfx_pr] = pdfx
+            if pippdfx < td[c_mpip_dn_pdfx]:
+                td[c_mpip_dn_pdfx] = pippdfx
+                td[c_mpip_dn_pdfx_dt] = dtpdfx
+                td[c_mpip_dn_pdfx_pr] = pdfx
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
             handle_ls(p1030, ls, cur_date, p1045, row)
@@ -213,8 +222,8 @@ def mpip_to_df(mpip):
         c_1045_pr,
         c_mpip_up_1045, c_mpip_up_1045_pr, c_mpip_up_1045_dt, 
         c_mpip_dn_1045, c_mpip_dn_1045_pr, c_mpip_dn_1045_dt, 
-        c_mpip_up_pdfx, c_mpip_up_pdfx_dt, c_mpip_up_pdfx_pr, 
-        c_mpip_dn_pdfx, c_mpip_dn_pdfx_dt, c_mpip_dn_pdfx_pr,
+        c_mpip_up_pdfx, c_mpip_up_pdfx_pr, c_mpip_up_pdfx_dt,
+        c_mpip_dn_pdfx, c_mpip_dn_pdfx_pr, c_mpip_dn_pdfx_dt,
     ]]
     return df_mpip
 
