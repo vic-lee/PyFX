@@ -34,23 +34,23 @@ is_same_date = lambda d1, d2: (d1.year == d2.year) \
 days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
 
-init_mpip = lambda: { 
-        c_1030_pr: 0, 
-        c_1030_pr: 0, 
+init_mpip = lambda p1030, p1045, dt1030, dt1045: { 
+        c_1030_pr: p1030, 
+        c_1045_pr: p1045, 
 
         c_mpip_up_1030: 0,
         c_mpip_up_1045: 0,
-        c_mpip_up_1030_dt: 0,
-        c_mpip_up_1045_dt: 0,
-        c_mpip_up_1030_pr: 0,
-        c_mpip_up_1045_pr: 0,
+        c_mpip_up_1030_dt: dt1030,
+        c_mpip_up_1045_dt: dt1045,
+        c_mpip_up_1030_pr: p1030,
+        c_mpip_up_1045_pr: p1045,
 
         c_mpip_dn_1030: 0,
         c_mpip_dn_1045: 0,
-        c_mpip_dn_1030_dt: 0,
-        c_mpip_dn_1045_dt: 0,
-        c_mpip_dn_1030_pr: 0,
-        c_mpip_dn_1045_pr: 0
+        c_mpip_dn_1030_dt: dt1030,
+        c_mpip_dn_1045_dt: dt1045,
+        c_mpip_dn_1030_pr: p1030,
+        c_mpip_dn_1045_pr: p1045,
     }
 
 init_ls = lambda: {
@@ -88,14 +88,12 @@ def proc_df():
 
         if date_minute.date() != cur_date:
             cur_date = date_minute.date()
-            mpip[cur_date] = init_mpip()
+            dt1030 = str(cur_date) + " 10:30:00"
+            dt1045 = str(cur_date) + " 10:45:00"
+            p1030 = df_1030.loc[dt1030]['val']
+            p1045 = df_1045.loc[dt1045]['val']
+            mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045)
             ls[cur_date] = init_ls()
-            df_1030_idx = str(cur_date) + " 10:30:00"
-            df_1045_idx = str(cur_date) + " 10:45:00"
-            p1030 = df_1030.loc[df_1030_idx]['val']
-            p1045 = df_1045.loc[df_1045_idx]['val']
-            mpip[cur_date][c_1030_pr] = p1030
-            mpip[cur_date][c_1045_pr] = p1045
 
         cur_pr = row['val']
 
@@ -186,7 +184,7 @@ def df_to_xls(df, fname):
     with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
         df.to_excel(writer, sheet_name="max_pip_mvmts")
         sheet = writer.sheets['max_pip_mvmts']
-        sheet.set_column(0, len(df.columns), 17)
+        sheet.set_column(0, len(df.columns), 18)
 
 
 def pip_mvmt_to_excel(df_pip, mvmts):
