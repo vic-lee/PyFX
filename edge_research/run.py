@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import matplotlib.pyplot as plt
 import xlsxwriter
@@ -37,6 +37,8 @@ CP = 'GBP-USD'
 
 
 pipmvmt = lambda final, initial: (final - initial) * 10000
+
+daydelta = lambda d, delta: d - timedelta(days=delta)
 
 is_same_date = lambda d1, d2: (d1.year == d2.year) \
     and (d1.month == d2.month) and (d1.day == d2.day)
@@ -91,7 +93,11 @@ def csv_in(fpath):
 def fix_csv_in(fpath): 
     df = pd.read_csv(fpath)
     df['datetime'] = pd.to_datetime(df['datetime'])
+    # for i, row in df.iterrows():
+        # df.loc[i, 'datetime'] = row['datetime'].replace(hour=0, minute=0, second=0, microsecond=0)
     df = df.set_index('datetime')
+    print(df)
+    # df.to_csv('datasrc/fix1819.csv')
     return df
 
 
@@ -99,6 +105,7 @@ def proc_df():
     cur_date = None
     p1030 = None
     p1045 = None
+    pdfx = None
     mpip = {}  
     ls = {}  
     
@@ -108,42 +115,41 @@ def proc_df():
             cur_date = date_minute.date()
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
+            dtpdfx = str(daydelta(cur_date, 1))
             p1030 = df_1030.loc[dt1030]['val']
             p1045 = df_1045.loc[dt1045]['val']
+            # pdfx = fixdf[]
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045)
             ls[cur_date] = init_ls()
 
         cur_pr = row['val']
 
-        cur_pip_1030 = pipmvmt(cur_pr, p1030)
-        cur_pip_1045 = pipmvmt(cur_pr, p1045)
+        pip1030 = pipmvmt(cur_pr, p1030)
+        pip1045 = pipmvmt(cur_pr, p1045)
+        # pippdfx = pipmvmt(cur_pr, )
 
-        handle_mpip(cur_pip_1030, mpip, cur_date, date_minute, cur_pr, cur_pip_1045)
+        if pip1030 > mpip[cur_date][c_mpip_up_1030]:
+            mpip[cur_date][c_mpip_up_1030] = pip1030
+            mpip[cur_date][c_mpip_up_1030_dt] = date_minute
+            mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
+        if pip1045 > mpip[cur_date][c_mpip_up_1045]:
+            mpip[cur_date][c_mpip_up_1045] = pip1045
+            mpip[cur_date][c_mpip_up_1045_dt] = date_minute
+            mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
+
+        if pip1030 < mpip[cur_date][c_mpip_dn_1030]:
+            mpip[cur_date][c_mpip_dn_1030] = pip1030
+            mpip[cur_date][c_mpip_dn_1030_dt] = date_minute
+            mpip[cur_date][c_mpip_dn_1030_pr] = cur_pr
+        if pip1045 < mpip[cur_date][c_mpip_dn_1045]:
+            mpip[cur_date][c_mpip_dn_1045] = pip1045
+            mpip[cur_date][c_mpip_dn_1045_dt] = date_minute
+            mpip[cur_date][c_mpip_dn_1045_pr] = cur_pr
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
             handle_ls(p1030, ls, cur_date, p1045, row)
 
     return mpip, ls
-
-
-def handle_mpip(cur_pip_1030, mpip, cur_date, date_minute, cur_pr, cur_pip_1045):
-    if cur_pip_1030 > mpip[cur_date][c_mpip_up_1030]:
-        mpip[cur_date][c_mpip_up_1030] = cur_pip_1030
-        mpip[cur_date][c_mpip_up_1030_dt] = date_minute
-        mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
-    if cur_pip_1045 > mpip[cur_date][c_mpip_up_1045]:
-        mpip[cur_date][c_mpip_up_1045] = cur_pip_1045
-        mpip[cur_date][c_mpip_up_1045_dt] = date_minute
-        mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
-
-    if cur_pip_1030 < mpip[cur_date][c_mpip_dn_1030]:
-        mpip[cur_date][c_mpip_dn_1030] = cur_pip_1030
-        mpip[cur_date][c_mpip_dn_1030_dt] = date_minute
-        mpip[cur_date][c_mpip_dn_1030_pr] = cur_pr
-    if cur_pip_1045 < mpip[cur_date][c_mpip_dn_1045]:
-        mpip[cur_date][c_mpip_dn_1045] = cur_pip_1045
-        mpip[cur_date][c_mpip_dn_1045_dt] = date_minute
-        mpip[cur_date][c_mpip_dn_1045_pr] = cur_pr
 
 
 def handle_ls(p1030, ls, cur_date, p1045, row):
@@ -215,9 +221,9 @@ def pip_mvmt_to_excel(df_pip, fname, mvmts):
 
 
 def main():
-    global mdf, df_1030, df_1045, df_1102
+    global mdf, df_1030, df_1045, df_1102, fixdf
 
-    fixdf = fix_csv_in("datasrc/bloomberg_fix_1819.csv")
+    fixdf = fix_csv_in("datasrc/fix1819.csv")
     datadf = csv_in("datasrc/GBPUSD_2018.csv")
     mdf = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')
