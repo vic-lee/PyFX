@@ -37,7 +37,7 @@ c_1102_pr = '1102_CLOSE'
 CP = 'GBP-USD'
 
 
-pipmvmt = lambda final, initial: (final - initial) * 10000
+pipmvmt = lambda final, initial: round((final - initial) * 10000, 1)
 
 daydelta = lambda d, delta: d - timedelta(days=delta)
 
@@ -133,7 +133,6 @@ def proc_df():
             p1030 = df_1030.loc[dt1030]['val']
             p1045 = df_1045.loc[dt1045]['val']
             pdfx, dtpdfx = get_prior_fix(dtpdfx_dt)
-            print("date: {}, price: {}".format(dtpdfx, pdfx))
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045)
             ls[cur_date] = init_ls()
 
@@ -141,7 +140,9 @@ def proc_df():
 
         pip1030 = pipmvmt(cur_pr, p1030)
         pip1045 = pipmvmt(cur_pr, p1045)
-        # pippdfx = pipmvmt(cur_pr, )
+        if pdfx is not None: 
+            pippdfx = pipmvmt(cur_pr, pdfx)
+            print(pippdfx)
 
         if pip1030 > mpip[cur_date][c_mpip_up_1030]:
             mpip[cur_date][c_mpip_up_1030] = pip1030
