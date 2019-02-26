@@ -196,8 +196,8 @@ def df_to_xls(df, fname):
         sheet.set_column(0, len(df.columns), wide_col)
 
 
-def pip_mvmt_to_excel(df_pip, mvmts):
-    with pd.ExcelWriter('2018_daily_pip_mvmts.xlsx', engine='xlsxwriter') as writer: 
+def pip_mvmt_to_excel(df_pip, fname, mvmts):
+    with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
         df_pip.to_excel(writer, sheet_name='all_daily_pip_mvmts')
         for pip_mvmt in mvmts: 
             df = days_against_pip_mvmt(df_pip, pip_mvmt)
@@ -217,7 +217,7 @@ def main():
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
     df_ls = ls_to_df(ls)
-    df_to_xls(df_mpip, '18mpip.xlsx')
+    df_to_xls(df_mpip, 'dataout/18mpip.xlsx')
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
@@ -231,7 +231,7 @@ def main():
     print("less than 5 pips: {} days".format(len(pip_neg5)))
     print("less than 6 pips: {} days".format(len(pip_neg6)))
 
-    pip_mvmt_to_excel(df_daily_pip, [-3, -4, -5, -6])
+    pip_mvmt_to_excel(df_daily_pip, 'dataout/18dpip.xlsx', [-3, -4, -5, -6])
 
 
 if __name__ == '__main__':
