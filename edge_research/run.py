@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import xlsxwriter
 
@@ -93,12 +94,24 @@ def csv_in(fpath):
 def fix_csv_in(fpath): 
     df = pd.read_csv(fpath)
     df['datetime'] = pd.to_datetime(df['datetime'])
-    # for i, row in df.iterrows():
-        # df.loc[i, 'datetime'] = row['datetime'].replace(hour=0, minute=0, second=0, microsecond=0)
     df = df.set_index('datetime')
     print(df)
-    # df.to_csv('datasrc/fix1819.csv')
     return df
+
+
+def get_prior_fix(d):
+    fx = None
+    try: 
+        fx = fixdf.loc[str(d)][CP]
+    except Exception as e: 
+        print("Could not locate the previous location, possibly due to out of bounds.")
+        print(e)
+        return fx, None
+    if not np.isnan(fx):
+        return fx, d
+    else: 
+        return get_prior_fix(daydelta(d, 1))
+
 
 
 def proc_df():
@@ -115,10 +128,12 @@ def proc_df():
             cur_date = date_minute.date()
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
-            dtpdfx = str(daydelta(cur_date, 1))
+            dtpdfx_dt = daydelta(cur_date, 1)
+            dtpdfx = str(dtpdfx_dt)
             p1030 = df_1030.loc[dt1030]['val']
             p1045 = df_1045.loc[dt1045]['val']
-            # pdfx = fixdf[]
+            pdfx, dtpdfx = get_prior_fix(dtpdfx_dt)
+            print("date: {}, price: {}".format(dtpdfx, pdfx))
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045)
             ls[cur_date] = init_ls()
 
