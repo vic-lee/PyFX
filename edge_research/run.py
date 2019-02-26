@@ -34,6 +34,7 @@ c_1030_pr = '1030_PRICE'
 c_1045_pr = '1045_PRICE'
 c_1102_pr = '1102_CLOSE'
 c_fx_pr = 'CURRENT_DAY_FIX_PRICE'
+c_pdfx_pr = 'PRIOR_DAY_FIX_PRICE'
 
 CP = 'GBP-USD'
 
@@ -48,7 +49,7 @@ is_same_date = lambda d1, d2: (d1.year == d2.year) \
 days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
 
-init_mpip = lambda p1030, p1045, dt1030, dt1045, pdfx: { 
+init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx: { 
         c_1030_pr: p1030, 
         c_1045_pr: p1045, 
 
@@ -66,7 +67,8 @@ init_mpip = lambda p1030, p1045, dt1030, dt1045, pdfx: {
         c_mpip_dn_1030_pr: p1030,
         c_mpip_dn_1045_pr: p1045,
 
-        c_fx_pr: pdfx, 
+        c_fx_pr: fx,
+        c_pdfx_pr: pdfx, 
         c_mpip_up_pdfx: 0, 
         c_mpip_up_pdfx_dt: None, 
         c_mpip_up_pdfx_pr: None, 
@@ -127,15 +129,19 @@ def get_prior_fix(d):
     fx = None
     try: 
         fx = fixdf.loc[str(daydelta(d, 1))][CP]
+        return fx
     except Exception as e: 
         print("Could not locate the previous location, possibly due to out of bounds.")
         print(e)
         return fx
+
+
+# get_fix_pr = lambda d: fixdf.loc[d][CP]
+def get_fix_pr(d):
+    fx = fixdf.loc[d][CP]
+    if np.isnan(fx):
+        return None
     return fx
-
-
-get_fix_pr = lambda d: fixdf.loc[d][CP]
-
 
 
 def proc_df():
@@ -154,21 +160,22 @@ def proc_df():
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
             dtpdfx_dt = daydelta(cur_date, 1)
-            dtpdfx = str(dtpdfx_dt)
+            # dtpdfx = str(dtpdfx_dt)
             p1030 = df_1030.loc[dt1030]['val']
             p1045 = df_1045.loc[dt1045]['val']
-            # pdfx, dtpdfx = get_prior_fix_recursive(dtpdfx_dt)
-            pdfx = get_prior_fix(dtpdfx_dt)
-            fx = get_fix_pr(dtpdfx)
-            print(fx)
-            mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx)
+            pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
+            fx = get_fix_pr(str(cur_date))
+            print("fix for date {} is {}".format(str(cur_date), fx))
+            mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx)
             ls[cur_date] = init_ls()
 
         cur_pr = row['val']
 
         pip1030 = pipmvmt(cur_pr, p1030)
         pip1045 = pipmvmt(cur_pr, p1045)
-        if pdfx is not None: 
+
+        pippdfx = None
+        if not pdfx == None and not np.isnan(pdfx): 
             pippdfx = pipmvmt(cur_pr, pdfx)
 
         td = mpip[cur_date]
@@ -191,7 +198,7 @@ def proc_df():
             td[c_mpip_dn_1045_dt] = date_minute
             td[c_mpip_dn_1045_pr] = cur_pr
         
-        if pdfx is not None: 
+        if pippdfx is not None: 
             if pippdfx > td[c_mpip_up_pdfx]:
                 td[c_mpip_up_pdfx] = pippdfx
                 td[c_mpip_up_pdfx_dt] = date_minute
@@ -242,7 +249,7 @@ def mpip_to_df(mpip):
         c_1045_pr,
         c_mpip_up_1045, c_mpip_up_1045_pr, c_mpip_up_1045_dt, 
         c_mpip_dn_1045, c_mpip_dn_1045_pr, c_mpip_dn_1045_dt, 
-        c_fx_pr,
+        c_fx_pr, c_pdfx_pr,
         c_mpip_up_pdfx, c_mpip_up_pdfx_pr, c_mpip_up_pdfx_dt,
         c_mpip_dn_pdfx, c_mpip_dn_pdfx_pr, c_mpip_dn_pdfx_dt,
     ]]
