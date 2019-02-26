@@ -64,6 +64,15 @@ init_mpip = lambda p1030, p1045, dt1030, dt1045: {
         c_mpip_dn_1045_dt: dt1045,
         c_mpip_dn_1030_pr: p1030,
         c_mpip_dn_1045_pr: p1045,
+
+        c_mpip_up_pdfx: 0, 
+        c_mpip_up_pdfx_dt: None, 
+        c_mpip_up_pdfx_pr: None, 
+
+        c_mpip_dn_pdfx: 0, 
+        c_mpip_dn_pdfx_dt: None, 
+        c_mpip_dn_pdfx_pr: None,
+
     }
 
 init_ls = lambda: {
@@ -95,7 +104,6 @@ def fix_csv_in(fpath):
     df = pd.read_csv(fpath)
     df['datetime'] = pd.to_datetime(df['datetime'])
     df = df.set_index('datetime')
-    print(df)
     return df
 
 
@@ -142,7 +150,6 @@ def proc_df():
         pip1045 = pipmvmt(cur_pr, p1045)
         if pdfx is not None: 
             pippdfx = pipmvmt(cur_pr, pdfx)
-            print(pippdfx)
 
         if pip1030 > mpip[cur_date][c_mpip_up_1030]:
             mpip[cur_date][c_mpip_up_1030] = pip1030
@@ -161,6 +168,9 @@ def proc_df():
             mpip[cur_date][c_mpip_dn_1045] = pip1045
             mpip[cur_date][c_mpip_dn_1045_dt] = date_minute
             mpip[cur_date][c_mpip_dn_1045_pr] = cur_pr
+        
+        if pdfx is not None: 
+            pass
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
             handle_ls(p1030, ls, cur_date, p1045, row)
@@ -203,6 +213,8 @@ def mpip_to_df(mpip):
         c_1045_pr,
         c_mpip_up_1045, c_mpip_up_1045_pr, c_mpip_up_1045_dt, 
         c_mpip_dn_1045, c_mpip_dn_1045_pr, c_mpip_dn_1045_dt, 
+        c_mpip_up_pdfx, c_mpip_up_pdfx_dt, c_mpip_up_pdfx_pr, 
+        c_mpip_dn_pdfx, c_mpip_dn_pdfx_dt, c_mpip_dn_pdfx_pr,
     ]]
     return df_mpip
 
