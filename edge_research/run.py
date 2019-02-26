@@ -35,6 +35,9 @@ days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
 
 init_mpip = lambda: { 
+        c_1030_pr: 0, 
+        c_1030_pr: 0, 
+
         c_mpip_up_1030: 0,
         c_mpip_up_1045: 0,
         c_mpip_up_1030_dt: 0,
@@ -99,19 +102,32 @@ def proc_df():
         cur_pip_1030 = pipmvmt(cur_pr, p1030)
         cur_pip_1045 = pipmvmt(cur_pr, p1045)
 
-        if cur_pip_1030 > mpip[cur_date][c_mpip_up_1030]:
-            mpip[cur_date][c_mpip_up_1030] = cur_pip_1030
-            mpip[cur_date][c_mpip_up_1030_dt] = date_minute
-            mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
-        if cur_pip_1045 > mpip[cur_date][c_mpip_up_1045]:
-            mpip[cur_date][c_mpip_up_1045] = cur_pip_1045
-            mpip[cur_date][c_mpip_up_1045_dt] = date_minute
-            mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
+        handle_mpip(cur_pip_1030, mpip, cur_date, date_minute, cur_pr, cur_pip_1045)
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
             handle_ls(p1030, ls, cur_date, p1045, row)
 
     return mpip, ls
+
+
+def handle_mpip(cur_pip_1030, mpip, cur_date, date_minute, cur_pr, cur_pip_1045):
+    if cur_pip_1030 > mpip[cur_date][c_mpip_up_1030]:
+        mpip[cur_date][c_mpip_up_1030] = cur_pip_1030
+        mpip[cur_date][c_mpip_up_1030_dt] = date_minute
+        mpip[cur_date][c_mpip_up_1030_pr] = cur_pr
+    if cur_pip_1045 > mpip[cur_date][c_mpip_up_1045]:
+        mpip[cur_date][c_mpip_up_1045] = cur_pip_1045
+        mpip[cur_date][c_mpip_up_1045_dt] = date_minute
+        mpip[cur_date][c_mpip_up_1045_pr] = cur_pr
+
+    if cur_pip_1030 < mpip[cur_date][c_mpip_dn_1030]:
+        mpip[cur_date][c_mpip_dn_1030] = cur_pip_1030
+        mpip[cur_date][c_mpip_dn_1030_dt] = date_minute
+        mpip[cur_date][c_mpip_dn_1030_pr] = cur_pr
+    if cur_pip_1045 < mpip[cur_date][c_mpip_dn_1045]:
+        mpip[cur_date][c_mpip_dn_1045] = cur_pip_1045
+        mpip[cur_date][c_mpip_dn_1045_dt] = date_minute
+        mpip[cur_date][c_mpip_dn_1045_pr] = cur_pr
 
 
 def handle_ls(p1030, ls, cur_date, p1045, row):
@@ -166,6 +182,13 @@ def daily_pip_mvmt():
     return pipmvmts
 
 
+def df_to_xls(df, fname):
+    with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
+        df.to_excel(writer, sheet_name="max_pip_mvmts")
+        sheet = writer.sheets['max_pip_mvmts']
+        sheet.set_column(0, len(df.columns), 17)
+
+
 def pip_mvmt_to_excel(df_pip, mvmts):
     with pd.ExcelWriter('2018_daily_pip_mvmts.xlsx', engine='xlsxwriter') as writer: 
         df_pip.to_excel(writer, sheet_name='all_daily_pip_mvmts')
@@ -187,8 +210,7 @@ def main():
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
     df_ls = ls_to_df(ls)
-    print(df_mpip.head())
-    # print(df_ls)
+    df_to_xls(df_mpip, '18mpip.xlsx')
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
