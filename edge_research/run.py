@@ -206,7 +206,7 @@ def pip_mvmt_to_excel(df_pip, mvmts):
 
 def main():
     global mdf, df_1030, df_1045, df_1102
-    df = csv_in("GBPUSD_2018.csv")
+    df = csv_in("datasrc/GBPUSD_2018.csv")
     mdf = df.between_time('10:30', '11:02')
     df_1030 = df.between_time('10:30', '10:30')
     df_1045 = df.between_time('10:45', '10:45')
