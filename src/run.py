@@ -172,16 +172,17 @@ def proc_df():
     p1045 = None
     pdfx = None
     fx = None
-    o = None
-    h = None
-    l = None
-    c = None
+    
     mpip = {}  
     ls = {}  
     
     for date_minute, row in mdf.iterrows():
 
         if date_minute.date() != cur_date:
+            o = None
+            h = None
+            l = None
+            c = None
             cur_date = date_minute.date()
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
