@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import xlsxwriter
 
+c_open = 'OPEN'
+c_high = 'HIGH'
+c_low = 'LOW'
+c_close = 'CLOSE'
 
 c_mpip_up_1030 = 'MAX_PIP_UP__1030'
 c_mpip_up_1045 = 'MAX_PIP_UP__1045'
@@ -106,6 +110,21 @@ def csv_in(fpath):
 def fix_csv_in(fpath): 
     df = pd.read_csv(fpath)
     df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.set_index('datetime')
+    return df
+
+
+def daily_csv_in(fpath):
+    df = pd.read_csv(fpath)
+    df.drop(df.tail(1).index,inplace=True)
+    # df['newdatetime'] = ""
+    for index, row in df.iterrows():
+        s = str(row["Date Time"])
+        newstr = s[-10:] + " " + s[6:19]
+        df.at[index, "Date Time"] = newstr
+        print(df.loc[index]["Date Time"])
+    df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d %H:%M:%S.%f')
+    df = df.drop(columns=['Date Time'])
     df = df.set_index('datetime')
     return df
 
@@ -271,6 +290,7 @@ def df_to_xls(df, fname):
         sheet = writer.sheets['max_pip_mvmts']
         wide_col = 20
         sheet.set_column(0, len(df.columns), wide_col)
+        workbook = writer.book
 
 
 def pipmvmt_to_xls(df_pip, fname, mvmts):
@@ -282,8 +302,9 @@ def pipmvmt_to_xls(df_pip, fname, mvmts):
 
 
 def main():
-    global mdf, df_1030, df_1045, df_1102, fixdf
+    global mdf, df_1030, df_1045, df_1102, fixdf, dailydf
 
+    dailydf = daily_csv_in("datasrc/GBPUSD_daily.csv")
     fixdf = fix_csv_in("datasrc/fix1819.csv")
     datadf = csv_in("datasrc/GBPUSD_2018.csv")
     mdf = datadf.between_time('10:30', '11:02')
