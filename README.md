@@ -6,6 +6,12 @@ This repository contains ipynb notebooks that research into edges in FX trading.
 
 ```
 {
+  "Daily:" {
+    "Open",
+    "High",
+    "Low",
+    "Close",
+  },
   "Benchmark: 1030": {
     "1030 price",
     "max pip up",
