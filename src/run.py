@@ -55,15 +55,15 @@ init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx: {
 
         c_mpip_up_1030: 0,
         c_mpip_up_1045: 0,
-        c_mpip_up_1030_dt: dt1030,
-        c_mpip_up_1045_dt: dt1045,
+        c_mpip_up_1030_dt: str(dt1030)[-8:],
+        c_mpip_up_1045_dt: str(dt1045)[-8:],
         c_mpip_up_1030_pr: p1030,
         c_mpip_up_1045_pr: p1045,
 
         c_mpip_dn_1030: 0,
         c_mpip_dn_1045: 0,
-        c_mpip_dn_1030_dt: dt1030,
-        c_mpip_dn_1045_dt: dt1045,
+        c_mpip_dn_1030_dt: str(dt1030)[-8:],
+        c_mpip_dn_1045_dt: str(dt1045)[-8:],
         c_mpip_dn_1030_pr: p1030,
         c_mpip_dn_1045_pr: p1045,
 
@@ -76,7 +76,6 @@ init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx: {
         c_mpip_dn_pdfx: 0, 
         c_mpip_dn_pdfx_dt: None, 
         c_mpip_dn_pdfx_pr: None,
-
     }
 
 init_ls = lambda: {
@@ -159,12 +158,10 @@ def proc_df():
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
             dtpdfx_dt = daydelta(cur_date, 1)
-            # dtpdfx = str(dtpdfx_dt)
             p1030 = df_1030.loc[dt1030]['val']
             p1045 = df_1045.loc[dt1045]['val']
             pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
             fx = get_fix_pr(str(cur_date))
-            # print("fix for date {} is {}".format(str(cur_date), fx))
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx)
             ls[cur_date] = init_ls()
 
@@ -181,30 +178,30 @@ def proc_df():
 
         if pip1030 > td[c_mpip_up_1030]:
             td[c_mpip_up_1030] = pip1030
-            td[c_mpip_up_1030_dt] = date_minute
+            td[c_mpip_up_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_up_1030_pr] = cur_pr
         if pip1045 > td[c_mpip_up_1045]:
             td[c_mpip_up_1045] = pip1045
-            td[c_mpip_up_1045_dt] = date_minute
+            td[c_mpip_up_1045_dt] = str(date_minute)[-8:]
             td[c_mpip_up_1045_pr] = cur_pr
 
         if pip1030 < td[c_mpip_dn_1030]:
             td[c_mpip_dn_1030] = pip1030
-            td[c_mpip_dn_1030_dt] = date_minute
+            td[c_mpip_dn_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_dn_1030_pr] = cur_pr
         if pip1045 < td[c_mpip_dn_1045]:
             td[c_mpip_dn_1045] = pip1045
-            td[c_mpip_dn_1045_dt] = date_minute
+            td[c_mpip_dn_1045_dt] = str(date_minute)[-8:]
             td[c_mpip_dn_1045_pr] = cur_pr
         
         if pippdfx is not None: 
             if pippdfx > td[c_mpip_up_pdfx]:
                 td[c_mpip_up_pdfx] = pippdfx
-                td[c_mpip_up_pdfx_dt] = date_minute
+                td[c_mpip_up_pdfx_dt] = str(date_minute)[-8:]
                 td[c_mpip_up_pdfx_pr] = cur_pr
             if pippdfx < td[c_mpip_dn_pdfx]:
                 td[c_mpip_dn_pdfx] = pippdfx
-                td[c_mpip_dn_pdfx_dt] = date_minute
+                td[c_mpip_dn_pdfx_dt] = str(date_minute)[-8:]
                 td[c_mpip_dn_pdfx_pr] = cur_pr
 
         if str(date_minute) == str(cur_date) + " 11:02:00":
@@ -276,7 +273,7 @@ def df_to_xls(df, fname):
         sheet.set_column(0, len(df.columns), wide_col)
 
 
-def pip_mvmt_to_excel(df_pip, fname, mvmts):
+def pipmvmt_to_xls(df_pip, fname, mvmts):
     with pd.ExcelWriter(fname, engine='xlsxwriter') as writer: 
         df_pip.to_excel(writer, sheet_name='all_daily_pip_mvmts')
         for pip_mvmt in mvmts: 
@@ -298,7 +295,7 @@ def main():
 
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
-    df_ls = ls_to_df(ls)
+    # df_ls = ls_to_df(ls)
     df_to_xls(df_mpip, 'dataout/18mpip.xlsx')
 
     daily_pip = daily_pip_mvmt()
@@ -313,7 +310,7 @@ def main():
     print("less than 5 pips: {} days".format(len(pip_neg5)))
     print("less than 6 pips: {} days".format(len(pip_neg6)))
 
-    pip_mvmt_to_excel(df_daily_pip, 'dataout/18dpip.xlsx', [-3, -4, -5, -6])
+    pipmvmt_to_xls(df_daily_pip, 'dataout/18dpip.xlsx', [-3, -4, -5, -6])
 
 
 if __name__ == '__main__':
