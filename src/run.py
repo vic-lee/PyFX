@@ -53,7 +53,13 @@ is_same_date = lambda d1, d2: (d1.year == d2.year) \
 days_against_pip_mvmt = lambda df, pipmvmt: df.query(\
     '{} < pip & pip < 0'.format(pipmvmt))
 
-init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx: { 
+init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx, o, h, l, c: { 
+
+        c_open: o, 
+        c_high: h, 
+        c_low: l, 
+        c_close: c,
+
         c_1030_pr: p1030, 
         c_1045_pr: p1045, 
 
@@ -117,13 +123,12 @@ def fix_csv_in(fpath):
 def daily_csv_in(fpath):
     df = pd.read_csv(fpath)
     df.drop(df.tail(1).index,inplace=True)
-    # df['newdatetime'] = ""
     for index, row in df.iterrows():
         s = str(row["Date Time"])
-        newstr = s[-10:] + " " + s[6:19]
+        newstr = s[-10:].strip()
         df.at[index, "Date Time"] = newstr
-        print(df.loc[index]["Date Time"])
-    df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d %H:%M:%S.%f')
+    df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d')
+    # df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d %H:%M:%S.%f')
     df = df.drop(columns=['Date Time'])
     df = df.set_index('datetime')
     return df
@@ -167,6 +172,10 @@ def proc_df():
     p1045 = None
     pdfx = None
     fx = None
+    o = None
+    h = None
+    l = None
+    c = None
     mpip = {}  
     ls = {}  
     
@@ -181,7 +190,12 @@ def proc_df():
             p1045 = df_1045.loc[dt1045]['val']
             pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
             fx = get_fix_pr(str(cur_date))
-            mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx)
+            if str(cur_date) in dailydf.index:
+                o = dailydf.loc[str(cur_date)]['Open']
+                h = dailydf.loc[str(cur_date)]['High']
+                l = dailydf.loc[str(cur_date)]['Low']
+                c = dailydf.loc[str(cur_date)]['Close']
+            mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx, o, h, l, c)
             ls[cur_date] = init_ls()
 
         cur_pr = row['val']
@@ -258,6 +272,7 @@ def ls_to_df(ls):
 def mpip_to_df(mpip):
     df_mpip = pd.DataFrame.from_dict(mpip, orient='index')
     df_mpip = df_mpip[[
+        c_open, c_high, c_low, c_close,
         c_1030_pr, 
         c_mpip_up_1030, c_mpip_up_1030_pr, c_mpip_up_1030_dt, 
         c_mpip_dn_1030, c_mpip_dn_1030_pr, c_mpip_dn_1030_dt, 
@@ -311,8 +326,6 @@ def main():
     df_1030 = datadf.between_time('10:30', '10:30')
     df_1045 = datadf.between_time('10:45', '10:45')
     df_1102 = datadf.between_time('11:02', '11:02')
-
-    # print(mdf)
 
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
