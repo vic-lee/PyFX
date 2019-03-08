@@ -214,19 +214,21 @@ def proc_df():
             td[c_mpip_up_1030] = pip1030
             td[c_mpip_up_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_up_1030_pr] = cur_pr
-        if pip1045 > td[c_mpip_up_1045]:
-            td[c_mpip_up_1045] = pip1045
-            td[c_mpip_up_1045_dt] = str(date_minute)[-8:]
-            td[c_mpip_up_1045_pr] = cur_pr
+        if (date_minute.minute >= 45):
+            if pip1045 > td[c_mpip_up_1045]:
+                td[c_mpip_up_1045] = pip1045
+                td[c_mpip_up_1045_dt] = str(date_minute)[-8:]
+                td[c_mpip_up_1045_pr] = cur_pr
 
         if pip1030 < td[c_mpip_dn_1030]:
             td[c_mpip_dn_1030] = pip1030
             td[c_mpip_dn_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_dn_1030_pr] = cur_pr
-        if pip1045 < td[c_mpip_dn_1045]:
-            td[c_mpip_dn_1045] = pip1045
-            td[c_mpip_dn_1045_dt] = str(date_minute)[-8:]
-            td[c_mpip_dn_1045_pr] = cur_pr
+        if (date_minute.minute >= 45):        
+            if pip1045 < td[c_mpip_dn_1045]:
+                td[c_mpip_dn_1045] = pip1045
+                td[c_mpip_dn_1045_dt] = str(date_minute)[-8:]
+                td[c_mpip_dn_1045_pr] = cur_pr
         
         if pippdfx is not None: 
             if pippdfx > td[c_mpip_up_pdfx]:
