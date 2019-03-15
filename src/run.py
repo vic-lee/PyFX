@@ -137,7 +137,31 @@ def daily_csv_in(fpath):
 def daily_xls_in(fpath):
     df = pd.read_excel(fpath)
     df.rename(columns = {'Date': 'datetime'}, inplace=True)
+    df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d')
+    df = daily_xls_filter_ohlc(df)
+    df = df.set_index('datetime')
     print(df)
+    return df
+
+
+def daily_xls_filter_ohlc(df):
+    """This function returns only bid prices and removes ask prices. 
+    We do this in compliance with the requirements. Should requirements change, 
+    one may update this function to choose new columns to include / not include 
+    in the dataframe. 
+    print df.columns to see original column names. 
+    """
+    df = df.drop(columns=[
+        'GBP/USD(Open, Ask)', 'GBP/USD(High, Ask)', 
+        'GBP/USD(Low, Ask)', 'GBP/USD(Close, Ask)'
+    ])
+    df = df.rename(columns={
+        'GBP/USD(Open, Bid)*': 'Open',
+        'GBP/USD(High, Bid)*': 'High',
+        'GBP/USD(Low, Bid)*': 'Low',
+        'GBP/USD(Close, Bid)*': 'Close',
+        'Tick Volume(GBP/USD)': 'Volume',
+    })
     return df
 
 
