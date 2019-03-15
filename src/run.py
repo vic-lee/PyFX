@@ -86,6 +86,7 @@ init_mpip = lambda p1030, p1045, dt1030, dt1045, fx, pdfx, o, h, l, c: {
         c_mpip_dn_pdfx: 0, 
         c_mpip_dn_pdfx_dt: None, 
         c_mpip_dn_pdfx_pr: None,
+
     }
 
 init_ls = lambda: {
@@ -128,9 +129,15 @@ def daily_csv_in(fpath):
         newstr = s[-10:].strip()
         df.at[index, "Date Time"] = newstr
     df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d')
-    # df['datetime'] = pd.to_datetime(df['Date Time'], format='%Y-%m-%d %H:%M:%S.%f')
     df = df.drop(columns=['Date Time'])
     df = df.set_index('datetime')
+    return df
+
+
+def daily_xls_in(fpath):
+    df = pd.read_excel(fpath)
+    df.rename(columns = {'Date': 'datetime'}, inplace=True)
+    print(df)
     return df
 
 
@@ -322,7 +329,8 @@ def pipmvmt_to_xls(df_pip, fname, mvmts):
 def main():
     global mdf, df_1030, df_1045, df_1102, fixdf, dailydf
 
-    dailydf = daily_csv_in("datasrc/GBPUSD_daily.csv")
+    # dailydf = daily_csv_in("datasrc/GBPUSD_daily.csv")
+    dailydf = daily_xls_in("datasrc/gbp_daily.xlsx")
     fixdf = fix_csv_in("datasrc/fix1819.csv")
     datadf = csv_in("datasrc/GBPUSD_2018.csv")
     mdf = datadf.between_time('10:30', '11:02')
