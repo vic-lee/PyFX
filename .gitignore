@@ -3,3 +3,4 @@
 /env
 .vscode/
 *.numbers
+__pycache__/

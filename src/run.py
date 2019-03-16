@@ -4,44 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import xlsxwriter
-
-c_open = 'OPEN'
-c_high = 'HIGH'
-c_low = 'LOW'
-c_close = 'CLOSE'
-
-c_mpip_up_1030 = 'MAX_PIP_UP__1030'
-c_mpip_up_1045 = 'MAX_PIP_UP__1045'
-c_mpip_up_1030_dt = "MAX_PIP_UP__1030_DATETIME"
-c_mpip_up_1045_dt = "MAX_PIP_UP__1045_DATETIME"
-c_mpip_up_1030_pr = "MAX_PIP_UP__1030_PRICE"
-c_mpip_up_1045_pr = "MAX_PIP_UP__1045_PRICE"
-
-c_mpip_dn_1030 = 'MAX_PIP_DOWN__1030'
-c_mpip_dn_1045 = 'MAX_PIP_DOWN__1045'
-c_mpip_dn_1030_dt = "MAX_PIP_DOWN__1030_DATETIME"
-c_mpip_dn_1045_dt = "MAX_PIP_DOWN__1045_DATETIME"
-c_mpip_dn_1030_pr = "MAX_PIP_DOWN__1030_PRICE"
-c_mpip_dn_1045_pr = "MAX_PIP_DOWN__1045_PRICE"
-
-c_mpip_up_pdfx = 'MAX_PIP_UP__PDFX'
-c_mpip_up_pdfx_dt = "MAX_PIP_UP__PDFX_DATETIME"
-c_mpip_up_pdfx_pr = "MAX_PIP_UP__PDFX_PRICE"
-
-c_mpip_dn_pdfx = 'MAX_PIP_DOWN__PDFX'
-c_mpip_dn_pdfx_dt = "MAX_PIP_DOWN__PDFX_DATETIME"
-c_mpip_dn_pdfx_pr = "MAX_PIP_DOWN__PDFX_PRICE"
-
-c_ls_1030 = '1030_LS'
-c_ls_1045 = '1045_LS'
-c_1030_pr = '1030_PRICE'
-c_1045_pr = '1045_PRICE'
-c_1102_pr = '1102_CLOSE'
-c_fx_pr = 'CURRENT_DAY_FIX_PRICE'
-c_pdfx_pr = 'PRIOR_DAY_FIX_PRICE'
-
-CP = 'GBP-USD'
-
+from keydef import *
 
 pipmvmt = lambda final, initial: round((final - initial) * 10000, 1)
 
@@ -137,7 +100,7 @@ def daily_csv_in(fpath):
 def daily_xls_in(fpath):
     df = pd.read_excel(fpath)
     df.rename(columns = {'Date': 'datetime'}, inplace=True)
-    df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d')
+    # df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d')
     df = daily_xls_filter_ohlc(df)
     df = df.set_index('datetime')
     print(df)
@@ -354,9 +317,9 @@ def main():
     global mdf, df_1030, df_1045, df_1102, fixdf, dailydf
 
     # dailydf = daily_csv_in("datasrc/GBPUSD_daily.csv")
-    dailydf = daily_xls_in("datasrc/gbp_daily.xlsx")
-    fixdf = fix_csv_in("datasrc/fix1819.csv")
-    datadf = csv_in("datasrc/GBPUSD_2018.csv")
+    dailydf = daily_xls_in("../data/datasrc/gbp_daily.xlsx")
+    fixdf = fix_csv_in("../data/datasrc/fix1819.csv")
+    datadf = csv_in("../data/datasrc/GBPUSD_2018.csv")
     mdf = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')
     df_1045 = datadf.between_time('10:45', '10:45')
@@ -365,7 +328,7 @@ def main():
     mpip, ls = proc_df()
     df_mpip = mpip_to_df(mpip)
     # df_ls = ls_to_df(ls)
-    df_to_xls(df_mpip, 'dataout/18mpip.xlsx')
+    df_to_xls(df_mpip, '../data/dataout/18mpip.xlsx')
 
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
@@ -379,7 +342,7 @@ def main():
     print("less than 5 pips: {} days".format(len(pip_neg5)))
     print("less than 6 pips: {} days".format(len(pip_neg6)))
 
-    pipmvmt_to_xls(df_daily_pip, 'dataout/18dpip.xlsx', [-3, -4, -5, -6])
+    pipmvmt_to_xls(df_daily_pip, '../data/dataout/18dpip.xlsx', [-3, -4, -5, -6])
 
 
 if __name__ == '__main__':
