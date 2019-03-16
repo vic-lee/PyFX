@@ -4,6 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import xlsxwriter
+import pickle
 from keydef import *
 
 pipmvmt = lambda final, initial: round((final - initial) * 10000, 1)
@@ -326,6 +327,9 @@ def main():
     df_1102 = datadf.between_time('11:02', '11:02')
 
     mpip, ls = proc_df()
+    # with open ("cache/data.pickle", "rb") as pin: 
+        # mpip = pickle.load(pin)
+        
     df_mpip = mpip_to_df(mpip)
     # df_ls = ls_to_df(ls)
     df_to_xls(df_mpip, '../data/dataout/18mpip.xlsx')
@@ -343,6 +347,9 @@ def main():
     print("less than 6 pips: {} days".format(len(pip_neg6)))
 
     pipmvmt_to_xls(df_daily_pip, '../data/dataout/18dpip.xlsx', [-3, -4, -5, -6])
+
+    with open("cache/data.pickle", "wb") as pout: 
+        pickle.dump(mpip, pout)
 
 
 if __name__ == '__main__':
