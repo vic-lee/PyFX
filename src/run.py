@@ -161,7 +161,7 @@ def get_fix_pr(d):
     return fx
 
 
-def proc_df():
+def process_data():
     cur_date = None
     p1030 = None
     p1045 = None
@@ -171,7 +171,7 @@ def proc_df():
     mpip = {}  
     ls = {}  
     
-    for date_minute, row in mdf.iterrows():
+    for date_minute, row in morning_df.iterrows():
 
         if date_minute.date() != cur_date:
             o = None
@@ -187,10 +187,11 @@ def proc_df():
             pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
             fx = get_fix_pr(str(cur_date))
             if str(cur_date) in dailydf.index:
-                o = dailydf.loc[str(cur_date)]['Open']
-                h = dailydf.loc[str(cur_date)]['High']
-                l = dailydf.loc[str(cur_date)]['Low']
-                c = dailydf.loc[str(cur_date)]['Close']
+                # print(type(int(dailydf.loc[str(cur_date)]['Open'])))
+                o = float(dailydf.loc[str(cur_date)]['Open'])
+                h = float(dailydf.loc[str(cur_date)]['High'])
+                l = float(dailydf.loc[str(cur_date)]['Low'])
+                c = float(dailydf.loc[str(cur_date)]['Close'])
             mpip[cur_date] = init_mpip(p1030, p1045, dt1030, dt1045, fx, pdfx, o, h, l, c)
             ls[cur_date] = init_ls()
 
@@ -315,18 +316,17 @@ def pipmvmt_to_xls(df_pip, fname, mvmts):
 
 
 def main():
-    global mdf, df_1030, df_1045, df_1102, fixdf, dailydf
+    global morning_df, df_1030, df_1045, df_1102, fixdf, dailydf
 
-    # dailydf = daily_csv_in("datasrc/GBPUSD_daily.csv")
     dailydf = daily_xls_in("../data/datasrc/gbp_daily.xlsx")
     fixdf = fix_csv_in("../data/datasrc/fix1819.csv")
     datadf = csv_in("../data/datasrc/GBPUSD_2018.csv")
-    mdf = datadf.between_time('10:30', '11:02')
+    morning_df = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')
     df_1045 = datadf.between_time('10:45', '10:45')
     df_1102 = datadf.between_time('11:02', '11:02')
 
-    mpip, ls = proc_df()
+    mpip, ls = process_data()
     # with open ("cache/data.pickle", "rb") as pin: 
         # mpip = pickle.load(pin)
         
@@ -337,14 +337,14 @@ def main():
     daily_pip = daily_pip_mvmt()
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
 
-    pip_neg3 = days_against_pip_mvmt(df_daily_pip, -3)
-    pip_neg4 = days_against_pip_mvmt(df_daily_pip, -4)
-    pip_neg5 = days_against_pip_mvmt(df_daily_pip, -5)
-    pip_neg6 = days_against_pip_mvmt(df_daily_pip, -6)
-    print("less than 3 pips: {} days".format(len(pip_neg3)))
-    print("less than 4 pips: {} days".format(len(pip_neg4)))
-    print("less than 5 pips: {} days".format(len(pip_neg5)))
-    print("less than 6 pips: {} days".format(len(pip_neg6)))
+    # pip_neg3 = days_against_pip_mvmt(df_daily_pip, -3)
+    # pip_neg4 = days_against_pip_mvmt(df_daily_pip, -4)
+    # pip_neg5 = days_against_pip_mvmt(df_daily_pip, -5)
+    # pip_neg6 = days_against_pip_mvmt(df_daily_pip, -6)
+    # print("less than 3 pips: {} days".format(len(pip_neg3)))
+    # print("less than 4 pips: {} days".format(len(pip_neg4)))
+    # print("less than 5 pips: {} days".format(len(pip_neg5)))
+    # print("less than 6 pips: {} days".format(len(pip_neg6)))
 
     pipmvmt_to_xls(df_daily_pip, '../data/dataout/18dpip.xlsx', [-3, -4, -5, -6])
 
