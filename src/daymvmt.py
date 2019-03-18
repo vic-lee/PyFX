@@ -28,18 +28,18 @@ class DayPipMovmentToPrice:
 
     
     def update_max_pip(self, current_price):
-        self.update_max_pip_up(current_price)
-        self.update_max_pip_down(current_price)
+        self._update_max_pip_up(current_price)
+        self._update_max_pip_down(current_price)
 
     
-    def update_max_pip_up(self, current_price):
+    def _update_max_pip_up(self, current_price):
         new_pip = current_price.pip_movement_from(self.benchmark_price)
         if new_pip > self.max_pip_up:
             self.max_pip_up = new_pip
             self.max_pip_up_time = current_price.get_time()
 
 
-    def update_max_pip_down(self, current_price):
+    def _update_max_pip_down(self, current_price):
         new_pip = current_price.pip_movement_from(self.benchmark_price)
         if new_pip < self.max_pip_down:
             self.max_pip_down = new_pip
