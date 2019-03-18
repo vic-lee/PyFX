@@ -9,5 +9,5 @@ class Price:
     def get_price(self):
         return self.price
     
-    def delta_price(self, other_price):
-        return (other_price.get_price() - self.price)
+    def price_delta_from(self, other_price):
+        return (self.price - other_price.get_price())
