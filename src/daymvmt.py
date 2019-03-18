@@ -1,3 +1,5 @@
+from price import Price
+
 class DayPipMovmentToPrice:
     """For a given day, this object encapsulates the maximum 
     upward and downward pip movements to a given price. 
@@ -16,7 +18,9 @@ class DayPipMovmentToPrice:
         self.benchmark_price = benchmark_price
         self.time_range = time_range
         self.max_pip_up = 0
+        self.max_pip_up_time = None
         self.max_pip_down = 0
+        self.max_pip_up_time = None
 
     
     def update_max_pip(self, current_price):
@@ -37,4 +41,4 @@ class DayPipMovmentToPrice:
 
 
     def get_pip_movement(self, price):
-        return round((price - self.benchmark_price) * 10000, 1)
+        return round((price.delta_from(self.benchmark_price)) * 10000, 1)
