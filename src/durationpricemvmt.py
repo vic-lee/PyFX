@@ -30,8 +30,8 @@ class DurationPipMovmentToPrice:
         day_price_movements = None
         for index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=index)
-            if self.is_row_new_day(date=index):
-                self.update_current_day(date=index)
+            if self._is_row_new_day(date=index):
+                self._update_current_day(date=index)
                 day_price_movements = DayPipMovmentToPrice(
                     date=self.current_date, 
                     benchmark_price=current_price, 
@@ -40,11 +40,11 @@ class DurationPipMovmentToPrice:
             day_price_movements.update_max_pip(current_price)
 
     
-    def is_row_new_day(self, date):
+    def _is_row_new_day(self, date):
         if date != self.current_date:
             return False
         return True
     
 
-    def update_current_day(self, date):
+    def _update_current_day(self, date):
         self.current_date = date
