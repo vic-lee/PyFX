@@ -13,6 +13,10 @@ class DayPipMovmentToPrice:
 
     Initialized daily. 
     """
+
+    UP = "up"
+    DOWN = "down"
+
     def __init__(self, date, benchmark_price, time_range):
         self.date = date
         self.benchmark_price = benchmark_price
@@ -29,16 +33,15 @@ class DayPipMovmentToPrice:
 
     
     def update_max_pip_up(self, current_price):
-        new_pip = self.get_pip_movement(current_price)
+        new_pip = current_price.pip_movement_from(self.benchmark_price)
         if new_pip > self.max_pip_up:
             self.max_pip_up = new_pip
+            self.max_pip_up_time = current_price.get_time()
 
 
     def update_max_pip_down(self, current_price):
-        new_pip = self.get_pip_movement(current_price)
+        new_pip = current_price.pip_movement_from(self.benchmark_price)
         if new_pip < self.max_pip_down:
             self.max_pip_down = new_pip
+            self.max_pip_down_time = current_price.get_time()
 
-
-    def get_pip_movement(self, price):
-        return round((price.delta_from(self.benchmark_price)) * 10000, 1)
