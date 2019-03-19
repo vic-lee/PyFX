@@ -27,16 +27,20 @@ class DurationPipMovmentToPrice:
         Algorithm: 
         For each day, perform max day price movement check. 
         """
-        day_price_movements = None
+
         for index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=index)
+            benchmark_prices = {}
             if self._is_row_new_day(date=index):
-                self._update_current_day(date=index)
+                self._update_current_date(date=index)
+                benchmark_prices = self._generate_benchmark_prices()
+
                 day_price_movements = DayPipMovmentToPrice(
                     date=self.current_date, 
                     benchmark_price=current_price, 
                     time_range=self.time_range
                 )
+
             day_price_movements.update_max_pip(current_price)
 
     
@@ -46,5 +50,13 @@ class DurationPipMovmentToPrice:
         return True
     
 
-    def _update_current_day(self, date):
+    def _update_current_date(self, date):
         self.current_date = date
+
+    
+    def _generate_benchmark_prices(self):
+        benchmark_prices = {}
+        for timestamp in self.benchmark_times:
+            benchmark_price = self.minute_price_df[self.current_date]['val']
+            benchmark_prices[timestamp] = benchmark_price
+        return benchmark_prices
