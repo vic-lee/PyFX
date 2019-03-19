@@ -187,7 +187,8 @@ def process_data():
             pdfx, dtpdfx_dt = get_prior_fix_recursive(dtpdfx_dt)
             fx = get_fix_pr(str(cur_date))
             if str(cur_date) in dailydf.index:
-                # print(type(int(dailydf.loc[str(cur_date)]['Open'])))
+                print(str(cur_date) + "\tOpen:\t" + str(float(dailydf.loc[str(cur_date)]['Open'])))
+                # print(dailydf.loc[str(cur_date)])
                 o = float(dailydf.loc[str(cur_date)]['Open'])
                 h = float(dailydf.loc[str(cur_date)]['High'])
                 l = float(dailydf.loc[str(cur_date)]['Low'])
