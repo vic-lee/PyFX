@@ -6,7 +6,9 @@ from daytimerange import TimeRangeInDay
 from durationpricemvmt import DurationPipMovmentToPrice
 
 def main():
-    pipmvmts = setup_pip_movement_obj()
+    pip_movements = setup_pip_movement_obj()
+    pip_movements.find_max_price_movements()
+    pip_movements.to_excel()
     
 
 def setup_pip_movement_obj():

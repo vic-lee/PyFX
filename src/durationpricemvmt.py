@@ -17,25 +17,23 @@ class DurationPipMovmentToPrice:
         self.current_date = None
         self.time_range = config.time_range
         self.benchmark_times = config.benchmark_times
-
-        # time_start = datetime(year=1970, month=1, day=1, hour=10, minute=30)
-        # time_end = datetime(year=1970, month=1, day=1, hour=11, minute=2)
-        # self.time_range = TimeRange(time_start, time_end)
+        
     
+    def to_excel(self, fname=None):
+        pass
+
 
     def find_max_price_movements(self):
         """
         Algorithm: 
         For each day, perform max day price movement check. 
         """
-        benchmark_prices = {}
 
         for index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=index)
             if self._is_row_new_day(date=index):
                 self._update_current_date(date=index)
                 benchmark_prices = self._generate_benchmark_prices()
-
                 price_mvmt_day_obj = DayPipMovmentToPrice(
                     date=self.current_date, 
                     benchmark_price=current_price, 
