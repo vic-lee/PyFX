@@ -8,6 +8,7 @@ class FXDataReader:
         self.MINUTELY = "minutely"
         self.DAILY = "daily"
 
+
     def read_fix_csv(self):
         if not self._does_fpath_exist(mode=self.FIX):
             self._log_read_error(mode=self.FIX)
@@ -17,6 +18,7 @@ class FXDataReader:
         df['datetime'] = pd.to_datetime(df['datetime'])
         df = df.set_index('datetime')
         return df
+
 
     def read_daily_xlsx(self):
         if not self._does_fpath_exist(mode=self.DAILY):
@@ -30,8 +32,27 @@ class FXDataReader:
         print(df)
         return df
 
+
     def read_minute_csv(self):
-        pass
+        if not self._does_fpath_exist(mode=self.MINUTELY):
+            self._log_read_error(mode=self.MINUTELY)
+            return None
+        fpath = self.fpaths[self.MINUTELY] 
+        df = pd.read_csv(fpath)
+
+        df.columns = ["date", "time", "val", "B", "C", "D", "E"]
+        df = df.drop(columns=['B', 'C', 'D', 'E'])
+
+        df['datetime'] = df["date"].map(str) + " " + df["time"] 
+        df["datetime"] = pd.to_datetime(df["datetime"])
+        df["date"] = pd.to_datetime(df["date"]) 
+        df = df.set_index('datetime')
+        df = df[['date', 'time', 'val']]
+        df = df.drop(columns=['time', 'date'])
+
+        return df
+
+
 
     def _log_read_error(self, mode):
         print("Error in reading {} data. Aborting...".format(mode))
