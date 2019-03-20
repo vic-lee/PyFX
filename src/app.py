@@ -1,6 +1,8 @@
 from os.path import abspath
+from datetime.datetime import time
 
 from datareader import DataReader
+from daytimerange import TimeRangeInDay
 from durationpricemvmt import DurationPipMovmentToPrice
 
 def main():
@@ -9,7 +11,10 @@ def main():
     minute_data = package[DataReader.MINUTELY]
 
     pip_movement_config = {
-        DurationPipMovmentToPrice.TIME_RANGE: "",
+        DurationPipMovmentToPrice.TIME_RANGE: TimeRangeInDay(
+            start_time=time(hour=10, minute=30),
+            end_time=time(hour=11, minute=2)
+        ),
         DurationPipMovmentToPrice.BENCHMARK_TIMES: "",
     }
 

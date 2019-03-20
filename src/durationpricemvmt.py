@@ -1,4 +1,4 @@
-from daytimerange import TimeRange
+from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from datetime import datetime
 from price import Price
