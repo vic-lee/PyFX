@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime, timedelta
-import os
+from os.path import abspath
 import numpy as np
 import matplotlib.pyplot as plt
 import xlsxwriter
@@ -324,9 +324,10 @@ def main():
     global morning_df, df_1030, df_1045, df_1102, fixdf, dailydf
 
     in_fpaths = {
-        DataReader.FIX: "../data/datasrc/fix1819.csv", 
-        DataReader.MINUTELY: "../data/datasrc/GBPUSD_2018.csv",
-        DataReader.DAILY: "../data/datasrc/gbp_daily.xlsx"
+        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"), 
+        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
+        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")
+        
     }
 
     fx_reader = DataReader(in_fpaths)
