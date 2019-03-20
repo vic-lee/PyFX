@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 import pickle
 from keydef import *
+from datareader import DataReader
 
 pipmvmt = lambda final, initial: round((final - initial) * 10000, 1)
 
@@ -322,9 +323,18 @@ def pipmvmt_to_xls(df_pip, fname, mvmts):
 def main():
     global morning_df, df_1030, df_1045, df_1102, fixdf, dailydf
 
-    dailydf = daily_xls_in("../data/datasrc/gbp_daily.xlsx")
-    fixdf = fix_csv_in("../data/datasrc/fix1819.csv")
-    datadf = csv_in("../data/datasrc/GBPUSD_2018.csv")
+    in_fpaths = {
+        DataReader.FIX: "../data/datasrc/fix1819.csv", 
+        DataReader.MINUTELY: "../data/datasrc/GBPUSD_2018.csv",
+        DataReader.DAILY: "../data/datasrc/gbp_daily.xlsx"
+    }
+
+    fx_reader = DataReader(in_fpaths)
+
+    dailydf = fx_reader.read_daily_data()
+    fixdf = fx_reader.read_fix_data()
+    datadf = fx_reader.read_minute_data()
+
     morning_df = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')
     df_1045 = datadf.between_time('10:45', '10:45')
