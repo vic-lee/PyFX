@@ -11,6 +11,14 @@ class DataReader:
         self.fpaths = fpaths
 
 
+    def read_data(self):
+        return {
+            self.FIX: self.read_fix_data(),
+            self.MINUTELY: self.read_minute_data(),
+            self.DAILY: self.read_daily_data(),
+        }
+
+
     def read_fix_data(self):
         if not self._does_fpath_exist(mode=self.FIX):
             self._log_read_error(mode=self.FIX)

@@ -331,10 +331,14 @@ def main():
     }
 
     fx_reader = DataReader(in_fpaths)
+    package = fx_reader.read_data()
+    dailydf = package[fx_reader.DAILY]
+    fixdf = package[fx_reader.FIX]
+    datadf = package[fx_reader.MINUTELY]
 
-    dailydf = fx_reader.read_daily_data()
-    fixdf = fx_reader.read_fix_data()
-    datadf = fx_reader.read_minute_data()
+    # dailydf = fx_reader.read_daily_data()
+    # fixdf = fx_reader.read_fix_data()
+    # datadf = fx_reader.read_minute_data()
 
     morning_df = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')
@@ -353,13 +357,7 @@ def main():
     df_daily_pip = pd.DataFrame.from_dict(daily_pip, orient='index')
 
     # pip_neg3 = days_against_pip_mvmt(df_daily_pip, -3)
-    # pip_neg4 = days_against_pip_mvmt(df_daily_pip, -4)
-    # pip_neg5 = days_against_pip_mvmt(df_daily_pip, -5)
-    # pip_neg6 = days_against_pip_mvmt(df_daily_pip, -6)
     # print("less than 3 pips: {} days".format(len(pip_neg3)))
-    # print("less than 4 pips: {} days".format(len(pip_neg4)))
-    # print("less than 5 pips: {} days".format(len(pip_neg5)))
-    # print("less than 6 pips: {} days".format(len(pip_neg6)))
 
     pipmvmt_to_xls(df_daily_pip, '../data/dataout/18dpip.xlsx', [-3, -4, -5, -6])
 
