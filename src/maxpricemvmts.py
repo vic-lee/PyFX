@@ -3,7 +3,7 @@ from daymvmt import DayPipMovmentToPrice
 from datetime import datetime
 from price import Price
 
-class DurationPipMovmentToPrice:
+class MaxPriceMovements:
     """This class finds the daily price movements within a period of time. 
     It is used in conjunction with DayPipMovmentToPrice class.
     """
@@ -17,7 +17,7 @@ class DurationPipMovmentToPrice:
         self.current_date = None
         self.time_range = config.time_range
         self.benchmark_times = config.benchmark_times
-        
+
     
     def to_excel(self, fname=None):
         pass
@@ -33,7 +33,7 @@ class DurationPipMovmentToPrice:
             current_price = Price(price=row['val'], time=index)
             if self._is_row_new_day(date=index):
                 self._update_current_date(date=index)
-                benchmark_prices = self._generate_benchmark_prices()
+                benchmark_prices = self._generate_benchmark_prices()    #1030
                 price_mvmt_day_obj = DayPipMovmentToPrice(
                     date=self.current_date, 
                     benchmark_price=current_price, 

@@ -326,19 +326,15 @@ def main():
     in_fpaths = {
         DataReader.FIX: abspath("../data/datasrc/fix1819.csv"), 
         DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
-        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")
-        
+        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")   
     }
 
     fx_reader = DataReader(in_fpaths)
     package = fx_reader.read_data()
+
     dailydf = package[fx_reader.DAILY]
     fixdf = package[fx_reader.FIX]
     datadf = package[fx_reader.MINUTELY]
-
-    # dailydf = fx_reader.read_daily_data()
-    # fixdf = fx_reader.read_fix_data()
-    # datadf = fx_reader.read_minute_data()
 
     morning_df = datadf.between_time('10:30', '11:02')
     df_1030 = datadf.between_time('10:30', '10:30')

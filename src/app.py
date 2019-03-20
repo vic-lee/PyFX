@@ -3,7 +3,7 @@ from datetime.datetime import time
 
 from datareader import DataReader
 from daytimerange import TimeRangeInDay
-from durationpricemvmt import DurationPipMovmentToPrice
+from maxpricemvmts import MaxPriceMovements
 
 def main():
     pip_movements = setup_pip_movement_obj()
@@ -19,16 +19,16 @@ def setup_pip_movement_obj():
 
 def init_pip_movement_obj(minute_data):
     pip_movement_config = {
-        DurationPipMovmentToPrice.TIME_RANGE: TimeRangeInDay(
+        MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
             start_time=time(hour=10, minute=30),
             end_time=time(hour=11, minute=2)
         ),
-        DurationPipMovmentToPrice.BENCHMARK_TIMES: [
+        MaxPriceMovements.BENCHMARK_TIMES: [
             time(hour=10, minute=30), time(hour=10, minute=45)
         ],
     }
 
-    return DurationPipMovmentToPrice(
+    return MaxPriceMovements(
         minute_price_df=minute_data, config=pip_movement_config)
 
 
