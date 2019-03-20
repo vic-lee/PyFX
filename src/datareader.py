@@ -1,15 +1,17 @@
 import pandas as pd
 
 
-class FXDataReader:
+class DataReader:
+    
+    FIX = "fix"
+    MINUTELY = "minutely"
+    DAILY = "daily"
+
     def __init__(self, fpaths):
         self.fpaths = fpaths
-        self.FIX = "fix"
-        self.MINUTELY = "minutely"
-        self.DAILY = "daily"
 
 
-    def read_fix_csv(self):
+    def read_fix_data(self):
         if not self._does_fpath_exist(mode=self.FIX):
             self._log_read_error(mode=self.FIX)
             return None
@@ -20,7 +22,7 @@ class FXDataReader:
         return df
 
 
-    def read_daily_xlsx(self):
+    def read_daily_data(self):
         if not self._does_fpath_exist(mode=self.DAILY):
             self._log_read_error(mode=self.DAILY)
             return None
@@ -33,7 +35,7 @@ class FXDataReader:
         return df
 
 
-    def read_minute_csv(self):
+    def read_minute_data(self):
         if not self._does_fpath_exist(mode=self.MINUTELY):
             self._log_read_error(mode=self.MINUTELY)
             return None
@@ -53,9 +55,9 @@ class FXDataReader:
         return df
 
 
-
     def _log_read_error(self, mode):
         print("Error in reading {} data. Aborting...".format(mode))
+
 
     def _filter_ohlc_in_daily(self, df):
         """This function returns only bid prices and removes ask prices. 
@@ -77,16 +79,21 @@ class FXDataReader:
         })
         return df
 
+
     def _does_minuitely_fpath_exist(self):
         pass
+
 
     def _does_fix_fpath_exist(self):
         pass
 
+
     def _does_daily_fpath_exist(self):
         pass
+
 
     def _does_fpath_exist(self, mode):
         if mode in self.fpaths:
             return True
         return False
+
