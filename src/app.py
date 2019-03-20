@@ -6,14 +6,16 @@ from daytimerange import TimeRangeInDay
 from durationpricemvmt import DurationPipMovmentToPrice
 
 def main():
+    pipmvmts = setup_pip_movement_obj()
+    
 
+def setup_pip_movement_obj():
     package = setup_fpaths()
     minute_data = package[DataReader.MINUTELY]
+    return init_pip_movement_obj(minute_data)
 
-    pipmvmts = setup_pip_movement_obj(minute_data)
 
-
-def setup_pip_movement_obj(minute_data):
+def init_pip_movement_obj(minute_data):
     pip_movement_config = {
         DurationPipMovmentToPrice.TIME_RANGE: TimeRangeInDay(
             start_time=time(hour=10, minute=30),
