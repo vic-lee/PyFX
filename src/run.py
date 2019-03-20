@@ -179,6 +179,7 @@ def process_data():
             l = None
             c = None
             cur_date = date_minute.date()
+            cur_date_1045 = date_minute.replace(hour=10, minute=45)
             dt1030 = str(cur_date) + " 10:30:00"
             dt1045 = str(cur_date) + " 10:45:00"
             dtpdfx_dt = daydelta(cur_date, 1)
@@ -211,7 +212,8 @@ def process_data():
             td[c_mpip_up_1030] = pip1030
             td[c_mpip_up_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_up_1030_pr] = cur_pr
-        if (date_minute.minute >= 45):
+        # if date_minute.minute >= 45:
+        if date_minute > cur_date_1045:
             if pip1045 > td[c_mpip_up_1045]:
                 td[c_mpip_up_1045] = pip1045
                 td[c_mpip_up_1045_dt] = str(date_minute)[-8:]
@@ -221,7 +223,8 @@ def process_data():
             td[c_mpip_dn_1030] = pip1030
             td[c_mpip_dn_1030_dt] = str(date_minute)[-8:]
             td[c_mpip_dn_1030_pr] = cur_pr
-        if (date_minute.minute >= 45):        
+        # if date_minute.minute >= 45:
+        if date_minute > cur_date_1045:
             if pip1045 < td[c_mpip_dn_1045]:
                 td[c_mpip_dn_1045] = pip1045
                 td[c_mpip_dn_1045_dt] = str(date_minute)[-8:]
