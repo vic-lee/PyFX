@@ -12,12 +12,29 @@ class MaxPriceMovements:
     BENCHMARK_TIMES = "benchmark_times"
 
     def __init__(self, minute_price_df, config):
-        self.max_price_movements = []   # an array of DayMovements
+        '''
+        Note: the initialization is highly coupled. Later initializations may 
+        depend on earlier initializations. Change the sequence of initialization
+        with caution. 
+        '''
+        '''
+        TODO: Data structure choice for max_price_movements is subject to change.
+        Consider multilevel dataframe (possible difficulty in excel exporting). 
+        '''
         self.current_date = None
         self.time_range = config[self.TIME_RANGE]
         self.benchmark_times = config[self.BENCHMARK_TIMES]
+        self.max_price_movements = \
+            self._generate_price_movements_obj_from_benchmark_times()
         self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
         print(self.minute_price_df)
+
+
+    def _generate_price_movements_obj_from_benchmark_times(self):
+        ret = {}
+        for btime in self.benchmark_times:
+            ret[btime] = []
+        return ret
     
 
     def _filter_df_to_time_range(self, df):
@@ -33,20 +50,23 @@ class MaxPriceMovements:
         Algorithm: 
         For each day, perform max day price movement check. 
         """
+        for benchmark_time in self.benchmark_times:
+            pass
 
-        for index, row in self.minute_price_df.iterrows():
-            current_price = Price(price=row['val'], time=index)
+        # price_mvmt_day_obj = None
+        # for index, row in self.minute_price_df.iterrows():
+        #     current_price = Price(price=row['val'], time=index)
 
-            if self._is_row_new_day(date=index):
-                self._update_current_date(date=index)
-                benchmark_prices = self._generate_benchmark_prices()    #1030
-                price_mvmt_day_obj = DayPipMovmentToPrice(
-                    date=self.current_date, 
-                    benchmark_price=current_price, 
-                    time_range=self.time_range
-                )
+        #     if self._is_row_new_day(date=index):
+        #         self._update_current_date(date=index)
+        #         benchmark_prices = self._generate_benchmark_prices()    #1030
+        #         price_mvmt_day_obj = DayPipMovmentToPrice(
+        #             date=self.current_date, 
+        #             benchmark_price=current_price, 
+        #             time_range=self.time_range
+        #         )
 
-            price_mvmt_day_obj.update_max_pip(current_price)
+        #     price_mvmt_day_obj.update_max_pip(current_price)
 
     
     def _is_row_new_day(self, date):
