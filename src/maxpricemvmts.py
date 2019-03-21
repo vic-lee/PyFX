@@ -15,8 +15,8 @@ class MaxPriceMovements:
         self.minute_price_df = minute_price_df    # minutely data
         self.max_price_movements = []   # an array of DayMovements
         self.current_date = None
-        self.time_range = config.time_range
-        self.benchmark_times = config.benchmark_times
+        self.time_range = config[self.TIME_RANGE]
+        self.benchmark_times = config[self.BENCHMARK_TIMES]
 
     
     def to_excel(self, fname=None):
