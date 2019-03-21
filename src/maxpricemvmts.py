@@ -12,11 +12,16 @@ class MaxPriceMovements:
     BENCHMARK_TIMES = "benchmark_times"
 
     def __init__(self, minute_price_df, config):
-        self.minute_price_df = minute_price_df    # minutely data
         self.max_price_movements = []   # an array of DayMovements
         self.current_date = None
         self.time_range = config[self.TIME_RANGE]
         self.benchmark_times = config[self.BENCHMARK_TIMES]
+        self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
+        print(self.minute_price_df)
+    
+
+    def _filter_df_to_time_range(self, df):
+        return df.between_time(self.time_range.start_time, self.time_range.end_time)
 
     
     def to_excel(self, fname=None):
@@ -32,7 +37,7 @@ class MaxPriceMovements:
         for index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=index)
             print("current date: {}\tindex: {}".format(self.current_date, index))
-                
+
             if self._is_row_new_day(date=index):
                 self._update_current_date(date=index)
                 benchmark_prices = self._generate_benchmark_prices()    #1030
