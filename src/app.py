@@ -1,17 +1,17 @@
 from os.path import abspath
-from datetime.datetime import time
+from datetime import time 
 
 from datareader import DataReader
 from daytimerange import TimeRangeInDay
 from maxpricemvmts import MaxPriceMovements
 
 def main():
-    pip_movements = setup_pip_movement_obj()
-    pip_movements.find_max_price_movements()
-    pip_movements.to_excel()
+    price_movements = setup_price_movement_obj()
+    price_movements.find_max_price_movements()
+    price_movements.to_excel()
     
 
-def setup_pip_movement_obj():
+def setup_price_movement_obj():
     package = setup_fpaths()
     minute_data = package[DataReader.MINUTELY]
     return init_pip_movement_obj(minute_data)
