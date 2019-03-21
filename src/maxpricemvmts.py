@@ -36,7 +36,6 @@ class MaxPriceMovements:
 
         for index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=index)
-            print("current date: {}\tindex: {}".format(self.current_date, index))
 
             if self._is_row_new_day(date=index):
                 self._update_current_date(date=index)
@@ -63,6 +62,6 @@ class MaxPriceMovements:
     def _generate_benchmark_prices(self):
         benchmark_prices = {}
         for timestamp in self.benchmark_times:
-            benchmark_price = self.minute_price_df[self.current_date]['val']
+            benchmark_price = self.minute_price_df.loc[self.current_date]['val']
             benchmark_prices[timestamp] = benchmark_price
         return benchmark_prices
