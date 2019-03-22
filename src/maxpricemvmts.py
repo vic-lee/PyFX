@@ -83,11 +83,3 @@ class MaxPriceMovements:
         if index.date() != date.date():
             return True
         return False
-
-    
-    def _generate_benchmark_prices(self):
-        benchmark_prices = {}
-        for timestamp in self.benchmark_times:
-            benchmark_price = self.minute_price_df.loc[self.current_date]['val']
-            benchmark_prices[timestamp] = benchmark_price
-        return benchmark_prices
