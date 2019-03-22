@@ -21,7 +21,6 @@ class MaxPriceMovements:
         TODO: Data structure choice for max_price_movements is subject to change.
         Consider multilevel dataframe (possible difficulty in excel exporting). 
         '''
-        self.current_date = None
         self.time_range = config[self.TIME_RANGE]
         self.benchmark_times = config[self.BENCHMARK_TIMES]
         self.max_price_movements = \
@@ -33,7 +32,7 @@ class MaxPriceMovements:
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
         for btime in self.benchmark_times:
-            ret[btime] = []
+            ret[btime] = {}
         return ret
     
 
@@ -56,15 +55,16 @@ class MaxPriceMovements:
 
 
     def _find_max_price_movement_against_benchmark(self, benchmark_time):
-        day_objs = []
+        day_objs = {}
         price_movement_day_obj = None
+        current_date = None
         for time_index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=time_index)
             if self._is_row_new_day(date=time_index):
-                self._update_current_date(date=time_index)
+                if price_movement_day_obj != None and current_date != None: 
+                    day_objs[self.current_date] = price_movement_day_obj
 
-                if price_movement_day_obj != None: 
-                    day_objs.append(price_movement_day_obj)
+                current_date = time_index
 
                 price_movement_day_obj = DayPipMovmentToPrice(
                     date=self.current_date, 
@@ -80,10 +80,6 @@ class MaxPriceMovements:
         if date != self.current_date:
             return True
         return False
-    
-
-    def _update_current_date(self, date):
-        self.current_date = date
 
     
     def _generate_benchmark_prices(self):
