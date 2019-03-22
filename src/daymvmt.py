@@ -47,6 +47,23 @@ class DayPipMovmentToPrice:
 
 
     def to_string(self):
+        f_max_pip_up_time = self._format_max_pip_up_time()
+        f_max_pip_down_time = self._format_max_pip_down_time()
         return ("Date: {}\tMax pip up: {}\tMax pip up time: {}\tMax pip down: \
             {}\tMax pip down time: {}".format(self.date, self.max_pip_up, \
-            self.max_pip_up_time, self.max_pip_down, self.max_pip_down_time))
+            f_max_pip_up_time, self.max_pip_down, f_max_pip_down_time))
+
+
+    def _format_max_pip_up_time(self):
+        return self._format_time(time=self.max_pip_up_time)
+    
+
+    def _format_max_pip_down_time(self):
+        return self._format_time(time=self.max_pip_down_time)
+
+
+    def _format_time(self, time):
+        if time == None:
+            return "N/A"
+        else:
+            return time.time()
