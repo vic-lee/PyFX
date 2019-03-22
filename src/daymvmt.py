@@ -24,7 +24,7 @@ class DayPipMovmentToPrice:
         self.max_pip_up = 0
         self.max_pip_up_time = None
         self.max_pip_down = 0
-        self.max_pip_up_time = None
+        self.max_pip_down_time = None
 
     
     def update_max_pip(self, current_price):
@@ -45,3 +45,8 @@ class DayPipMovmentToPrice:
             self.max_pip_down = new_pip
             self.max_pip_down_time = current_price.get_time()
 
+
+    def to_string(self):
+        return ("Date: {}\tMax pip up: {}\tMax pip up time: {}\tMax pip down: \
+            {}\tMax pip down time: {}".format(self.date, self.max_pip_up, \
+            self.max_pip_up_time, self.max_pip_down, self.max_pip_down_time))
