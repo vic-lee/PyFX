@@ -75,25 +75,28 @@ class MaxPriceMovements:
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=time_index)
-
+            benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
-                daily_max_pips = self._init_new_day_obj(current_date, current_price)
+                daily_max_pips = self._init_new_day_obj(current_date, benchmark_price)
 
             daily_max_pips.update_max_pip(current_price)
         
         return day_objs
 
 
-    def _generate_benchmark_prices_from_benchmark_times(self):
-        pass
+    def _get_benchmark_price(self, date, benchmark_time) -> Price:
+        price_df = self.benchmark_prices_matrix[benchmark_time]
+        index = datetime(year=date.year, month=date.month, day=date.day, hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
+        price = price_df.loc[index]['val']
+        return Price(price=price, time=index)
 
 
-    def _init_new_day_obj(self, current_date: datetime.date, current_price: Price) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, benchmark_price: Price) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date, 
-            benchmark_price=current_price,
+            benchmark_price=benchmark_price,
             time_range=self.time_range)
 
 
