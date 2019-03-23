@@ -61,11 +61,9 @@ class MaxPriceMovements:
         for time_index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=time_index)
             if self._is_row_new_day(date=current_date, index=time_index):
-                if price_movement_day_obj != None and current_date != None: 
-                    print(price_movement_day_obj.to_string())
-                    day_objs[current_date] = price_movement_day_obj
+                day_objs = self._add_prior_day_obj(price_movement_day_obj, day_objs)
 
-                current_date = time_index
+                current_date = time_index.date()
 
                 price_movement_day_obj = DayPipMovmentToPrice(
                     date=current_date, 
@@ -74,6 +72,13 @@ class MaxPriceMovements:
 
             price_movement_day_obj.update_max_pip(current_price)
         
+        return day_objs
+
+
+    def _add_prior_day_obj(self, prior_day_obj, day_objs):
+        if prior_day_obj != None: 
+            print(prior_day_obj.to_string())
+            day_objs[prior_day_obj.date] = prior_day_obj
         return day_objs
 
     
