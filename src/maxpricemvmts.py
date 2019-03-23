@@ -1,3 +1,5 @@
+from typing import Date
+
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from datetime import datetime
@@ -63,7 +65,7 @@ class MaxPriceMovements:
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(price_movement_day_obj, day_objs)
 
-                current_date = time_index.date()
+                current_date = self._update_current_date(newdate=time_index)
 
                 price_movement_day_obj = DayPipMovmentToPrice(
                     date=current_date, 
@@ -80,6 +82,10 @@ class MaxPriceMovements:
             print(prior_day_obj.to_string())
             day_objs[prior_day_obj.date] = prior_day_obj
         return day_objs
+
+
+    def _update_current_date(self, newdate) -> Date:
+        return newdate.date()
 
     
     def _is_row_new_day(self, date, index):
