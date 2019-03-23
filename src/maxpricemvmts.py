@@ -2,7 +2,7 @@ from datetime import datetime, time
 
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
-from price import Price
+from price import PriceTime
 
 class MaxPriceMovements:
     """This class finds the daily price movements within a period of time. 
@@ -74,7 +74,7 @@ class MaxPriceMovements:
         daily_max_pips = None
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
-            current_price = Price(price=row['val'], time=time_index)
+            current_price = PriceTime(price=row['val'], time=time_index)
             benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
@@ -86,14 +86,14 @@ class MaxPriceMovements:
         return day_objs
 
 
-    def _get_benchmark_price(self, date, benchmark_time) -> Price:
+    def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
         price_df = self.benchmark_prices_matrix[benchmark_time]
         index = datetime(year=date.year, month=date.month, day=date.day, hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
         price = price_df.loc[index]['val']
-        return Price(price=price, time=index)
+        return PriceTime(price=price, time=index)
 
 
-    def _init_new_day_obj(self, current_date: datetime.date, benchmark_price: Price) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, benchmark_price: PriceTime) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date, 
             benchmark_price=benchmark_price,

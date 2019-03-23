@@ -1,11 +1,11 @@
-class Price: 
-    def __init__(self, price, time):
+class PriceTime: 
+    def __init__(self, price, datetime):
         self.price = price
-        self.time = time
+        self.datetime = datetime
 
 
-    def get_time(self):
-        return self.time
+    def get_datetime(self):
+        return self.datetime
 
 
     def get_price(self):
