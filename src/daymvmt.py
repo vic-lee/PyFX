@@ -1,4 +1,4 @@
-from price import Price
+from price import PriceTime
 
 class DayPipMovmentToPrice:
     """For a given day, this object encapsulates the maximum 
@@ -17,9 +17,9 @@ class DayPipMovmentToPrice:
     UP = "up"
     DOWN = "down"
 
-    def __init__(self, date, benchmark_price, time_range):
+    def __init__(self, date, benchmark_pricetime: PriceTime, time_range):
         self.date = date
-        self.benchmark_price = benchmark_price
+        self.benchmark_pricetime = benchmark_pricetime
         self.time_range = time_range
         self.max_pip_up = 0
         self.max_pip_up_time = None
@@ -33,14 +33,14 @@ class DayPipMovmentToPrice:
 
     
     def _update_max_pip_up(self, current_price):
-        new_pip = current_price.pip_movement_from(self.benchmark_price)
+        new_pip = current_price.pip_movement_from(self.benchmark_pricetime)
         if new_pip > self.max_pip_up:
             self.max_pip_up = new_pip
             self.max_pip_up_time = current_price.get_time()
 
 
     def _update_max_pip_down(self, current_price):
-        new_pip = current_price.pip_movement_from(self.benchmark_price)
+        new_pip = current_price.pip_movement_from(self.benchmark_pricetime)
         if new_pip < self.max_pip_down:
             self.max_pip_down = new_pip
             self.max_pip_down_time = current_price.get_time()

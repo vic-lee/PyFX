@@ -93,10 +93,10 @@ class MaxPriceMovements:
         return PriceTime(price=price, time=index)
 
 
-    def _init_new_day_obj(self, current_date: datetime.date, benchmark_price: PriceTime) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date, 
-            benchmark_price=benchmark_price,
+            benchmark_pricetime=benchmark_pricetime,
             time_range=self.time_range)
 
 
