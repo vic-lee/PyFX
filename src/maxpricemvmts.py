@@ -34,7 +34,6 @@ class MaxPriceMovements:
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
         self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
-        print(self.minute_price_df)
 
 
     def _generate_price_movements_obj_from_benchmark_times(self):
@@ -88,7 +87,6 @@ class MaxPriceMovements:
 
     def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None: 
-            print(prior_day_obj.to_string())
             day_objs[prior_day_obj.date] = prior_day_obj
         return day_objs
 
@@ -103,3 +101,14 @@ class MaxPriceMovements:
         if index.date() != date:
             return True
         return False
+
+
+    def to_string(self):
+        benchmark_time_header_template = \
+            "\n/********************** Benchmark Time: {} **********************/\n"
+        for btime in self.max_price_movements:
+            print(benchmark_time_header_template.format(btime))
+            max_pips_for_btime = self.max_price_movements[btime]
+            for day in max_pips_for_btime:
+                day_max_pips = max_pips_for_btime[day]
+                print(day_max_pips.to_string())

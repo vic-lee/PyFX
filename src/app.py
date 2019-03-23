@@ -8,6 +8,7 @@ from maxpricemvmts import MaxPriceMovements
 def main():
     price_movements = setup_price_movement_obj()
     price_movements.find_max_price_movements()
+    print(price_movements.to_string())
     price_movements.to_excel()
     
 
