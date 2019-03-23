@@ -51,7 +51,7 @@ class DayPipMovmentToPrice:
         f_max_pip_down_time = self._format_max_pip_down_time()
 
         return ("{:20} {:20} {:30} {:24} {:30}".format(
-            "Date: {}".format(self.date.date()),
+            "Date: {}".format(self.date),
             "Max pip up: {}".format(self.max_pip_up),
             "Max pip up time: {}".format(f_max_pip_up_time),
             "Max pip down: {}".format(self.max_pip_down),
