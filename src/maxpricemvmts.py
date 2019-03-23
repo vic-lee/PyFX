@@ -1,6 +1,7 @@
+from datetime import datetime, time
+
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
-from datetime import datetime
 from price import Price
 
 class MaxPriceMovements:
@@ -20,6 +21,13 @@ class MaxPriceMovements:
         '''
         TODO: Data structure choice for max_price_movements is subject to change.
         Consider multilevel dataframe (possible difficulty in excel exporting). 
+
+        Current implementation: 
+        "benchmark_time": {
+            "date": {
+                pip_info
+            }
+        }
         '''
         self.time_range = config[self.TIME_RANGE]
         self.benchmark_times = config[self.BENCHMARK_TIMES]
@@ -54,7 +62,7 @@ class MaxPriceMovements:
                 self._find_max_price_movement_against_benchmark(benchmark_time=btime)
 
 
-    def _find_max_price_movement_against_benchmark(self, benchmark_time):
+    def _find_max_price_movement_against_benchmark(self, benchmark_time: time):
         day_objs = {}
         daily_max_pips = None
         current_date = None
@@ -64,21 +72,21 @@ class MaxPriceMovements:
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
-                daily_max_pips = self._init_new_day_obj(current_date, time_index, current_price)
+                daily_max_pips = self._init_new_day_obj(current_date, current_price)
 
             daily_max_pips.update_max_pip(current_price)
         
         return day_objs
 
 
-    def _init_new_day_obj(self, current_date, time_index, current_price) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, current_price: Price) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date, 
             benchmark_price=current_price,
             time_range=self.time_range)
 
 
-    def _save_prior_day_obj(self, prior_day_obj, day_objs):
+    def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None: 
             print(prior_day_obj.to_string())
             day_objs[prior_day_obj.date] = prior_day_obj
