@@ -58,23 +58,24 @@ class MaxPriceMovements:
 
     def _find_max_price_movement_against_benchmark(self, benchmark_time):
         day_objs = {}
-        price_movement_day_obj = None
+        day_price_movements = None
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=time_index)
             if self._is_row_new_day(date=current_date, index=time_index):
-                day_objs = self._save_prior_day_obj(price_movement_day_obj, day_objs)
-
+                day_objs = self._save_prior_day_obj(day_price_movements, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
+                day_price_movements = self._init_new_day_obj(current_date, time_index, current_price)
 
-                price_movement_day_obj = DayPipMovmentToPrice(
-                    date=current_date, 
-                    benchmark_price=current_price,
-                    time_range=self.time_range)
-
-            price_movement_day_obj.update_max_pip(current_price)
+            day_price_movements.update_max_pip(current_price)
         
         return day_objs
+
+    def _init_new_day_obj(self, current_date, time_index, current_price) -> DayPipMovmentToPrice:
+        return DayPipMovmentToPrice(
+            date=current_date, 
+            benchmark_price=current_price,
+            time_range=self.time_range)
 
 
     def _save_prior_day_obj(self, prior_day_obj, day_objs):
