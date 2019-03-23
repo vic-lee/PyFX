@@ -34,6 +34,7 @@ class MaxPriceMovements:
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
         self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
+        self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
 
     def _generate_price_movements_obj_from_benchmark_times(self):
@@ -45,6 +46,13 @@ class MaxPriceMovements:
 
     def _filter_df_to_time_range(self, df):
         return df.between_time(self.time_range.start_time, self.time_range.end_time)
+    
+
+    def _generate_benchmark_prices_matrix(self):
+        ret = {}
+        for btime in self.benchmark_times:
+            ret[btime] = self.minute_price_df.between_time(btime, btime)
+        return ret
 
     
     def to_excel(self, fname=None):
@@ -76,6 +84,10 @@ class MaxPriceMovements:
             daily_max_pips.update_max_pip(current_price)
         
         return day_objs
+
+
+    def _generate_benchmark_prices_from_benchmark_times(self):
+        pass
 
 
     def _init_new_day_obj(self, current_date: datetime.date, current_price: Price) -> DayPipMovmentToPrice:
