@@ -1,5 +1,3 @@
-from typing import Date
-
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from datetime import datetime
@@ -62,7 +60,7 @@ class MaxPriceMovements:
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
             current_price = Price(price=row['val'], time=time_index)
-            
+
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
@@ -87,13 +85,13 @@ class MaxPriceMovements:
         return day_objs
 
 
-    def _update_current_date(self, newdate) -> Date:
+    def _update_current_date(self, newdate: datetime) -> datetime.date:
         return newdate.date()
 
     
-    def _is_row_new_day(self, date, index):
+    def _is_row_new_day(self, date: datetime.date, index: datetime) -> bool:
         if date == None: 
             return True
-        if index.date() != date.date():
+        if index.date() != date:
             return True
         return False
