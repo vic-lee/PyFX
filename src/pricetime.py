@@ -18,3 +18,11 @@ class PriceTime:
     
     def pip_movement_from(self, other_price):
         return round(self.delta_from(other_price) * 10000, 1)
+
+    
+    def is_earlier_than(self, other_price: PriceTime) -> bool: 
+        return self.datetime < other_price.datetime
+    
+
+    def is_later_than(self, other_price: PriceTime) -> bool:
+        return self.datetime > other_price.datetime
