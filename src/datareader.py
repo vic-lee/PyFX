@@ -39,7 +39,6 @@ class DataReader:
         df.rename(columns = {'Date': 'datetime'}, inplace=True)
         df = self._filter_ohlc_in_daily(df)
         df = df.set_index('datetime')
-        print(df)
         return df
 
 
