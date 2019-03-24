@@ -22,9 +22,9 @@ class DayPipMovmentToPrice:
         self.benchmark_pricetime = benchmark_pricetime
         self.time_range = time_range
         self.max_pip_up = 0
-        self.max_pip_up_time = None
+        self.max_pip_up_time = self.benchmark_pricetime.get_datetime()
         self.max_pip_down = 0
-        self.max_pip_down_time = None
+        self.max_pip_down_time = self.benchmark_pricetime.get_datetime()
 
     
     def update_max_pip(self, current_price):
