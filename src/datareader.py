@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime, date
 
 
 class DataReader:
@@ -38,7 +39,11 @@ class DataReader:
         df = pd.read_excel(fpath)
         df.rename(columns = {'Date': 'datetime'}, inplace=True)
         df = self._filter_ohlc_in_daily(df)
+
+        df['datetime'] = df['datetime'].apply(lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
+            
         df = df.set_index('datetime')
+        print(df)
         return df
 
 
