@@ -78,7 +78,7 @@ class MaxPriceMovements(Metric):
         daily_max_pips = None
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
-            current_price = PriceTime(price=row['val'], datetime=time_index)
+            current_price = PriceTime(price=row['Close'], datetime=time_index)
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
@@ -102,7 +102,7 @@ class MaxPriceMovements(Metric):
     def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
         price_df = self.benchmark_prices_matrix[benchmark_time]
         index = datetime(year=date.year, month=date.month, day=date.day, hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
-        price = price_df.loc[index]['val']
+        price = price_df.loc[index]['Close']
         return PriceTime(price=price, datetime=index)
 
 

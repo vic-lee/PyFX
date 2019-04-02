@@ -53,16 +53,16 @@ class DataReader:
         fpath = self.fpaths[self.MINUTELY] 
         df = pd.read_csv(fpath)
 
-        df.columns = ["date", "time", "val", "B", "C", "D", "E"]
-        df = df.drop(columns=['B', 'C', 'D', 'E'])
+        df.columns = ["date", "time", "Open", "High", "Low", "Close", "E"]
+        df = df.drop(columns=['E'])
 
         df['datetime'] = df["date"].map(str) + " " + df["time"] 
         df["datetime"] = pd.to_datetime(df["datetime"])
         df["date"] = pd.to_datetime(df["date"]) 
         df = df.set_index('datetime')
-        df = df[['date', 'time', 'val']]
+        # df = df[['date', 'time', 'val']]
         df = df.drop(columns=['time', 'date'])
-
+        print(df)
         return df
 
 
