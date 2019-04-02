@@ -1,25 +1,25 @@
 from os.path import abspath
-from datetime import time 
+from datetime import datetime, time 
 
 from datareader import DataReader
 from daytimerange import TimeRangeInDay
 from maxpricemvmts import MaxPriceMovements
 
 def main():
+    start_time = datetime.now()
+
     price_movements = setup_price_movement_obj()
     price_movements.find_max_price_movements()
     # print(price_movements.to_string())
     price_movements.to_excel()
+
+    end_time = datetime.now()
+    print("Program runtime: {}".format((end_time - start_time)))
     
 
 def setup_price_movement_obj():
-    package = setup_fpaths()
-    minute_data = package[DataReader.MINUTELY]
-    fix_data = package[DataReader.FIX]
-    return init_pip_movement_obj(minute_data, fix_data)
+    price_data = setup_fpaths()
 
-
-def init_pip_movement_obj(minute_data, fix_data):
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
             start_time=time(hour=10, minute=30),
@@ -29,9 +29,10 @@ def init_pip_movement_obj(minute_data, fix_data):
             time(hour=10, minute=30), time(hour=10, minute=45)
         ],
     }
+    
+    return MaxPriceMovements(price_dfs=price_data, config=pip_movement_config)
 
-    return MaxPriceMovements(
-        minute_price_df=minute_data, fix_price_df=fix_data, config=pip_movement_config)
+    # return init_pip_movement_obj(price_data=package)
 
 
 def setup_fpaths():
