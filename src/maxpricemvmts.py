@@ -185,7 +185,7 @@ class MaxPriceMovements:
                 exported_df = data_on_date.to_df()
                 df_list.append(exported_df)
 
-            df_for_benchmark = pd.concat(df_list, sort=True)
+            df_for_benchmark = pd.concat(df_list, sort=False)
 
             old_columns = df_for_benchmark.columns
             df_for_benchmark.columns = pd.MultiIndex.from_product([[str(benchmark_time)], old_columns])
