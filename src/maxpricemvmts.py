@@ -1,8 +1,10 @@
 from datetime import datetime, time
+import pandas as pd
 
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from pricetime import PriceTime
+from datawriter import DataWriter
 
 class MaxPriceMovements:
     """This class finds the daily price movements within a period of time. 
@@ -53,10 +55,6 @@ class MaxPriceMovements:
         for btime in self.benchmark_times:
             ret[btime] = self.minute_price_df.between_time(btime, btime)
         return ret
-
-    
-    def to_excel(self, fname=None):
-        pass
 
 
     def find_max_price_movements(self):
@@ -127,3 +125,38 @@ class MaxPriceMovements:
             for day in max_pips_for_btime:
                 day_max_pips = max_pips_for_btime[day]
                 print(day_max_pips.to_string())
+
+
+    def to_excel(self, fname=None):
+        '''
+        1. Convert to df
+        2. Pass df to data_converter
+        '''
+        df = self._load_objs_to_df()
+        data_exporter = DataWriter(df=df)
+        # data_exporter.df_to_xlsx()
+
+    
+    def _load_objs_to_df(self) -> pd.DataFrame:
+        '''
+        |------|---OHLC---|---Benchmark 1---|---Benchmark 2---|
+        |------|----...---|--MaxPipUp,Down--|--MaxPipUp,Down--|
+        |--T1--|
+        |--T2--|
+        '''
+        df = pd.DataFrame()
+        benchmarked_df_list = []
+        # df = df.set_index("date")
+        for _, data in self.max_price_movements.items():
+            df_list = []
+            for _, data_on_date in data.items():
+                exported_df = data_on_date.to_df()
+                df_list.append(exported_df)
+            df_for_benchmark = pd.concat(df_list, sort=True)
+            benchmarked_df_list.append(df_for_benchmark)
+
+        for right_df in benchmarked_df_list:
+            df = df.join(right_df, how="outer")
+
+        print(df)
+        return df
