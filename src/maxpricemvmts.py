@@ -38,7 +38,7 @@ class MaxPriceMovements:
 
         self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
         self.fix_price_df = fix_price_df
-        
+
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
 
@@ -117,6 +117,20 @@ class MaxPriceMovements:
         if index.date() != date:
             return True
         return False
+
+
+    def get_prior_fix_recursive(self, d):
+        fx = None
+        try: 
+            fx = fixdf.loc[str(d)][CP]
+        except Exception as e: 
+            print("Could not locate the previous location, possibly due to out of bounds.")
+            print(e)
+            return fx, None
+        if not np.isnan(fx):
+            return fx, d
+        else: 
+            return get_prior_fix_recursive(daydelta(d, 1))
 
 
     def to_string(self):
