@@ -14,7 +14,7 @@ class MaxPriceMovements:
     TIME_RANGE = "time range"
     BENCHMARK_TIMES = "benchmark_times"
 
-    def __init__(self, minute_price_df, config):
+    def __init__(self, minute_price_df, fix_price_df, config):
         '''
         Note: the initialization is highly coupled. Later initializations may 
         depend on earlier initializations. Change the sequence of initialization
@@ -35,7 +35,10 @@ class MaxPriceMovements:
         self.benchmark_times = config[self.BENCHMARK_TIMES]
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
+
         self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
+        self.fix_price_df = fix_price_df
+        
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
 
@@ -134,7 +137,7 @@ class MaxPriceMovements:
         '''
         df = self._load_objs_to_df()
         data_exporter = DataWriter(df=df)
-        # data_exporter.df_to_xlsx()
+        data_exporter.df_to_xlsx()
 
     
     def _load_objs_to_df(self) -> pd.DataFrame:
@@ -157,7 +160,7 @@ class MaxPriceMovements:
 
             old_columns = df_for_benchmark.columns
             df_for_benchmark.columns = pd.MultiIndex.from_product([[str(benchmark_time)], old_columns])
-            
+
             benchmarked_df_list.append(df_for_benchmark)
 
         df = self._join_benchmarked_dfs(benchmarked_df_list)

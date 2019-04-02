@@ -8,17 +8,18 @@ from maxpricemvmts import MaxPriceMovements
 def main():
     price_movements = setup_price_movement_obj()
     price_movements.find_max_price_movements()
-    print(price_movements.to_string())
+    # print(price_movements.to_string())
     price_movements.to_excel()
     
 
 def setup_price_movement_obj():
     package = setup_fpaths()
     minute_data = package[DataReader.MINUTELY]
-    return init_pip_movement_obj(minute_data)
+    fix_data = package[DataReader.FIX]
+    return init_pip_movement_obj(minute_data, fix_data)
 
 
-def init_pip_movement_obj(minute_data):
+def init_pip_movement_obj(minute_data, fix_data):
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
             start_time=time(hour=10, minute=30),
@@ -30,7 +31,7 @@ def init_pip_movement_obj(minute_data):
     }
 
     return MaxPriceMovements(
-        minute_price_df=minute_data, config=pip_movement_config)
+        minute_price_df=minute_data, fix_price_df=fix_data, config=pip_movement_config)
 
 
 def setup_fpaths():
