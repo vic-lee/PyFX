@@ -69,9 +69,10 @@ class MaxPriceMovements:
         for btime in self.max_price_movements:
             self.max_price_movements[btime] = \
                 self._find_max_price_movement_against_benchmark(benchmark_time=btime)
+        self.max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None, pdfx_benchmark=True)
 
 
-    def _find_max_price_movement_against_benchmark(self, benchmark_time: time):
+    def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
         day_objs = {}
         daily_max_pips = None
         current_date = None
@@ -80,7 +81,12 @@ class MaxPriceMovements:
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
-                benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
+
+                if pdfx_benchmark == False: 
+                    benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
+                else: 
+                    benchmark_price = self._get_prior_fix_recursive(current_date - timedelta(days=1))
+                    
                 daily_max_pips = self._init_new_day_obj(current_date, benchmark_price)
 
             daily_max_pips.update_max_pip(current_price)
@@ -120,7 +126,7 @@ class MaxPriceMovements:
         return False
 
 
-    def get_prior_fix_recursive(self, d):
+    def _get_prior_fix_recursive(self, d):
 
         daydelta = lambda d, delta: d - timedelta(days=delta)
 
@@ -134,7 +140,7 @@ class MaxPriceMovements:
         if not np.isnan(fx):
             return fx, d
         else: 
-            return self.get_prior_fix_recursive(daydelta(d, 1))
+            return self._get_prior_fix_recursive(daydelta(d, 1))
 
 
     def to_string(self):
