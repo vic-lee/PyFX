@@ -86,10 +86,14 @@ class MaxPriceMovements:
                     benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
                 else: 
                     benchmark_price = self._get_prior_fix_recursive(current_date - timedelta(days=1))
-                    
-                daily_max_pips = self._init_new_day_obj(current_date, benchmark_price)
 
-            daily_max_pips.update_max_pip(current_price)
+                if benchmark_price is not None: 
+                    daily_max_pips = self._init_new_day_obj(current_date, benchmark_price)
+                else: 
+                    daily_max_pips = None
+
+            if daily_max_pips is not None:
+                daily_max_pips.update_max_pip(current_price)
         
         return day_objs
 
@@ -136,9 +140,10 @@ class MaxPriceMovements:
         except Exception as e: 
             print("Could not locate the previous location, possibly due to out of bounds.")
             print(e)
-            return fx, None
+            return None
         if not np.isnan(fx):
-            return fx, d
+            index = datetime(year=d.year, month=d.month, day=d.day, hour=0, minute=0, second=0)
+            return PriceTime(price=fx, datetime=index)
         else: 
             return self._get_prior_fix_recursive(daydelta(d, 1))
 
