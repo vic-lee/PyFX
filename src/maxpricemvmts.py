@@ -144,19 +144,26 @@ class MaxPriceMovements:
         |--T1--|
         |--T2--|
         '''
-        df = pd.DataFrame()
         benchmarked_df_list = []
-        # df = df.set_index("date")
+
         for _, data in self.max_price_movements.items():
             df_list = []
+
             for _, data_on_date in data.items():
                 exported_df = data_on_date.to_df()
                 df_list.append(exported_df)
+
             df_for_benchmark = pd.concat(df_list, sort=True)
             benchmarked_df_list.append(df_for_benchmark)
 
-        for right_df in benchmarked_df_list:
-            df = df.join(right_df, how="outer")
+        df = self._join_benchmarked_dfs(benchmarked_df_list)
 
         print(df)
-        return df
+        return df    
+        
+    def _join_benchmarked_dfs(self, benchmarked_df_list):
+        df_out = pd.DataFrame()
+        for right_df in benchmarked_df_list:
+            df_out = df_out.join(right_df, how="outer")
+        return df_out
+
