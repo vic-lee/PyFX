@@ -73,10 +73,10 @@ class MaxPriceMovements:
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
             current_price = PriceTime(price=row['val'], datetime=time_index)
-            benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
+                benchmark_price = self._get_benchmark_price(date=time_index.date(), benchmark_time=benchmark_time)
                 daily_max_pips = self._init_new_day_obj(current_date, benchmark_price)
 
             daily_max_pips.update_max_pip(current_price)
@@ -146,7 +146,7 @@ class MaxPriceMovements:
         '''
         benchmarked_df_list = []
 
-        for _, data in self.max_price_movements.items():
+        for benchmark_time, data in self.max_price_movements.items():
             df_list = []
 
             for _, data_on_date in data.items():
@@ -154,6 +154,10 @@ class MaxPriceMovements:
                 df_list.append(exported_df)
 
             df_for_benchmark = pd.concat(df_list, sort=True)
+
+            old_columns = df_for_benchmark.columns
+            df_for_benchmark.columns = pd.MultiIndex.from_product([[str(benchmark_time)], old_columns])
+            
             benchmarked_df_list.append(df_for_benchmark)
 
         df = self._join_benchmarked_dfs(benchmarked_df_list)
@@ -161,6 +165,7 @@ class MaxPriceMovements:
         print(df)
         return df    
         
+
     def _join_benchmarked_dfs(self, benchmarked_df_list):
         df_out = pd.DataFrame()
         for right_df in benchmarked_df_list:
