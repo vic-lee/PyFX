@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime
 
 
 class DataReader:
@@ -43,7 +43,6 @@ class DataReader:
         df['datetime'] = df['datetime'].apply(lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
             
         df = df.set_index('datetime')
-        print(df)
         return df
 
 
