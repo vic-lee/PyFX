@@ -87,9 +87,9 @@ class DayPipMovmentToPrice:
     def to_df(self) -> pd.DataFrame:
         f_max_pip_up_time = self._format_max_pip_up_time()
         f_max_pip_down_time = self._format_max_pip_down_time()
-        benchmark_time_str = str(self.benchmark_pricetime.get_datetime().time())
 
         df = pd.DataFrame({
+            "Benchmark Price": self.benchmark_pricetime.get_price(),
             "Max Pip Up": self.max_pip_up,
             "Time at Max Pip Up": f_max_pip_up_time,
             "Price at Max Pip Up": self.price_at_max_pip_up,
