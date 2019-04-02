@@ -18,7 +18,7 @@ def main():
     
 
 def setup_price_movement_obj():
-    price_data = setup_fpaths()
+    price_data = read_price_data()
 
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
@@ -29,13 +29,13 @@ def setup_price_movement_obj():
             time(hour=10, minute=30), time(hour=10, minute=45)
         ],
     }
-    
+
     return MaxPriceMovements(price_dfs=price_data, config=pip_movement_config)
 
     # return init_pip_movement_obj(price_data=package)
 
 
-def setup_fpaths():
+def read_price_data():
     in_fpaths = {
         DataReader.FIX: abspath("../data/datasrc/fix1819.csv"), 
         DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
