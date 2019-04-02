@@ -1,5 +1,6 @@
 from datetime import datetime, time
 import pandas as pd
+import numpy as np
 
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
@@ -120,9 +121,12 @@ class MaxPriceMovements:
 
 
     def get_prior_fix_recursive(self, d):
+
+        daydelta = lambda d, delta: d - timedelta(days=delta)
+
         fx = None
         try: 
-            fx = fixdf.loc[str(d)][CP]
+            fx = self.fix_price_df.loc[str(d)]['GBP-USD']
         except Exception as e: 
             print("Could not locate the previous location, possibly due to out of bounds.")
             print(e)
@@ -130,7 +134,7 @@ class MaxPriceMovements:
         if not np.isnan(fx):
             return fx, d
         else: 
-            return get_prior_fix_recursive(daydelta(d, 1))
+            return self.get_prior_fix_recursive(daydelta(d, 1))
 
 
     def to_string(self):
