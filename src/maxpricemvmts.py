@@ -2,13 +2,14 @@ from datetime import datetime, time, timedelta
 import pandas as pd
 import numpy as np
 
+from metric import Metric
 from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from pricetime import PriceTime
 from datawriter import DataWriter
 from datareader import DataReader
 
-class MaxPriceMovements:
+class MaxPriceMovements(Metric):
     """This class finds the daily price movements within a period of time. 
     It is used in conjunction with DayPipMovmentToPrice class.
     """
@@ -33,16 +34,14 @@ class MaxPriceMovements:
             }
         }
         '''
-        self.time_range = config[self.TIME_RANGE]
+        Metric.__init__(self, time_range=config[self.TIME_RANGE], price_dfs=price_dfs)
+
         self.benchmark_times = config[self.BENCHMARK_TIMES]
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
 
-        self.minute_price_df = self._filter_df_to_time_range(price_dfs[DataReader.MINUTELY])
-        self.fix_price_df = price_dfs[DataReader.FIX]
-        self.daily_price_df = price_dfs[DataReader.DAILY]
-
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
+
 
 
     def _generate_price_movements_obj_from_benchmark_times(self):
@@ -196,6 +195,7 @@ class MaxPriceMovements:
             benchmarked_df_list.append(df_for_benchmark)
 
         df = self._join_benchmarked_dfs(df, benchmarked_df_list)
+        df = self._join_daily_price_df(target=df)
 
         print(df)
         return df    
@@ -205,4 +205,10 @@ class MaxPriceMovements:
         target = pd.DataFrame()
         for right_df in benchmarked_df_list:
             target = target.join(right_df, how="outer")
+        return target
+
+
+    def _join_daily_price_df(self, target): 
+        self.daily_price_df.columns = pd.MultiIndex.from_product([["OHLC"], self.daily_price_df.columns])
+        target = target.join(self.daily_price_df)
         return target
