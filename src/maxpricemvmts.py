@@ -6,6 +6,7 @@ from daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from pricetime import PriceTime
 from datawriter import DataWriter
+from datareader import DataReader
 
 class MaxPriceMovements:
     """This class finds the daily price movements within a period of time. 
@@ -15,7 +16,7 @@ class MaxPriceMovements:
     TIME_RANGE = "time range"
     BENCHMARK_TIMES = "benchmark_times"
 
-    def __init__(self, minute_price_df, fix_price_df, config):
+    def __init__(self, price_dfs, config):
         '''
         Note: the initialization is highly coupled. Later initializations may 
         depend on earlier initializations. Change the sequence of initialization
@@ -37,8 +38,8 @@ class MaxPriceMovements:
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
 
-        self.minute_price_df = self._filter_df_to_time_range(minute_price_df)
-        self.fix_price_df = fix_price_df
+        self.minute_price_df = self._filter_df_to_time_range(price_dfs[DataReader.MINUTELY])
+        self.fix_price_df = price_dfs[DataReader.FIX]
 
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
