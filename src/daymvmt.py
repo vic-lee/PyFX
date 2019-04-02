@@ -1,4 +1,5 @@
 from pricetime import PriceTime
+import pandas as pd
 
 class DayPipMovmentToPrice:
     """For a given day, this object encapsulates the maximum 
@@ -75,3 +76,18 @@ class DayPipMovmentToPrice:
 
     def _is_in_benchmark_period(self, current_price: PriceTime) -> bool: 
         return current_price.is_later_than(self.benchmark_pricetime)
+
+    
+    def to_df(self) -> pd.DataFrame:
+        f_max_pip_up_time = self._format_max_pip_up_time()
+        f_max_pip_down_time = self._format_max_pip_down_time()
+        benchmark_time_str = str(self.benchmark_pricetime.get_datetime().time())
+
+        df = pd.DataFrame({
+            "Max Pip Up " + benchmark_time_str: self.max_pip_up,
+            "Max Pip Up Time " + benchmark_time_str: f_max_pip_up_time,
+            "Max Pip Down " + benchmark_time_str: self.max_pip_down,
+            "Max Pip Down Time " + benchmark_time_str: f_max_pip_down_time,
+        }, index=[self.date])
+        
+        return df
