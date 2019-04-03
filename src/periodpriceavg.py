@@ -14,11 +14,38 @@ class PeriodPriceAvg(Metric):
     
     def _calc_avgs(self):
         df = self._generate_period_prices_df()
-        
-        df['Mean'] = df.mean(axis=1).round(5)
-        print(df)
+        df_stats = pd.DataFrame()
+        df_stats['Mean'] = df.mean(axis=1).round(5)
+
+        for index, row in df.iterrows():
+            df_stats.at[index, 'Time for Min'] = self._find_time_for_min(row)
+            df_stats.at[index, 'Time for Max'] = self._find_time_for_max(row)
+
+        print(df_stats)
 
         return df
+
+    
+    def _find_time_for_min(self, row):
+        min_price = None
+        min_time = None
+        for time, price in row.iteritems():
+            if min_price == None or price < min_price: 
+                min_price = price
+                min_time = time
+        print("Min time: {}".format(min_time))
+        return min_time
+
+
+    def _find_time_for_max(self, row):
+        max_price = None
+        max_time = None
+        for time, price in row.iteritems():
+            if max_price == None or price > max_price: 
+                max_price = price
+                max_time = time
+        return max_time
+
 
     def _generate_period_prices_df(self):
         time_cur = self.time_range_for_avg.start_time
