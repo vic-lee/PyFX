@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import xlsxwriter
 import pickle
 from keydef import *
-from datareader import DataReader
+from dataio.datareader import DataReader
 
 pipmvmt = lambda final, initial: round((final - initial) * 10000, 1)
 

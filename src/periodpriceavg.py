@@ -2,7 +2,7 @@ from datetime import timedelta, time
 import pandas as pd
 
 from metric import Metric
-from datareader import DataReader
+from dataio.datareader import DataReader
 from datastructure.daytimerange import TimeRangeInDay
 
 class PeriodPriceAvg(Metric): 

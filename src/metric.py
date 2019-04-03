@@ -1,7 +1,7 @@
 import numpy as np
 from datetime import datetime, timedelta
 
-from datareader import DataReader
+from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
 
 class Metric:

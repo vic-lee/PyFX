@@ -8,8 +8,8 @@ from metric import Metric
 from datastructure.daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
 from datastructure.pricetime import PriceTime
-from datawriter import DataWriter
-from datareader import DataReader
+from dataio.datawriter import DataWriter
+from dataio.datareader import DataReader
 from periodpriceavg import PeriodPriceAvg
 
 
