@@ -131,24 +131,6 @@ class MaxPriceMovements(Metric):
         return False
 
 
-    def _get_prior_fix_recursive(self, d):
-
-        daydelta = lambda d, delta: d - timedelta(days=delta)
-
-        fx = None
-        try: 
-            fx = self.fix_price_df.loc[str(d)]['GBP-USD']
-        except Exception as e: 
-            print("Could not locate the previous location, possibly due to out of bounds.")
-            print(e)
-            return None
-        if not np.isnan(fx):
-            index = datetime(year=d.year, month=d.month, day=d.day, hour=0, minute=0, second=0)
-            return PriceTime(price=fx, datetime=index)
-        else: 
-            return self._get_prior_fix_recursive(daydelta(d, 1))
-
-
     def to_string(self):
         benchmark_time_header_template = \
             "\n/********************** Benchmark Time: {} **********************/\n"
@@ -202,7 +184,7 @@ class MaxPriceMovements(Metric):
         
 
     def _join_benchmarked_dfs(self, target, benchmarked_df_list):
-        target = pd.DataFrame()
+        # target = pd.DataFrame()
         for right_df in benchmarked_df_list:
             target = target.join(right_df, how="outer")
         return target
