@@ -78,14 +78,15 @@ class DataReader:
         """
         df = df.drop(columns=[
             'GBP/USD(Open, Ask)', 'GBP/USD(High, Ask)', 
-            'GBP/USD(Low, Ask)', 'GBP/USD(Close, Ask)'
+            'GBP/USD(Low, Ask)', 'GBP/USD(Close, Ask)',
+            'Tick Volume(GBP/USD)'
         ])
         df = df.rename(columns={
             'GBP/USD(Open, Bid)*': 'Open',
             'GBP/USD(High, Bid)*': 'High',
             'GBP/USD(Low, Bid)*': 'Low',
             'GBP/USD(Close, Bid)*': 'Close',
-            'Tick Volume(GBP/USD)': 'Volume',
+            # 'Tick Volume(GBP/USD)': 'Volume',
         })
         return df
 
