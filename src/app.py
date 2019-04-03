@@ -5,6 +5,8 @@ from datareader import DataReader
 from daytimerange import TimeRangeInDay
 from maxpricemvmts import MaxPriceMovements
 from periodpriceavg import PeriodPriceAvg
+from dfbundler import DataFrameBundler
+from datawriter import DataWriter
 
 def main():
     start_time = datetime.now()
@@ -16,17 +18,6 @@ def main():
     # print(price_movements.to_string())
     price_movements.to_excel()
 
-    price_avg_1058_1102 = PeriodPriceAvg(
-        price_dfs=price_data, 
-        time_range=TimeRangeInDay(
-            start_time=time(hour=10, minute=30),
-            end_time=time(hour=11, minute=2)
-        ), 
-        time_range_for_avg=TimeRangeInDay(
-            start_time=time(hour=10, minute=55),
-            end_time=time(hour=11, minute=2)
-        )
-    )
 
     end_time = datetime.now()
     print("Program runtime: {}".format((end_time - start_time)))

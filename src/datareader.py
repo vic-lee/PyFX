@@ -62,7 +62,6 @@ class DataReader:
         df = df.set_index('datetime')
         # df = df[['date', 'time', 'val']]
         df = df.drop(columns=['time', 'date'])
-        print(df)
         return df
 
 

@@ -217,7 +217,11 @@ class MaxPriceMovements(Metric):
             time_range_for_avg=TimeRangeInDay(
                 start_time=time(hour=10, minute=55),
                 end_time=time(hour=11, minute=2)
-            )
+            ), 
+            include_open={
+                time(hour=10, minute=55),
+                time(hour=10, minute=56),
+            }
         ).to_df()
         df.columns = pd.MultiIndex.from_product([["1055_1102"], df.columns])
         target = target.join(df)

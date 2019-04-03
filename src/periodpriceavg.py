@@ -6,7 +6,7 @@ from datareader import DataReader
 from daytimerange import TimeRangeInDay
 
 class PeriodPriceAvg(Metric): 
-    def __init__(self, price_dfs, time_range: TimeRangeInDay, time_range_for_avg: TimeRangeInDay):
+    def __init__(self, price_dfs, time_range: TimeRangeInDay, time_range_for_avg: TimeRangeInDay, include_open=None):
         Metric.__init__(self, time_range, price_dfs)
         self.time_range_for_avg = time_range_for_avg
         self.avgs = self._calc_avgs()
@@ -21,7 +21,8 @@ class PeriodPriceAvg(Metric):
             df_stats.at[index, 'Time for Min'] = self._find_time_for_min(row)
             df_stats.at[index, 'Time for Max'] = self._find_time_for_max(row)
 
-        print(df_stats)
+        df = df.join(df_stats, how="outer")
+        print(df)
 
         return df
 
@@ -33,8 +34,7 @@ class PeriodPriceAvg(Metric):
             if min_price == None or price < min_price: 
                 min_price = price
                 min_time = time
-        print("Min time: {}".format(min_time))
-        return min_time
+        return min_time[:-6]
 
 
     def _find_time_for_max(self, row):
@@ -44,7 +44,7 @@ class PeriodPriceAvg(Metric):
             if max_price == None or price > max_price: 
                 max_price = price
                 max_time = time
-        return max_time
+        return max_time[:-6]
 
 
     def _generate_period_prices_df(self):
@@ -53,7 +53,7 @@ class PeriodPriceAvg(Metric):
 
         while time_cur <= self.time_range_for_avg.end_time:
             single_minute_df = self.minute_price_df.between_time(time_cur, time_cur)['Close']
-            single_minute_df = single_minute_df.rename(time_cur)
+            single_minute_df = single_minute_df.rename(str(time_cur) + " Close")
             single_minute_df.index = single_minute_df.index.normalize()
             df_list[time_cur] = single_minute_df
             time_cur = self.incr_one_min(time_cur)

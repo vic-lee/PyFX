@@ -2,9 +2,9 @@ import pandas as pd
 
 class DataWriter: 
     
-    def __init__(self, df, default_fname="dataout"):
+    def __init__(self, df, filename="dataout"):
         self._df = df
-        self._default_fname = default_fname
+        self._default_fname = filename
         self._default_fname_xlsx = self._default_fname + ".xlsx"
         self._default_fname_csv = self._default_fname + ".csv"
 
