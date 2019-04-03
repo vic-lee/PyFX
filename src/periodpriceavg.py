@@ -13,21 +13,17 @@ class PeriodPriceAvg(Metric):
 
     
     def _calc_avgs(self):
-        '''
-        Generate a df for every PriceTime within the time range. 
-        Lump dfs together. 
-        Create a new column for avg. 
-        Calculate avg for every datapoint in the row. 
-        '''
+        df = self._generate_period_prices_df()
+        
+        df['Mean'] = df.mean(axis=1).round(5)
+        print(df)
 
-        price_in_range_df = self._generate_df_for_prices_in_range()
-        df = pd.DataFrame()
         return df
-    
-    def _generate_df_for_prices_in_range(self):
-        time_cur = self.time_range_for_avg.start_time
 
+    def _generate_period_prices_df(self):
+        time_cur = self.time_range_for_avg.start_time
         df_list = {}
+
         while time_cur <= self.time_range_for_avg.end_time:
             single_minute_df = self.minute_price_df.between_time(time_cur, time_cur)['Close']
             single_minute_df = single_minute_df.rename(time_cur)
@@ -36,8 +32,6 @@ class PeriodPriceAvg(Metric):
             time_cur = self.incr_one_min(time_cur)
 
         df = self._join_minute_dfs(df_list)
-        df['Mean'] = df.mean(axis=1).round(5)
-        print(df)
 
         return df
 
@@ -62,4 +56,4 @@ class PeriodPriceAvg(Metric):
 
 
     def to_df(self):
-        pass
+        return self.avgs
