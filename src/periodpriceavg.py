@@ -32,11 +32,12 @@ class PeriodPriceAvg(Metric):
             single_minute_df = self.minute_price_df.between_time(time_cur, time_cur)['Close']
             single_minute_df = single_minute_df.rename(time_cur)
             single_minute_df.index = single_minute_df.index.normalize()
-            print(single_minute_df)
             df_list[time_cur] = single_minute_df
             time_cur = self.incr_one_min(time_cur)
 
         df = self._join_minute_dfs(df_list)
+        df['Mean'] = df.mean(axis=1).round(5)
+        print(df)
 
         return df
 
@@ -45,7 +46,6 @@ class PeriodPriceAvg(Metric):
         df_out = pd.DataFrame()
         for _, right_df in df_list.items():
             df_out = df_out.join(right_df, how="outer")
-        print(df_out)
         return df_out
 
 
