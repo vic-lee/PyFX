@@ -5,9 +5,9 @@ from os.path import abspath
 
 
 from metric import Metric
-from daytimerange import TimeRangeInDay
+from datastructure.daytimerange import TimeRangeInDay
 from daymvmt import DayPipMovmentToPrice
-from pricetime import PriceTime
+from datastructure.pricetime import PriceTime
 from datawriter import DataWriter
 from datareader import DataReader
 from periodpriceavg import PeriodPriceAvg

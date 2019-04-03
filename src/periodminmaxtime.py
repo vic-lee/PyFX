@@ -1,5 +1,5 @@
 from metric import Metric
-from daytimerange import TimeRangeInDay
+from datastructure.daytimerange import TimeRangeInDay
 
 class PeriodMinMaxTime(Metric): 
     def __init__(self, price_dfs, time_range, time_range_for_calc):

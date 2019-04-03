@@ -2,7 +2,7 @@ import numpy as np
 from datetime import datetime, timedelta
 
 from datareader import DataReader
-from pricetime import PriceTime
+from datastructure.pricetime import PriceTime
 
 class Metric:
     def __init__(self, time_range, price_dfs):

@@ -1,4 +1,4 @@
-from pricetime import PriceTime
+from datastructure.pricetime import PriceTime
 import pandas as pd
 
 class DayPipMovmentToPrice:

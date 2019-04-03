@@ -2,7 +2,7 @@ from os.path import abspath
 from datetime import datetime, time 
 
 from datareader import DataReader
-from daytimerange import TimeRangeInDay
+from datastructure.daytimerange import TimeRangeInDay
 from maxpricemvmts import MaxPriceMovements
 from periodpriceavg import PeriodPriceAvg
 from dfbundler import DataFrameBundler
