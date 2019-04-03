@@ -2,11 +2,13 @@ from os.path import abspath
 from datetime import datetime, time 
 
 from dataio.datareader import DataReader
-from datastructure.daytimerange import TimeRangeInDay
+from dataio.datawriter import DataWriter
+
 from metric.maxpricemvmts import MaxPriceMovements
 from metric.periodpriceavg import PeriodPriceAvg
+
 from dfbundler import DataFrameBundler
-from dataio.datawriter import DataWriter
+from datastructure.daytimerange import TimeRangeInDay
 
 def main():
     start_time = datetime.now()
