@@ -4,21 +4,35 @@ from datetime import datetime, time
 from datareader import DataReader
 from daytimerange import TimeRangeInDay
 from maxpricemvmts import MaxPriceMovements
+from periodpriceavg import PeriodPriceAvg
 
 def main():
     start_time = datetime.now()
 
-    price_movements = setup_price_movement_obj()
+    price_data = read_price_data()
+
+    price_movements = setup_price_movement_obj(data=price_data)
     price_movements.find_max_price_movements()
     # print(price_movements.to_string())
     price_movements.to_excel()
+
+    price_avg_1058_1102 = PeriodPriceAvg(
+        price_dfs=price_data, 
+        time_range=TimeRangeInDay(
+            start_time=time(hour=10, minute=30),
+            end_time=time(hour=11, minute=2)
+        ), 
+        time_range_for_avg=TimeRangeInDay(
+            start_time=time(hour=10, minute=55),
+            end_time=time(hour=11, minute=2)
+        )
+    )
 
     end_time = datetime.now()
     print("Program runtime: {}".format((end_time - start_time)))
     
 
-def setup_price_movement_obj():
-    price_data = read_price_data()
+def setup_price_movement_obj(data):
 
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
@@ -30,7 +44,7 @@ def setup_price_movement_obj():
         ],
     }
 
-    return MaxPriceMovements(price_dfs=price_data, config=pip_movement_config)
+    return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
 
     # return init_pip_movement_obj(price_data=package)
 
