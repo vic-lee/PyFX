@@ -1,6 +1,8 @@
 from datetime import datetime, time, timedelta
 import pandas as pd
 import numpy as np
+from os.path import abspath
+
 
 from metric import Metric
 from daytimerange import TimeRangeInDay
@@ -8,6 +10,8 @@ from daymvmt import DayPipMovmentToPrice
 from pricetime import PriceTime
 from datawriter import DataWriter
 from datareader import DataReader
+from periodpriceavg import PeriodPriceAvg
+
 
 class MaxPriceMovements(Metric):
     """This class finds the daily price movements within a period of time. 
@@ -159,9 +163,19 @@ class MaxPriceMovements(Metric):
         |--T1--|
         |--T2--|
         '''
-        benchmarked_df_list = []
         df = pd.DataFrame()
 
+        benchmarked_df_list = self._generate_benchmarked_df_list()
+
+        df = self._join_benchmarked_dfs(df, benchmarked_df_list)
+        df = self._join_daily_price_df(target=df)
+        df = self._join_period_avg_data(target=df)
+
+        print(df)
+        return df    
+
+    def _generate_benchmarked_df_list(self):
+        benchmarked_df_list = []
         for benchmark_time, data in self.max_price_movements.items():
             df_list = []
 
@@ -175,12 +189,7 @@ class MaxPriceMovements(Metric):
             df_for_benchmark.columns = pd.MultiIndex.from_product([[str(benchmark_time)], old_columns])
 
             benchmarked_df_list.append(df_for_benchmark)
-
-        df = self._join_benchmarked_dfs(df, benchmarked_df_list)
-        df = self._join_daily_price_df(target=df)
-
-        print(df)
-        return df    
+        return benchmarked_df_list
         
 
     def _join_benchmarked_dfs(self, target, benchmarked_df_list):
@@ -194,3 +203,34 @@ class MaxPriceMovements(Metric):
         self.daily_price_df.columns = pd.MultiIndex.from_product([["OHLC"], self.daily_price_df.columns])
         target = target.join(self.daily_price_df)
         return target
+
+
+    def _join_period_avg_data(self, target):
+        price_data = read_price_data()
+
+        df = PeriodPriceAvg(
+            price_dfs=price_data, 
+            time_range=TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ), 
+            time_range_for_avg=TimeRangeInDay(
+                start_time=time(hour=10, minute=55),
+                end_time=time(hour=11, minute=2)
+            )
+        ).to_df()
+        df.columns = pd.MultiIndex.from_product([["1055_1102"], df.columns])
+        target = target.join(df)
+        return target
+
+
+def read_price_data():
+    in_fpaths = {
+        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"), 
+        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
+        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")  
+    }
+
+    fx_reader = DataReader(in_fpaths)
+    package = fx_reader.read_data()
+    return package
