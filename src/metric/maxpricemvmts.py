@@ -4,13 +4,15 @@ import numpy as np
 from os.path import abspath
 
 
-from metric import Metric
 from datastructure.daytimerange import TimeRangeInDay
-from daymvmt import DayPipMovmentToPrice
 from datastructure.pricetime import PriceTime
+
 from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
-from periodpriceavg import PeriodPriceAvg
+
+from metric.metric import Metric
+from metric.daymvmt import DayPipMovmentToPrice
+from metric.periodpriceavg import PeriodPriceAvg
 
 
 class MaxPriceMovements(Metric):

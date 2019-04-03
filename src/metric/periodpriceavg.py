@@ -1,7 +1,7 @@
 from datetime import timedelta, time
 import pandas as pd
 
-from metric import Metric
+from metric.metric import Metric
 from dataio.datareader import DataReader
 from datastructure.daytimerange import TimeRangeInDay
 

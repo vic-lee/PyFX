@@ -3,8 +3,8 @@ from datetime import datetime, time
 
 from dataio.datareader import DataReader
 from datastructure.daytimerange import TimeRangeInDay
-from maxpricemvmts import MaxPriceMovements
-from periodpriceavg import PeriodPriceAvg
+from metric.maxpricemvmts import MaxPriceMovements
+from metric.periodpriceavg import PeriodPriceAvg
 from dfbundler import DataFrameBundler
 from dataio.datawriter import DataWriter
 
