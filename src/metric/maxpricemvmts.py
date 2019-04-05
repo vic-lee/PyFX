@@ -223,6 +223,9 @@ class MaxPriceMovements(Metric):
 
     def _join_period_avg_data(self, target):
         price_data = read_price_data()
+        
+        time_range_start = time(hour=10, minute=50)
+        time_range_end = time(hour=11, minute=2)
 
         df = PeriodPriceAvg(
             price_dfs=price_data, 
@@ -231,15 +234,19 @@ class MaxPriceMovements(Metric):
                 end_time=time(hour=11, minute=2)
             ), 
             time_range_for_avg=TimeRangeInDay(
-                start_time=time(hour=10, minute=55),
-                end_time=time(hour=11, minute=2)
+                start_time=time_range_start,
+                end_time=time_range_end
             ), 
             include_open={
                 time(hour=10, minute=55),
                 time(hour=10, minute=56),
             }
         ).to_df()
-        df.columns = pd.MultiIndex.from_product([["1055_1102"], df.columns])
+        
+        column_str = str(time_range_start.hour) + str(time_range_start.minute) \
+            + "_" + str(time_range_end.hour) + str(time_range_end.minute)
+        df.columns = pd.MultiIndex.from_product([[column_str], df.columns])
+
         target = target.join(df)
         return target
 
