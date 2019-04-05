@@ -13,6 +13,7 @@ from dataio.datareader import DataReader
 from metric.metric import Metric
 from metric.daymvmt import DayPipMovmentToPrice
 from metric.periodpriceavg import PeriodPriceAvg
+from metric.minutelydata import MinutelyData
 
 
 class MaxPriceMovements(Metric):
@@ -242,10 +243,23 @@ class MaxPriceMovements(Metric):
                 time(hour=10, minute=56),
             }
         ).to_df()
-        
-        column_str = str(time_range_start.hour) + str(time_range_start.minute) \
-            + "_" + str(time_range_end.hour) + str(time_range_end.minute)
+
+        column_str = str(time_range_start) + "_" + str(time_range_end)
         df.columns = pd.MultiIndex.from_product([[column_str], df.columns])
+
+        minute_data = MinutelyData(
+            price_dfs=price_data, 
+            time_range=TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ), 
+            specs=[
+            {
+                "range_start": time_range_start,
+                "range_end": time_range_end, 
+                "include": ["Open", "Close"]
+            }
+        ]).to_df()
 
         target = target.join(df)
         return target
