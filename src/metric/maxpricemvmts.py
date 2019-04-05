@@ -211,15 +211,6 @@ class MaxPriceMovements(Metric):
         print(daily_price)
         daily_price.join(target)
         return daily_price
-        # daily_price_in_time_range = self.daily_price_df.loc[
-        #     date(year=2018, month=1, day=2):
-        #     date(year=2018, month=12, day=28)
-        # ]
-        # daily_price_in_time_range.columns = pd.MultiIndex.from_product(
-        #     [["OHLC"], daily_price_in_time_range.columns])
-        # print(daily_price_in_time_range)
-        # target = target.join(daily_price_in_time_range, how="outer")
-        # return target
 
 
     def _join_period_avg_data(self, target):
