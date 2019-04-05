@@ -40,6 +40,9 @@ class DataReader:
         df.rename(columns = {'Date': 'datetime'}, inplace=True)
         df = self._filter_ohlc_in_daily(df)
 
+        mask = (df['datetime'] > "2018-01-02") & (df['datetime'] <= "2018-12-29")
+        df = df.loc[mask]
+        
         df['datetime'] = df['datetime'].apply(lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
             
         df = df.set_index('datetime')

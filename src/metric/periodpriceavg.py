@@ -22,7 +22,7 @@ class PeriodPriceAvg(Metric):
             df_stats.at[index, 'Time for Max'] = self._find_time_for_max(row)
 
         df = df.join(df_stats, how="outer")
-        print(df)
+        # print(df)
 
         return df
 

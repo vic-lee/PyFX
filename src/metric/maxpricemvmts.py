@@ -1,4 +1,4 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime, date, time, timedelta
 import pandas as pd
 import numpy as np
 from os.path import abspath
@@ -204,10 +204,21 @@ class MaxPriceMovements(Metric):
 
 
     def _join_daily_price_df(self, target): 
-        self.daily_price_df.columns = pd.MultiIndex.from_product([["OHLC"], self.daily_price_df.columns])
-        print(self.daily_price_df)
-        target = target.join(self.daily_price_df)
-        return target
+        daily_price = self.daily_price_df
+        daily_price.columns = pd.MultiIndex.from_product(
+            [["OHLC"], daily_price.columns])
+        print(daily_price)
+        daily_price.join(target)
+        return daily_price
+        # daily_price_in_time_range = self.daily_price_df.loc[
+        #     date(year=2018, month=1, day=2):
+        #     date(year=2018, month=12, day=28)
+        # ]
+        # daily_price_in_time_range.columns = pd.MultiIndex.from_product(
+        #     [["OHLC"], daily_price_in_time_range.columns])
+        # print(daily_price_in_time_range)
+        # target = target.join(daily_price_in_time_range, how="outer")
+        # return target
 
 
     def _join_period_avg_data(self, target):
