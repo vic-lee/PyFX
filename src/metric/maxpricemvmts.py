@@ -166,11 +166,13 @@ class MaxPriceMovements(Metric):
         |--T2--|
         '''
         df = pd.DataFrame()
+        df.columns = pd.MultiIndex.from_product([[""], df.columns])
+
 
         benchmarked_df_list = self._generate_benchmarked_df_list()
 
-        df = self._join_benchmarked_dfs(df, benchmarked_df_list)
         df = self._join_daily_price_df(target=df)
+        df = self._join_benchmarked_dfs(df, benchmarked_df_list)
         df = self._join_period_avg_data(target=df)
 
         print(df)
@@ -203,6 +205,7 @@ class MaxPriceMovements(Metric):
 
     def _join_daily_price_df(self, target): 
         self.daily_price_df.columns = pd.MultiIndex.from_product([["OHLC"], self.daily_price_df.columns])
+        print(self.daily_price_df)
         target = target.join(self.daily_price_df)
         return target
 
