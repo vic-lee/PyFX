@@ -32,7 +32,7 @@ class MinutelyData(Metric):
         while time_cur <= end_time:
 
             for m in metric_to_include:
-                df = self.minute_price_df.between_time(time_cur, time_cur)[m]
+                df = self.full_minute_price_df.between_time(time_cur, time_cur)[m]
                 df = df.rename("{} {}".format(str(time_cur), m))
                 df.index = df.index.normalize()
                 df_list.append(df)
@@ -62,4 +62,5 @@ class MinutelyData(Metric):
 
     
     def to_df(self):
+        print(self.df)
         return self.df

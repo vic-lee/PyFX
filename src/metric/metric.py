@@ -10,6 +10,7 @@ class Metric:
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.minute_price_df = self._filter_df_to_time_range(price_dfs[DataReader.MINUTELY])
+        self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
 
 
     def _filter_df_to_time_range(self, df):
