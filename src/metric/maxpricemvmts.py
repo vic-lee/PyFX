@@ -180,16 +180,16 @@ class MaxPriceMovements(Metric):
             for _, data_on_date in data.items():
                 exported_df = data_on_date.to_df()
                 df_list.append(exported_df)
-            
+
             df_for_benchmark = pd.concat(df_list, sort=False)
 
             if (str(benchmark_time) == 'PDFX'):
                 current_day_fix_df = self.fix_price_df[['GBP-USD']]
                 current_day_fix_df.columns = ['Current Day Fix']
-                
+
                 df_for_benchmark = pd.merge(
-                    left=current_day_fix_df, 
-                    right=df_for_benchmark, 
+                    left=current_day_fix_df,
+                    right=df_for_benchmark,
                     left_index=True,
                     right_index=True,
                     how='inner')
@@ -231,7 +231,17 @@ class MaxPriceMovements(Metric):
                     "range_start": time_range_start,
                     "range_end": time_range_end,
                     "include": ["Close"]
-                }
+                },
+                {
+                    "range_start": time(hour=11, minute=30),
+                    "range_end": time(hour=11, minute=30),
+                    "include": ['Close']
+                },
+                {
+                    "range_start": time(hour=11, minute=45),
+                    "range_end": time(hour=11, minute=45),
+                    "include": ['Close']
+                },
             ]).to_df()
 
         minute_data.columns = pd.MultiIndex.from_product(
