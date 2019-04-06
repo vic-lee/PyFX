@@ -24,14 +24,28 @@ class DayPipMovmentToPrice:
         self.time_range = time_range
 
         self.max_pip_up = None
-        self.max_pip_up_time = self.benchmark_pricetime.get_datetime()
-        self.price_at_max_pip_up = self.benchmark_pricetime.get_price()
+        self.max_pip_up_time = self._initialize_datetime_for_max_min()
+        self.price_at_max_pip_up = self._initialize_prices_for_max_min()
 
         self.max_pip_down = None
-        self.max_pip_down_time = self.benchmark_pricetime.get_datetime()
-        self.price_at_max_pip_down = self.benchmark_pricetime.get_price()
+        self.max_pip_down_time = self._initialize_datetime_for_max_min()
+        self.price_at_max_pip_down = self._initialize_prices_for_max_min()
 
+
+    def _initialize_datetime_for_max_min(self):
+        if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
+            return self.benchmark_pricetime.get_datetime()
+        else:
+            return None
+
+
+    def _initialize_prices_for_max_min(self):
+        if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
+            return self.benchmark_pricetime.get_price()
+        else:
+            return None
     
+
     def update_max_pip(self, current_price):
         self._update_max_pip_up(current_price)
         self._update_max_pip_down(current_price)
@@ -91,7 +105,7 @@ class DayPipMovmentToPrice:
 
     def _format_time(self, time):
         if time == None:
-            return "N/A"
+            return None
         else:
             return time.time()
 
