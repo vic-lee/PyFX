@@ -23,11 +23,11 @@ class DayPipMovmentToPrice:
         self.benchmark_pricetime = benchmark_pricetime
         self.time_range = time_range
 
-        self.max_pip_up = 0
+        self.max_pip_up = None
         self.max_pip_up_time = self.benchmark_pricetime.get_datetime()
         self.price_at_max_pip_up = self.benchmark_pricetime.get_price()
 
-        self.max_pip_down = 0
+        self.max_pip_down = None
         self.max_pip_down_time = self.benchmark_pricetime.get_datetime()
         self.price_at_max_pip_down = self.benchmark_pricetime.get_price()
 
@@ -39,7 +39,8 @@ class DayPipMovmentToPrice:
     
     def _update_max_pip_up(self, current_price):
         new_pip = current_price.pip_movement_from(self.benchmark_pricetime)
-        if self._is_in_benchmark_period(current_price) and new_pip > self.max_pip_up:
+        # if self._is_in_benchmark_period(current_price) and new_pip > self.max_pip_up:
+        if self._is_in_benchmark_period(current_price) and self._is_new_pip_greater(new_pip):
             self.max_pip_up = new_pip
             self.max_pip_up_time = current_price.get_datetime()
             self.price_at_max_pip_up = current_price.get_price()
@@ -47,7 +48,8 @@ class DayPipMovmentToPrice:
 
     def _update_max_pip_down(self, current_price):
         new_pip = current_price.pip_movement_from(self.benchmark_pricetime)
-        if self._is_in_benchmark_period(current_price) and new_pip < self.max_pip_down:
+        # if self._is_in_benchmark_period(current_price) and new_pip < self.max_pip_down:
+        if self._is_in_benchmark_period(current_price) and self._is_new_pip_lower(new_pip):
             self.max_pip_down = new_pip
             self.max_pip_down_time = current_price.get_datetime()
             self.price_at_max_pip_down = current_price.get_price()
@@ -64,6 +66,20 @@ class DayPipMovmentToPrice:
             "Max pip down: {}".format(self.max_pip_down),
             "Max pip down time: {}".format(f_max_pip_down_time)))
 
+
+    def _is_new_pip_greater(self, new_pip):
+        if self.max_pip_up is not None:
+            return (new_pip > self.max_pip_up)
+        else: 
+            return (new_pip > 0)
+
+    
+    def _is_new_pip_lower(self, new_pip):
+        if self.max_pip_down is not None:
+            return (new_pip < self.max_pip_down)
+        else: 
+            return (new_pip < 0)
+    
 
     def _format_max_pip_up_time(self):
         return self._format_time(time=self.max_pip_up_time)
@@ -91,11 +107,11 @@ class DayPipMovmentToPrice:
         df = pd.DataFrame({
             "Benchmark Price": self.benchmark_pricetime.get_price(),
             "Max Pip Up": self.max_pip_up,
-            "Time at Max Pip Up": f_max_pip_up_time,
             "Price at Max Pip Up": self.price_at_max_pip_up,
+            "Time at Max Pip Up": f_max_pip_up_time,
             "Max Pip Down": self.max_pip_down,
-            "Time at Max Pip Down": f_max_pip_down_time,
             "Price at Max Pip Down": self.price_at_max_pip_down,
+            "Time at Max Pip Down": f_max_pip_down_time,
         }, index=[self.date])
         
         return df
