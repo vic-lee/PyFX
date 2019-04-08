@@ -1,4 +1,5 @@
 from datastructure.pricetime import PriceTime
+from datastructure.daytimerange import TimeRangeInDay
 import pandas as pd
 
 class DayPipMovmentToPrice:
@@ -18,19 +19,24 @@ class DayPipMovmentToPrice:
     UP = "up"
     DOWN = "down"
 
-    def __init__(self, date, benchmark_pricetime: PriceTime, time_range):
+    def __init__(self, date, benchmark_pricetime: PriceTime, time_range: TimeRangeInDay):
         self.date = date
         self.benchmark_pricetime = benchmark_pricetime
         self.time_range = time_range
 
-        self.max_pip_up = None
+        self.max_pip_up = self._initialize_max_pips()
         self.max_pip_up_time = self._initialize_datetime_for_max_min()
         self.price_at_max_pip_up = self._initialize_prices_for_max_min()
 
-        self.max_pip_down = None
+        self.max_pip_down = self._initialize_max_pips()
         self.max_pip_down_time = self._initialize_datetime_for_max_min()
         self.price_at_max_pip_down = self._initialize_prices_for_max_min()
 
+    def _initialize_max_pips(self):
+        if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
+            return 0
+        else:
+            return None
 
     def _initialize_datetime_for_max_min(self):
         if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
