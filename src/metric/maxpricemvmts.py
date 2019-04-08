@@ -169,6 +169,8 @@ class MaxPriceMovements(Metric):
         df = self._join_minute_data_from_range(df)
         df = self._join_period_avg_data(target=df)
 
+        df.index = df.index.strftime('%Y-%m-%d')
+
         print(df)
         return df
 
@@ -183,16 +185,9 @@ class MaxPriceMovements(Metric):
 
             df_for_benchmark = pd.concat(df_list, sort=False)
 
+            # Include Current Day Fix if the metric is PDFX
             if (str(benchmark_time) == 'PDFX'):
-                current_day_fix_df = self.fix_price_df[['GBP-USD']]
-                current_day_fix_df.columns = ['Current Day Fix']
-
-                df_for_benchmark = pd.merge(
-                    left=current_day_fix_df,
-                    right=df_for_benchmark,
-                    left_index=True,
-                    right_index=True,
-                    how='inner')
+                df_for_benchmark = self._merge_pdfx_with_cdfx(df_for_benchmark)
 
             old_columns = df_for_benchmark.columns
             df_for_benchmark.columns = pd.MultiIndex.from_product(
@@ -200,6 +195,24 @@ class MaxPriceMovements(Metric):
 
             benchmarked_df_list.append(df_for_benchmark)
         return benchmarked_df_list
+
+    def _merge_pdfx_with_cdfx(self, df_for_benchmark):
+        current_day_fix_df = self.fix_price_df[['GBP-USD']]
+
+        current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-28']
+        current_day_fix_df = current_day_fix_df[np.isfinite(current_day_fix_df['GBP-USD'])]
+        current_day_fix_df.columns = ['Current Day Fix']
+        # print(current_day_fix_df.loc['2018-12-23'])
+        # current_day_fix_df = current_day_fix_df.drop(index=['2018-12-23 00:00:00'])
+        print(current_day_fix_df)
+
+        df_for_benchmark = pd.merge(
+            left=current_day_fix_df,
+            right=df_for_benchmark,
+            left_index=True,
+            right_index=True,
+            how='outer')
+        return df_for_benchmark        
 
     def _join_benchmarked_dfs(self, target, benchmarked_df_list):
         for right_df in benchmarked_df_list:
@@ -210,7 +223,6 @@ class MaxPriceMovements(Metric):
         daily_price = self.daily_price_df
         daily_price.columns = pd.MultiIndex.from_product(
             [["OHLC"], daily_price.columns])
-        print(daily_price)
         daily_price.join(target)
         return daily_price
 
