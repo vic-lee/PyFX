@@ -1,6 +1,7 @@
 from datastructure.pricetime import PriceTime
 from datastructure.daytimerange import TimeRangeInDay
 import pandas as pd
+import datetime
 
 class DayPipMovmentToPrice:
     """For a given day, this object encapsulates the maximum 
@@ -134,5 +135,5 @@ class DayPipMovmentToPrice:
             "Price at Max Pip Down": self.price_at_max_pip_down,
             "Time at Max Pip Down": f_max_pip_down_time,
         }, index=[self.date])
-        
+
         return df
