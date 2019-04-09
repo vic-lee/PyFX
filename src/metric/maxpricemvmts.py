@@ -90,13 +90,16 @@ class MaxPriceMovements(Metric):
                 if pdfx_benchmark == False:
                     benchmark_price = self._get_benchmark_price(
                         date=time_index.date(), benchmark_time=benchmark_time)
+                    time_range_start_pricetime = benchmark_price
                 else:
                     benchmark_price = self._get_prior_fix_recursive(
                         current_date - timedelta(days=1))
+                    time_range_start_pricetime = self._get_benchmark_price(
+                        date=time_index.date(), benchmark_time=self.time_range.start_time)
 
                 if benchmark_price is not None:
                     daily_max_pips = self._init_new_day_obj(
-                        current_date, benchmark_price)
+                        current_date, benchmark_price, time_range_start_pricetime)
                 else:
                     daily_max_pips = None
 
@@ -112,10 +115,12 @@ class MaxPriceMovements(Metric):
         price = price_df.loc[index]['Close']
         return PriceTime(price=price, datetime=index)
 
-    def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime, \
+        time_range_start_pricetime: PriceTime) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date,
             benchmark_pricetime=benchmark_pricetime,
+            time_range_start_pricetime=time_range_start_pricetime,
             time_range=self.time_range)
 
     def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):

@@ -11,7 +11,7 @@ class TimeRangeInDay:
 
 
     def is_datetime_in_range(self, datetime):
-        return datetime.time() > self.start_time and datetime.time() < self.end_time
+        return datetime.time() >= self.start_time and datetime.time() <= self.end_time
 
 
     def to_string_simp(self):

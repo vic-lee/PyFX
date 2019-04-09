@@ -19,9 +19,10 @@ class DayPipMovmentToPrice:
     UP = "up"
     DOWN = "down"
 
-    def __init__(self, date, benchmark_pricetime: PriceTime, time_range: TimeRangeInDay):
+    def __init__(self, date, benchmark_pricetime: PriceTime, time_range_start_pricetime: PriceTime, time_range: TimeRangeInDay):
         self.date = date
         self.benchmark_pricetime = benchmark_pricetime
+        self.time_range_start_pricetime = time_range_start_pricetime
         self.time_range = time_range
 
         self.max_pip_up = self._initialize_max_pips()
@@ -42,14 +43,14 @@ class DayPipMovmentToPrice:
         if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
             return self.benchmark_pricetime.get_datetime()
         else:
-            return None
+            return self.time_range_start_pricetime.get_datetime()
 
 
     def _initialize_prices_for_max_min(self):
         if (self.time_range.is_datetime_in_range(self.benchmark_pricetime.get_datetime())):
             return self.benchmark_pricetime.get_price()
         else:
-            return None
+            return self.time_range_start_pricetime.get_price()
     
 
     def update_max_pip(self, current_price):
