@@ -1,5 +1,6 @@
 from os.path import abspath
 from datetime import datetime, time
+import pandas as pd
 
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
@@ -49,6 +50,11 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
         data=price_data, cp_name=currency_pair_name)
     df_dict["Selected Minute Data"] = selected_minute_data
 
+    price_avg_data, timerange = include_period_avg_data(
+        price_data, currency_pair_name)
+    column_str = str(timerange.start_time) + "_" + str(timerange.end_time)
+    df_dict[column_str] = price_avg_data
+
     '''Aggregate dataframes'''
     dfbundler = DataFrameBundler(df_dict)
     master_df = dfbundler.output()
@@ -89,7 +95,7 @@ def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
     return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
 
 
-def include_minutely_data(data, cp_name: str) -> MinutelyData:
+def include_minutely_data(data, cp_name: str) -> pd.DataFrame:
     if cp_name == "GBPUSD":
         """HACK: Think of a solution to remove dual time standards."""
         minute_data = MinutelyData(
@@ -144,6 +150,50 @@ def include_minutely_data(data, cp_name: str) -> MinutelyData:
             ]).to_df()
 
     return minute_data
+
+
+def include_period_avg_data(data, cp_name: str):
+    if cp_name == "GBPUSD":
+        time_range_start = time(hour=10, minute=58)
+        time_range_end = time(hour=11, minute=2)
+        df = PeriodPriceAvg(
+            price_dfs=data,
+            cp_name=cp_name,
+            time_range=TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ),
+            time_range_for_avg=TimeRangeInDay(
+                start_time=time_range_start,
+                end_time=time_range_end
+            ),
+            include_open={
+                time(hour=10, minute=55),
+                time(hour=10, minute=56),
+            }
+        ).to_df()
+
+    else:
+        time_range_start = time(hour=17, minute=58)
+        time_range_end = time(hour=18, minute=2)
+        df = PeriodPriceAvg(
+            price_dfs=data,
+            cp_name=cp_name,
+            time_range=TimeRangeInDay(
+                start_time=time(hour=17, minute=30),
+                end_time=time(hour=18, minute=2)
+            ),
+            time_range_for_avg=TimeRangeInDay(
+                start_time=time_range_start,
+                end_time=time_range_end
+            ),
+            include_open={
+                time(hour=17, minute=55),
+                time(hour=17, minute=56),
+            }
+        ).to_df()
+
+    return df, TimeRangeInDay(start_time=time_range_start, end_time=time_range_end)
 
 
 def read_price_data(currency_pair_name) -> dict:
