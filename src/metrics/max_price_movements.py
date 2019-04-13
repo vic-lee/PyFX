@@ -269,6 +269,7 @@ class MaxPriceMovements(Metric):
                 start_time=time(hour=10, minute=30),
                 end_time=time(hour=11, minute=2)
             ),
+            cp_name=self.currency_pair_name,
             specs=[
                 {
                     "range_start": time_range_start,
@@ -302,6 +303,7 @@ class MaxPriceMovements(Metric):
 
         df = PeriodPriceAvg(
             price_dfs=price_data,
+            cp_name=self.currency_pair_name,
             time_range=TimeRangeInDay(
                 start_time=time(hour=10, minute=30),
                 end_time=time(hour=11, minute=2)

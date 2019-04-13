@@ -6,8 +6,8 @@ from dataio.datareader import DataReader
 from datastructure.daytimerange import TimeRangeInDay
 
 class PeriodPriceAvg(Metric): 
-    def __init__(self, price_dfs, time_range: TimeRangeInDay, time_range_for_avg: TimeRangeInDay, include_open=None):
-        Metric.__init__(self, time_range, price_dfs)
+    def __init__(self, price_dfs, cp_name: str, time_range: TimeRangeInDay, time_range_for_avg: TimeRangeInDay, include_open=None):
+        Metric.__init__(self, time_range, price_dfs, cp_name)
         self.time_range_for_avg = time_range_for_avg
         self.avgs = self._calc_avgs()
 
