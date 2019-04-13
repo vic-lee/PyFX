@@ -125,8 +125,8 @@ class MaxPriceMovements(Metric):
         try:
             price = price_df.loc[index]['Close']
             return PriceTime(price=price, datetime=index)
-            
-        except Exception as e:
+
+        except:
             print("Could not locate price for " + str(index))
             return None
 
