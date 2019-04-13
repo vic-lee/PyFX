@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import time
-from metric.metric import Metric
+from metrics.metric import Metric
 
 
 class MinutelyData(Metric):

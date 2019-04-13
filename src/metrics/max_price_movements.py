@@ -10,10 +10,10 @@ from datastructure.pricetime import PriceTime
 from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
 
-from metric.metric import Metric
-from metric.day_movement import DayPipMovmentToPrice
-from metric.period_price_avg import PeriodPriceAvg
-from metric.minutely_data import MinutelyData
+from metrics.metric import Metric
+from metrics.day_movement import DayPipMovmentToPrice
+from metrics.period_price_avg import PeriodPriceAvg
+from metrics.minutely_data import MinutelyData
 
 
 class MaxPriceMovements(Metric):
