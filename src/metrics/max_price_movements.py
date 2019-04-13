@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from os.path import abspath
 
-
 from datastructure.daytimerange import TimeRangeInDay
 from datastructure.pricetime import PriceTime
 
@@ -56,6 +55,8 @@ class MaxPriceMovements(Metric):
 
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
+        print("\nInitialize analysis for pair {}".format(self.currency_pair_name))
+
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
         for btime in self.benchmark_times:
@@ -69,7 +70,6 @@ class MaxPriceMovements(Metric):
         ret = {}
         for btime in self.benchmark_times:
             ret[btime] = self.minute_price_df.between_time(btime, btime)
-            print(ret[btime])
         return ret
 
     def find_max_price_movements(self):
@@ -163,61 +163,24 @@ class MaxPriceMovements(Metric):
                 day_max_pips = max_pips_for_btime[day]
                 print(day_max_pips.to_string())
 
-    def to_excel(self, fname=None, time_suffix=None):
-        '''
-        1. Convert to df
-        2. Pass df to data_converter
-        '''
-        df = self._load_objs_to_df()
-        data_exporter = DataWriter(
-            df=df, currency_pair_name=self.currency_pair_name, timestamp=time_suffix)
-        data_exporter.df_to_xlsx()
+    def to_benchmarked_results(self):
+        benchmarked_dfs = {}
 
-    def _load_objs_to_df(self) -> pd.DataFrame:
-        '''
-        |------|---OHLC---|---Benchmark 1---|---Benchmark 2---|
-        |------|----...---|--MaxPipUp,Down--|--MaxPipUp,Down--|
-        |--T1--|
-        |--T2--|
-        '''
-        df = pd.DataFrame()
-        df.columns = pd.MultiIndex.from_product([[""], df.columns])
-
-        benchmarked_df_list = self._generate_benchmarked_df_list()
-
-        df = self._join_daily_price_df(target=df)
-        df = self._join_benchmarked_dfs(df, benchmarked_df_list)
-        df = self._join_minute_data_from_range(df)
-        df = self._join_period_avg_data(target=df)
-
-        df.index = df.index.strftime('%Y-%m-%d')
-        # df = df[np.isfinite(df['GBP-USD'])]
-        df = df.dropna(how='all')
-
-        return df
-
-    def _generate_benchmarked_df_list(self):
-        benchmarked_df_list = []
-        for benchmark_time, data in self.max_price_movements.items():
+        for benchmarked_time, data in self.max_price_movements.items():
             df_list = []
 
-            for _, data_on_date in data.items():
-                exported_df = data_on_date.to_df()
+            for _, daily_analysis in data.items():
+                exported_df = daily_analysis.to_df()
                 df_list.append(exported_df)
 
-            df_for_benchmark = pd.concat(df_list, sort=False)
+            df_at_benchmark = pd.concat(df_list, sort=False)
 
-            # Include Current Day Fix if the metric is PDFX
-            if (str(benchmark_time) == 'PDFX'):
-                df_for_benchmark = self._merge_pdfx_with_cdfx(df_for_benchmark)
+            if (str(benchmarked_time) == 'PDFX'):
+                df_at_benchmark = self._merge_pdfx_with_cdfx(df_at_benchmark)
 
-            old_columns = df_for_benchmark.columns
-            df_for_benchmark.columns = pd.MultiIndex.from_product(
-                [[str(benchmark_time)], old_columns])
+            benchmarked_dfs[str(benchmarked_time)] = df_at_benchmark
 
-            benchmarked_df_list.append(df_for_benchmark)
-
-        return benchmarked_df_list
+        return benchmarked_dfs
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
         cp_identifier = self.currency_pair_name[:3] + \
@@ -238,138 +201,3 @@ class MaxPriceMovements(Metric):
             right_index=True,
             how='outer')
         return df_for_benchmark
-
-    def _join_benchmarked_dfs(self, target, benchmarked_df_list):
-        for right_df in benchmarked_df_list:
-            target = target.join(right_df, how="outer")
-
-        return target
-
-    def _join_daily_price_df(self, target):
-        daily_price = self.daily_price_df
-        daily_price.columns = pd.MultiIndex.from_product(
-            [["OHLC"], daily_price.columns])
-        daily_price.join(target)
-        return daily_price
-
-    def _join_minute_data_from_range(self, target):
-        price_data = self.read_price_data()
-
-        if self.currency_pair_name == "GBPUSD":
-
-            """HACK: Think of a solution to remove dual time standards."""
-
-            minute_data = MinutelyData(
-                price_dfs=price_data,
-                time_range=TimeRangeInDay(
-                    start_time=time(hour=10, minute=30),
-                    end_time=time(hour=11, minute=2)
-                ),
-                cp_name=self.currency_pair_name,
-                specs=[
-                    {
-                        "range_start": time(hour=10, minute=49),
-                        "range_end": time(hour=11, minute=2),
-                        "include": ["Close"]
-                    },
-                    {
-                        "range_start": time(hour=11, minute=30),
-                        "range_end": time(hour=11, minute=30),
-                        "include": ['Close']
-                    },
-                    {
-                        "range_start": time(hour=11, minute=45),
-                        "range_end": time(hour=11, minute=45),
-                        "include": ['Close']
-                    },
-                ]).to_df()
-
-        else:
-
-            minute_data = MinutelyData(
-                price_dfs=price_data,
-                time_range=TimeRangeInDay(
-                    start_time=time(hour=10, minute=30),
-                    end_time=time(hour=11, minute=2)
-                ),
-                cp_name=self.currency_pair_name,
-                specs=[
-                    {
-                        "range_start": time(hour=17, minute=49),
-                        "range_end": time(hour=18, minute=2),
-                        "include": ["Close"]
-                    },
-                    {
-                        "range_start": time(hour=18, minute=30),
-                        "range_end": time(hour=18, minute=30),
-                        "include": ['Close']
-                    },
-                    {
-                        "range_start": time(hour=18, minute=45),
-                        "range_end": time(hour=18, minute=45),
-                        "include": ['Close']
-                    },
-                ]).to_df()
-
-        minute_data.columns = pd.MultiIndex.from_product(
-            [["Selected Minute Data"], minute_data.columns])
-
-        target = target.join(minute_data)
-
-        return target
-
-    def _join_period_avg_data(self, target):
-        price_data = self.read_price_data()
-
-        if self.currency_pair_name == "GBPUSD":
-            time_range_start = time(hour=10, minute=58)
-            time_range_end = time(hour=11, minute=2)
-            df = PeriodPriceAvg(
-                price_dfs=price_data,
-                cp_name=self.currency_pair_name,
-                time_range=TimeRangeInDay(
-                    start_time=time(hour=10, minute=30),
-                    end_time=time(hour=11, minute=2)
-                ),
-                time_range_for_avg=TimeRangeInDay(
-                    start_time=time_range_start,
-                    end_time=time_range_end
-                ),
-                include_open={
-                    time(hour=10, minute=55),
-                    time(hour=10, minute=56),
-                }
-            ).to_df()
-
-        else:
-            time_range_start = time(hour=17, minute=58)
-            time_range_end = time(hour=18, minute=2)
-            df = PeriodPriceAvg(
-                price_dfs=price_data,
-                cp_name=self.currency_pair_name,
-                time_range=TimeRangeInDay(
-                    start_time=time(hour=17, minute=30),
-                    end_time=time(hour=18, minute=2)
-                ),
-                time_range_for_avg=TimeRangeInDay(
-                    start_time=time_range_start,
-                    end_time=time_range_end
-                ),
-                include_open={
-                    time(hour=17, minute=55),
-                    time(hour=17, minute=56),
-                }
-            ).to_df()
-
-        column_str = str(time_range_start) + "_" + str(time_range_end)
-        df.columns = pd.MultiIndex.from_product([[column_str], df.columns])
-
-        target = target.join(df)
-        return target
-
-    def read_price_data(self):
-        return {
-            DataReader.FIX: self.fix_price_df,
-            DataReader.MINUTELY: self.minute_price_df,
-            DataReader.DAILY: self.daily_price_df
-        }
