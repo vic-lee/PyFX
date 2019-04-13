@@ -37,9 +37,7 @@ class DataReader:
         df = pd.read_excel(fpath)
         df.rename(columns={'Date': 'datetime'}, inplace=True)
 
-        print('len is ' + str(len(df.columns)))
-
-        if (len(df.columns) == 11):
+        if (len(df.columns) == 11):     #HACK
             df = df.drop(columns=['O'])            
 
         df = self._filter_ohlc_in_daily(df)

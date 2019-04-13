@@ -18,22 +18,26 @@ def main():
         "USDCHF", "USDJPY", "USDMXN", "USDTRY", "USDZAR"
     ]
 
-    # for currency_pair in currency_pairs:
-    #     analyze_currency_pair(currency_pair)
+    fname_suffix = generate_folder_timestamp()
 
-    analyze_currency_pair("AUDUSD")
+    for currency_pair in currency_pairs:
+        analyze_currency_pair(currency_pair, fname_suffix)
+
+    # analyze_currency_pair("AUDUSD")
 
     end_time = datetime.now()
     print("Program runtime: {}".format((end_time - start_time)))
 
 
-def analyze_currency_pair(currency_pair_name) -> None:
+def analyze_currency_pair(currency_pair_name, timestamp) -> None:
+
     price_data = read_price_data(currency_pair_name)
 
     price_movements = setup_price_movement_obj(
         data=price_data, cp_name=currency_pair_name)
+
     price_movements.find_max_price_movements()
-    price_movements.to_excel()
+    price_movements.to_excel(time_suffix=timestamp)
 
 
 def setup_price_movement_obj(data, cp_name):
@@ -77,6 +81,12 @@ def read_price_data(currency_pair_name) -> dict:
     fx_reader = DataReader(in_fpaths, currency_pair_name)
     package = fx_reader.read_data()
     return package
+
+
+def generate_folder_timestamp() -> str:
+    now = datetime.now()
+    fname_suffix = now.strftime("_%Y%m%d_%H%M%S")
+    return fname_suffix
 
 
 if __name__ == '__main__':

@@ -163,14 +163,14 @@ class MaxPriceMovements(Metric):
                 day_max_pips = max_pips_for_btime[day]
                 print(day_max_pips.to_string())
 
-    def to_excel(self, fname=None):
+    def to_excel(self, fname=None, time_suffix=None):
         '''
         1. Convert to df
         2. Pass df to data_converter
         '''
         df = self._load_objs_to_df()
         data_exporter = DataWriter(
-            df=df, currency_pair_name=self.currency_pair_name)
+            df=df, currency_pair_name=self.currency_pair_name, timestamp=time_suffix)
         data_exporter.df_to_xlsx()
 
     def _load_objs_to_df(self) -> pd.DataFrame:
