@@ -6,6 +6,7 @@ from dataio.datawriter import DataWriter
 
 from metrics.max_price_movements import MaxPriceMovements
 from metrics.period_price_avg import PeriodPriceAvg
+from metrics.minutely_data import MinutelyData
 
 from datastructure.daytimerange import TimeRangeInDay
 
@@ -35,6 +36,8 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
     '''Read data'''
     price_data = read_price_data(currency_pair_name)
 
+    df_dict = {}
+
     '''Generate data analysis'''
     price_movements = setup_price_movement_obj(
         data=price_data, cp_name=currency_pair_name)
@@ -42,8 +45,11 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
     price_movements.find_max_price_movements()
     price_movements.to_excel(time_suffix=timestamp)
 
+    selected_minute_data = include_minutely_data(
+        data=price_data, cp_name=currency_pair_name)
+    df_dict["Selected Minute Data"] = selected_minute_data
+
     '''Aggregate dataframes'''
-    df_dict = {}
     dfbundler = DataFrameBundler(df_dict)
     master_df = dfbundler.output()
 
@@ -81,6 +87,63 @@ def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
         }
 
     return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
+
+
+def include_minutely_data(data, cp_name: str) -> MinutelyData:
+    if cp_name == "GBPUSD":
+        """HACK: Think of a solution to remove dual time standards."""
+        minute_data = MinutelyData(
+            price_dfs=data,
+            time_range=TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ),
+            cp_name=cp_name,
+            specs=[
+                {
+                    "range_start": time(hour=10, minute=49),
+                    "range_end": time(hour=11, minute=2),
+                    "include": ["Close"]
+                },
+                {
+                    "range_start": time(hour=11, minute=30),
+                    "range_end": time(hour=11, minute=30),
+                    "include": ['Close']
+                },
+                {
+                    "range_start": time(hour=11, minute=45),
+                    "range_end": time(hour=11, minute=45),
+                    "include": ['Close']
+                },
+            ]).to_df()
+
+    else:
+        minute_data = MinutelyData(
+            price_dfs=data,
+            time_range=TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ),
+            cp_name=cp_name,
+            specs=[
+                {
+                    "range_start": time(hour=17, minute=49),
+                    "range_end": time(hour=18, minute=2),
+                    "include": ["Close"]
+                },
+                {
+                    "range_start": time(hour=18, minute=30),
+                    "range_end": time(hour=18, minute=30),
+                    "include": ['Close']
+                },
+                {
+                    "range_start": time(hour=18, minute=45),
+                    "range_end": time(hour=18, minute=45),
+                    "include": ['Close']
+                },
+            ]).to_df()
+
+    return minute_data
 
 
 def read_price_data(currency_pair_name) -> dict:
