@@ -44,9 +44,9 @@ class MaxPriceMovements(Metric):
         '''
 
         Metric.__init__(
-            self, 
-            time_range=config[self.TIME_RANGE], 
-            price_dfs=price_dfs, 
+            self,
+            time_range=config[self.TIME_RANGE],
+            price_dfs=price_dfs,
             currency_pair_name=config[self.CURRENCY_PAIR]
         )
 
@@ -124,8 +124,8 @@ class MaxPriceMovements(Metric):
         price = price_df.loc[index]['Close']
         return PriceTime(price=price, datetime=index)
 
-    def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime, \
-        time_range_start_pricetime: PriceTime) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime,
+                          time_range_start_pricetime: PriceTime) -> DayPipMovmentToPrice:
         return DayPipMovmentToPrice(
             date=current_date,
             benchmark_pricetime=benchmark_pricetime,
@@ -163,7 +163,8 @@ class MaxPriceMovements(Metric):
         2. Pass df to data_converter
         '''
         df = self._load_objs_to_df()
-        data_exporter = DataWriter(df=df, currency_pair_name=self.currency_pair_name)
+        data_exporter = DataWriter(
+            df=df, currency_pair_name=self.currency_pair_name)
         data_exporter.df_to_xlsx()
 
     def _load_objs_to_df(self) -> pd.DataFrame:
@@ -212,15 +213,17 @@ class MaxPriceMovements(Metric):
                 [[str(benchmark_time)], old_columns])
 
             benchmarked_df_list.append(df_for_benchmark)
-        
+
         print(benchmarked_df_list[0])
         return benchmarked_df_list
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
-        current_day_fix_df = self.fix_price_df[['GBP-USD']]
+        cp_identifier = self.currency_pair_name[:3] + '-' + self.currency_pair_name[3:]
+        current_day_fix_df = self.fix_price_df[[cp_identifier]]
 
         current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
-        current_day_fix_df = current_day_fix_df[np.isfinite(current_day_fix_df['GBP-USD'])]
+        current_day_fix_df = current_day_fix_df[np.isfinite(
+            current_day_fix_df[cp_identifier])]
         current_day_fix_df.columns = ['Current Day Fix']
         # print(current_day_fix_df.loc['2018-12-23'])
         # current_day_fix_df = current_day_fix_df.drop(index=['2018-12-23 00:00:00'])
@@ -232,7 +235,7 @@ class MaxPriceMovements(Metric):
             left_index=True,
             right_index=True,
             how='outer')
-        return df_for_benchmark        
+        return df_for_benchmark
 
     def _join_benchmarked_dfs(self, target, benchmarked_df_list):
         for right_df in benchmarked_df_list:
@@ -313,13 +316,9 @@ class MaxPriceMovements(Metric):
         return target
 
 
-def read_price_data():
-    in_fpaths = {
-        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"),
-        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
-        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")
-    }
-
-    fx_reader = DataReader(in_fpaths)
-    package = fx_reader.read_data()
-    return package
+    def read_price_data(self):
+        return {
+            DataReader.FIX: self.fix_price_df, 
+            DataReader.MINUTELY: self.minute_price_df, 
+            DataReader.DAILY: self.daily_price_df
+        }
