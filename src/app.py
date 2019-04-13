@@ -1,5 +1,5 @@
 from os.path import abspath
-from datetime import datetime, time 
+from datetime import datetime, time
 
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
@@ -7,23 +7,31 @@ from dataio.datawriter import DataWriter
 from metric.maxpricemvmts import MaxPriceMovements
 from metric.periodpriceavg import PeriodPriceAvg
 
-from dfbundler import DataFrameBundler
 from datastructure.daytimerange import TimeRangeInDay
+
 
 def main():
     start_time = datetime.now()
 
-    price_data = read_price_data()
+    currency_pairs = [
+        "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD",
+        "USDCHF", "USDJPY", "USDMXN", "USDTRY", "USDZAR"
+    ]
 
-    price_movements = setup_price_movement_obj(data=price_data)
-    price_movements.find_max_price_movements()
-    # print(price_movements.to_string())
-    price_movements.to_excel()
-
+    for currency_pair in currency_pairs:
+        analyze_currency_pair(currency_pair)
 
     end_time = datetime.now()
     print("Program runtime: {}".format((end_time - start_time)))
-    
+
+
+def analyze_currency_pair(currency_pair_name) -> None:
+    price_data = read_price_data(currency_pair_name)
+
+    price_movements = setup_price_movement_obj(data=price_data)
+    price_movements.find_max_price_movements()
+    price_movements.to_excel()
+
 
 def setup_price_movement_obj(data):
 
@@ -42,17 +50,17 @@ def setup_price_movement_obj(data):
     # return init_pip_movement_obj(price_data=package)
 
 
-def read_price_data():
+def read_price_data(currency_pair_name) -> dict:
     in_fpaths = {
-        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"), 
-        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_2018.csv"),
-        DataReader.DAILY: abspath("../data/datasrc/gbp_daily.xlsx")  
+        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"),
+        DataReader.MINUTELY: abspath("../data/datasrc/{}_Minute.csv".format(currency_pair_name)),
+        DataReader.DAILY: abspath(
+            "../data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
     }
 
     fx_reader = DataReader(in_fpaths)
     package = fx_reader.read_data()
     return package
-
 
 
 if __name__ == '__main__':
