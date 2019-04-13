@@ -13,6 +13,11 @@ class Metric:
         self.minute_price_df = self._filter_df_to_time_range(price_dfs[DataReader.MINUTELY])
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
 
+        print(self.full_minute_price_df)
+        print(self.minute_price_df)
+        print(self.daily_price_df)
+        print(self.fix_price_df)
+
 
     def _filter_df_to_time_range(self, df):
         return df.between_time(self.time_range.start_time, self.time_range.end_time)
@@ -24,7 +29,8 @@ class Metric:
 
         fx = None
         try: 
-            fx = self.fix_price_df.loc[str(d)]['GBP-USD']
+            cp_identifier = self.currency_pair_name[:3] + '-' + self.currency_pair_name[3:]
+            fx = self.fix_price_df.loc[str(d)][cp_identifier]
         except Exception as e: 
             print("Could not locate the previous location, possibly due to out of bounds.")
             print(e)

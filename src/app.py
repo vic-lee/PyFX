@@ -39,16 +39,30 @@ def analyze_currency_pair(currency_pair_name) -> None:
 
 def setup_price_movement_obj(data, cp_name):
 
-    pip_movement_config = {
-        MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
-            start_time=time(hour=10, minute=30),
-            end_time=time(hour=11, minute=2)
-        ),
-        MaxPriceMovements.BENCHMARK_TIMES: [
-            time(hour=10, minute=30), time(hour=10, minute=45)
-        ],
-        MaxPriceMovements.CURRENCY_PAIR: cp_name
-    }
+    if (cp_name == "GBPUSD"):
+        pip_movement_config = {
+            MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
+                start_time=time(hour=10, minute=30),
+                end_time=time(hour=11, minute=2)
+            ),
+            MaxPriceMovements.BENCHMARK_TIMES: [
+                time(hour=10, minute=30),
+                time(hour=10, minute=45)
+            ],
+            MaxPriceMovements.CURRENCY_PAIR: cp_name
+        }
+    else:
+        pip_movement_config = {
+            MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
+                start_time=time(hour=17, minute=30),
+                end_time=time(hour=18, minute=2)
+            ),
+            MaxPriceMovements.BENCHMARK_TIMES: [
+                time(hour=17, minute=30),
+                time(hour=17, minute=45)
+            ],
+            MaxPriceMovements.CURRENCY_PAIR: cp_name
+        }
 
     return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
 

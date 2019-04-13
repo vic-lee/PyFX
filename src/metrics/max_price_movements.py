@@ -121,8 +121,14 @@ class MaxPriceMovements(Metric):
         price_df = self.benchmark_prices_matrix[benchmark_time]
         index = datetime(year=date.year, month=date.month, day=date.day,
                          hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
-        price = price_df.loc[index]['Close']
-        return PriceTime(price=price, datetime=index)
+
+        try:
+            price = price_df.loc[index]['Close']
+            return PriceTime(price=price, datetime=index)
+            
+        except Exception as e:
+            print("Could not locate price for " + str(index))
+            return None
 
     def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime,
                           time_range_start_pricetime: PriceTime) -> DayPipMovmentToPrice:
@@ -135,6 +141,7 @@ class MaxPriceMovements(Metric):
     def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None:
             day_objs[prior_day_obj.date] = prior_day_obj
+            print(prior_day_obj.to_string())
         return day_objs
 
     def _update_current_date(self, newdate: datetime) -> datetime.date:
@@ -251,7 +258,7 @@ class MaxPriceMovements(Metric):
         return daily_price
 
     def _join_minute_data_from_range(self, target):
-        price_data = read_price_data()
+        price_data = self.read_price_data()
 
         time_range_start = time(hour=10, minute=49)
         time_range_end = time(hour=11, minute=2)
@@ -288,7 +295,7 @@ class MaxPriceMovements(Metric):
         return target
 
     def _join_period_avg_data(self, target):
-        price_data = read_price_data()
+        price_data = self.read_price_data()
 
         time_range_start = time(hour=10, minute=58)
         time_range_end = time(hour=11, minute=2)
