@@ -18,8 +18,10 @@ def main():
         "USDCHF", "USDJPY", "USDMXN", "USDTRY", "USDZAR"
     ]
 
-    for currency_pair in currency_pairs:
-        analyze_currency_pair(currency_pair)
+    # for currency_pair in currency_pairs:
+    #     analyze_currency_pair(currency_pair)
+
+    analyze_currency_pair("AUDUSD")
 
     end_time = datetime.now()
     print("Program runtime: {}".format((end_time - start_time)))
