@@ -4,14 +4,14 @@ from datetime import datetime
 
 class DataWriter:
 
-    def __init__(self, df, filename="../data/dataout/dataout"):
+    def __init__(self, df, currency_pair_name, filename="../data/dataout/dataout"):
         self._df = df
         self._default_fname = filename
 
         fname_suffix = self._generate_time_suffix()
 
-        self._default_fname_xlsx = self._default_fname + fname_suffix + ".xlsx"
-        self._default_fname_csv = self._default_fname + fname_suffix + ".csv"
+        self._default_fname_xlsx = currency_pair_name + self._default_fname + fname_suffix + ".xlsx"
+        self._default_fname_csv = currency_pair_name + self._default_fname + fname_suffix + ".csv"
 
     def _generate_time_suffix(self):
         now = datetime.now()

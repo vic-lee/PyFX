@@ -5,8 +5,9 @@ from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
 
 class Metric:
-    def __init__(self, time_range, price_dfs):
+    def __init__(self, time_range, price_dfs, currency_pair_name: str):
         self.time_range = time_range
+        self.currency_pair_name = currency_pair_name
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.minute_price_df = self._filter_df_to_time_range(price_dfs[DataReader.MINUTELY])

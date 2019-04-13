@@ -23,6 +23,7 @@ class MaxPriceMovements(Metric):
 
     TIME_RANGE = "time range"
     BENCHMARK_TIMES = "benchmark_times"
+    CURRENCY_PAIR = "currency_pair"
 
     def __init__(self, price_dfs, config):
         '''
@@ -41,8 +42,13 @@ class MaxPriceMovements(Metric):
             }
         }
         '''
+
         Metric.__init__(
-            self, time_range=config[self.TIME_RANGE], price_dfs=price_dfs)
+            self, 
+            time_range=config[self.TIME_RANGE], 
+            price_dfs=price_dfs, 
+            currency_pair_name=config[self.CURRENCY_PAIR]
+        )
 
         self.benchmark_times = config[self.BENCHMARK_TIMES]
         self.max_price_movements = \
@@ -157,7 +163,7 @@ class MaxPriceMovements(Metric):
         2. Pass df to data_converter
         '''
         df = self._load_objs_to_df()
-        data_exporter = DataWriter(df=df)
+        data_exporter = DataWriter(df=df, currency_pair_name=self.currency_pair_name)
         data_exporter.df_to_xlsx()
 
     def _load_objs_to_df(self) -> pd.DataFrame:
