@@ -10,8 +10,11 @@ class DataWriter:
 
         fname_suffix = self._generate_time_suffix()
 
-        self._default_fname_xlsx = currency_pair_name + self._default_fname + fname_suffix + ".xlsx"
-        self._default_fname_csv = currency_pair_name + self._default_fname + fname_suffix + ".csv"
+        self._default_fname_xlsx = self._default_fname + '_' + \
+            currency_pair_name + fname_suffix + ".xlsx"
+
+        self._default_fname_csv = currency_pair_name + '_' + \
+            currency_pair_name + self._default_fname + fname_suffix + ".csv"
 
     def _generate_time_suffix(self):
         now = datetime.now()
