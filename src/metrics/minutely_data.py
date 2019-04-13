@@ -62,5 +62,4 @@ class MinutelyData(Metric):
 
     
     def to_df(self):
-        print(self.df)
         return self.df

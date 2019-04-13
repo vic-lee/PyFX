@@ -29,8 +29,7 @@ class Metric:
             fx = self.fix_price_df.loc[str(d)][cp_identifier]
         except Exception as e:
             print(
-                "Could not locate the previous location, possibly due to out of bounds.")
-            print(e)
+                "Could not locate the previous location, possibly due to out of bounds." + str(e))
             return None
         if not np.isnan(fx):
             index = datetime(year=d.year, month=d.month,

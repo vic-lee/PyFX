@@ -4,14 +4,13 @@ import pandas as pd
 
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
+from dataio.dfbundler import DataFrameBundler
 
 from metrics.max_price_movements import MaxPriceMovements
 from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
 from datastructure.daytimerange import TimeRangeInDay
-
-from dfbundler import DataFrameBundler
 
 
 def main():
@@ -50,8 +49,6 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
     price_movements.find_max_price_movements()
     price_movement_analyses = price_movements.to_benchmarked_results()
     df_dict = {**df_dict, **price_movement_analyses}
-
-    # price_movements.to_excel(time_suffix=timestamp)
 
     '''2.2 Selected Minute Data'''
     selected_minute_data = include_minutely_data(
