@@ -9,6 +9,8 @@ from metrics.period_price_avg import PeriodPriceAvg
 
 from datastructure.daytimerange import TimeRangeInDay
 
+from dfbundler import DataFrameBundler
+
 
 def main():
     start_time = datetime.now()
@@ -26,21 +28,32 @@ def main():
     # analyze_currency_pair("AUDUSD")
 
     end_time = datetime.now()
-    print("Program runtime: {}".format((end_time - start_time)))
+    print("\nProgram runtime: {}".format((end_time - start_time)))
 
 
 def analyze_currency_pair(currency_pair_name, timestamp) -> None:
-
+    '''Read data'''
     price_data = read_price_data(currency_pair_name)
 
+    '''Generate data analysis'''
     price_movements = setup_price_movement_obj(
         data=price_data, cp_name=currency_pair_name)
 
     price_movements.find_max_price_movements()
     price_movements.to_excel(time_suffix=timestamp)
 
+    '''Aggregate dataframes'''
+    df_dict = {}
+    dfbundler = DataFrameBundler(df_dict)
+    master_df = dfbundler.output()
 
-def setup_price_movement_obj(data, cp_name):
+    '''Output to excel'''
+    output_writer = DataWriter(
+        df=master_df, currency_pair_name=currency_pair_name, timestamp=timestamp)
+    output_writer.df_to_xlsx()
+
+
+def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
 
     if (cp_name == "GBPUSD"):
         pip_movement_config = {
