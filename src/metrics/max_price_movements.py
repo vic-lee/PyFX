@@ -220,7 +220,8 @@ class MaxPriceMovements(Metric):
         return benchmarked_df_list
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
-        cp_identifier = self.currency_pair_name[:3] + '-' + self.currency_pair_name[3:]
+        cp_identifier = self.currency_pair_name[:3] + \
+            '-' + self.currency_pair_name[3:]
         current_day_fix_df = self.fix_price_df[[cp_identifier]]
 
         current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
@@ -256,6 +257,8 @@ class MaxPriceMovements(Metric):
 
         if self.currency_pair_name == "GBPUSD":
 
+            """HACK: Think of a solution to remove dual time standards."""
+
             minute_data = MinutelyData(
                 price_dfs=price_data,
                 time_range=TimeRangeInDay(
@@ -279,11 +282,11 @@ class MaxPriceMovements(Metric):
                         "range_end": time(hour=11, minute=45),
                         "include": ['Close']
                     },
-            ]).to_df()
+                ]).to_df()
 
-        else: 
+        else:
 
-             minute_data = MinutelyData(
+            minute_data = MinutelyData(
                 price_dfs=price_data,
                 time_range=TimeRangeInDay(
                     start_time=time(hour=10, minute=30),
@@ -306,8 +309,7 @@ class MaxPriceMovements(Metric):
                         "range_end": time(hour=18, minute=45),
                         "include": ['Close']
                     },
-            ]).to_df()
-
+                ]).to_df()
 
         minute_data.columns = pd.MultiIndex.from_product(
             [["Selected Minute Data"], minute_data.columns])
@@ -319,25 +321,45 @@ class MaxPriceMovements(Metric):
     def _join_period_avg_data(self, target):
         price_data = self.read_price_data()
 
-        time_range_start = time(hour=10, minute=58)
-        time_range_end = time(hour=11, minute=2)
+        if self.currency_pair_name == "GBPUSD":
+            time_range_start = time(hour=10, minute=58)
+            time_range_end = time(hour=11, minute=2)
+            df = PeriodPriceAvg(
+                price_dfs=price_data,
+                cp_name=self.currency_pair_name,
+                time_range=TimeRangeInDay(
+                    start_time=time(hour=10, minute=30),
+                    end_time=time(hour=11, minute=2)
+                ),
+                time_range_for_avg=TimeRangeInDay(
+                    start_time=time_range_start,
+                    end_time=time_range_end
+                ),
+                include_open={
+                    time(hour=10, minute=55),
+                    time(hour=10, minute=56),
+                }
+            ).to_df()
 
-        df = PeriodPriceAvg(
-            price_dfs=price_data,
-            cp_name=self.currency_pair_name,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            time_range_for_avg=TimeRangeInDay(
-                start_time=time_range_start,
-                end_time=time_range_end
-            ),
-            include_open={
-                time(hour=10, minute=55),
-                time(hour=10, minute=56),
-            }
-        ).to_df()
+        else:
+            time_range_start = time(hour=17, minute=58)
+            time_range_end = time(hour=18, minute=2)
+            df = PeriodPriceAvg(
+                price_dfs=price_data,
+                cp_name=self.currency_pair_name,
+                time_range=TimeRangeInDay(
+                    start_time=time(hour=17, minute=30),
+                    end_time=time(hour=18, minute=2)
+                ),
+                time_range_for_avg=TimeRangeInDay(
+                    start_time=time_range_start,
+                    end_time=time_range_end
+                ),
+                include_open={
+                    time(hour=17, minute=55),
+                    time(hour=17, minute=56),
+                }
+            ).to_df()
 
         column_str = str(time_range_start) + "_" + str(time_range_end)
         df.columns = pd.MultiIndex.from_product([[column_str], df.columns])
@@ -345,10 +367,9 @@ class MaxPriceMovements(Metric):
         target = target.join(df)
         return target
 
-
     def read_price_data(self):
         return {
-            DataReader.FIX: self.fix_price_df, 
-            DataReader.MINUTELY: self.minute_price_df, 
+            DataReader.FIX: self.fix_price_df,
+            DataReader.MINUTELY: self.minute_price_df,
             DataReader.DAILY: self.daily_price_df
         }
