@@ -30,12 +30,13 @@ def main():
 def analyze_currency_pair(currency_pair_name) -> None:
     price_data = read_price_data(currency_pair_name)
 
-    price_movements = setup_price_movement_obj(data=price_data)
+    price_movements = setup_price_movement_obj(
+        data=price_data, cp_name=currency_pair_name)
     price_movements.find_max_price_movements()
     price_movements.to_excel()
 
 
-def setup_price_movement_obj(data):
+def setup_price_movement_obj(data, cp_name):
 
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
@@ -45,11 +46,10 @@ def setup_price_movement_obj(data):
         MaxPriceMovements.BENCHMARK_TIMES: [
             time(hour=10, minute=30), time(hour=10, minute=45)
         ],
+        MaxPriceMovements.CURRENCY_PAIR: cp_name
     }
 
     return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
-
-    # return init_pip_movement_obj(price_data=package)
 
 
 def read_price_data(currency_pair_name) -> dict:
