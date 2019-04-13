@@ -63,6 +63,7 @@ class MaxPriceMovements(Metric):
         ret = {}
         for btime in self.benchmark_times:
             ret[btime] = self.minute_price_df.between_time(btime, btime)
+            print(ret[btime])
         return ret
 
     def find_max_price_movements(self):
@@ -105,6 +106,8 @@ class MaxPriceMovements(Metric):
 
             if daily_max_pips is not None:
                 daily_max_pips.update_max_pip(current_price)
+
+        day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
 
         return day_objs
 
@@ -175,6 +178,8 @@ class MaxPriceMovements(Metric):
         df = self._join_period_avg_data(target=df)
 
         df.index = df.index.strftime('%Y-%m-%d')
+        # df = df[np.isfinite(df['GBP-USD'])]
+        df = df.dropna(how='all')
 
         print(df)
         return df
@@ -187,6 +192,8 @@ class MaxPriceMovements(Metric):
             for _, data_on_date in data.items():
                 exported_df = data_on_date.to_df()
                 df_list.append(exported_df)
+                if data_on_date.date == date(year=2018, month=12, day=31):
+                    print(data_on_date.to_df())
 
             df_for_benchmark = pd.concat(df_list, sort=False)
 
@@ -199,12 +206,14 @@ class MaxPriceMovements(Metric):
                 [[str(benchmark_time)], old_columns])
 
             benchmarked_df_list.append(df_for_benchmark)
+        
+        print(benchmarked_df_list[0])
         return benchmarked_df_list
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
         current_day_fix_df = self.fix_price_df[['GBP-USD']]
 
-        current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-28']
+        current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
         current_day_fix_df = current_day_fix_df[np.isfinite(current_day_fix_df['GBP-USD'])]
         current_day_fix_df.columns = ['Current Day Fix']
         # print(current_day_fix_df.loc['2018-12-23'])
@@ -222,6 +231,7 @@ class MaxPriceMovements(Metric):
     def _join_benchmarked_dfs(self, target, benchmarked_df_list):
         for right_df in benchmarked_df_list:
             target = target.join(right_df, how="outer")
+
         return target
 
     def _join_daily_price_df(self, target):

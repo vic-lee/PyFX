@@ -26,11 +26,11 @@ class DayPipMovmentToPrice:
         self.time_range_start_pricetime = time_range_start_pricetime
         self.time_range = time_range
 
-        self.max_pip_up = self._initialize_max_pips()
+        self.max_pip_up = 0
         self.max_pip_up_time = self._initialize_datetime_for_max_min()
         self.price_at_max_pip_up = self._initialize_prices_for_max_min()
 
-        self.max_pip_down = self._initialize_max_pips()
+        self.max_pip_down = 0
         self.max_pip_down_time = self._initialize_datetime_for_max_min()
         self.price_at_max_pip_down = self._initialize_prices_for_max_min()
 

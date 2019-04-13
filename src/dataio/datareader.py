@@ -64,7 +64,6 @@ class DataReader:
         df["date"] = pd.to_datetime(df["date"]) 
         df = df.set_index('datetime')
         df = df.drop(columns=['time', 'date'])
-        print(df.loc["2018-12-31 10:30:00"])
         return df
 
 

@@ -4,3 +4,4 @@
 .vscode/
 *.numbers
 __pycache__/
+dataout/
