@@ -104,7 +104,7 @@ class MaxPriceMovements(Metric):
                     time_range_start_pricetime = self._get_benchmark_price(
                         date=time_index.date(), benchmark_time=self.time_range.start_time)
 
-                if benchmark_price is not None:
+                if benchmark_price is not None and time_range_start_pricetime is not None:
                     daily_max_pips = self._init_new_day_obj(
                         current_date, benchmark_price, time_range_start_pricetime)
                 else:
