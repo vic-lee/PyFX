@@ -60,7 +60,7 @@ def read_price_data(currency_pair_name) -> dict:
             "../data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
     }
 
-    fx_reader = DataReader(in_fpaths)
+    fx_reader = DataReader(in_fpaths, currency_pair_name)
     package = fx_reader.read_data()
     return package
 

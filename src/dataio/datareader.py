@@ -8,8 +8,9 @@ class DataReader:
     MINUTELY = "minutely"
     DAILY = "daily"
 
-    def __init__(self, fpaths):
+    def __init__(self, fpaths, currency_pair_name: str):
         self.fpaths = fpaths
+        self._currency_pair_name = currency_pair_name
 
     def read_data(self):
         return {
@@ -75,7 +76,8 @@ class DataReader:
             df['datetime'] = df['datetime'].map(
                 lambda s: s[25:] + s[5:14])
 
-            df["datetime"] = pd.to_datetime(df["datetime"], format="%Y-%m-%d %H:%M:%S")
+            df["datetime"] = pd.to_datetime(
+                df["datetime"], format="%Y-%m-%d %H:%M:%S")
 
         df = df.set_index('datetime')
         return df
@@ -90,18 +92,25 @@ class DataReader:
         in the dataframe. 
         print df.columns to see original column names. 
         """
+
+        cp_identifier = self._currency_pair_name[:3] + \
+            '/' + self._currency_pair_name[3:]
+
         df = df.drop(columns=[
-            'GBP/USD(Open, Ask)', 'GBP/USD(High, Ask)',
-            'GBP/USD(Low, Ask)', 'GBP/USD(Close, Ask)',
-            'Tick Volume(GBP/USD)'
+            '{}(Open, Ask)'.format(cp_identifier),
+            '{}(High, Ask)'.format(cp_identifier),
+            '{}(Low, Ask)'.format(cp_identifier),
+            '{}(Close, Ask)'.format(cp_identifier),
+            'Tick Volume({})'.format(cp_identifier)
         ])
+
         df = df.rename(columns={
-            'GBP/USD(Open, Bid)*': 'Open',
-            'GBP/USD(High, Bid)*': 'High',
-            'GBP/USD(Low, Bid)*': 'Low',
-            'GBP/USD(Close, Bid)*': 'Close',
-            # 'Tick Volume(GBP/USD)': 'Volume',
+            '{}(Open, Bid)*'.format(cp_identifier): 'Open',
+            '{}(High, Bid)*'.format(cp_identifier): 'High',
+            '{}(Low, Bid)*'.format(cp_identifier): 'Low',
+            '{}(Close, Bid)*'.format(cp_identifier): 'Close',
         })
+
         return df
 
     def _does_minuitely_fpath_exist(self):
