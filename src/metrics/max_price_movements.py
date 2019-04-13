@@ -254,33 +254,60 @@ class MaxPriceMovements(Metric):
     def _join_minute_data_from_range(self, target):
         price_data = self.read_price_data()
 
-        time_range_start = time(hour=10, minute=49)
-        time_range_end = time(hour=11, minute=2)
+        if self.currency_pair_name == "GBPUSD":
 
-        minute_data = MinutelyData(
-            price_dfs=price_data,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            cp_name=self.currency_pair_name,
-            specs=[
-                {
-                    "range_start": time_range_start,
-                    "range_end": time_range_end,
-                    "include": ["Close"]
-                },
-                {
-                    "range_start": time(hour=11, minute=30),
-                    "range_end": time(hour=11, minute=30),
-                    "include": ['Close']
-                },
-                {
-                    "range_start": time(hour=11, minute=45),
-                    "range_end": time(hour=11, minute=45),
-                    "include": ['Close']
-                },
+            minute_data = MinutelyData(
+                price_dfs=price_data,
+                time_range=TimeRangeInDay(
+                    start_time=time(hour=10, minute=30),
+                    end_time=time(hour=11, minute=2)
+                ),
+                cp_name=self.currency_pair_name,
+                specs=[
+                    {
+                        "range_start": time(hour=10, minute=49),
+                        "range_end": time(hour=11, minute=2),
+                        "include": ["Close"]
+                    },
+                    {
+                        "range_start": time(hour=11, minute=30),
+                        "range_end": time(hour=11, minute=30),
+                        "include": ['Close']
+                    },
+                    {
+                        "range_start": time(hour=11, minute=45),
+                        "range_end": time(hour=11, minute=45),
+                        "include": ['Close']
+                    },
             ]).to_df()
+
+        else: 
+
+             minute_data = MinutelyData(
+                price_dfs=price_data,
+                time_range=TimeRangeInDay(
+                    start_time=time(hour=10, minute=30),
+                    end_time=time(hour=11, minute=2)
+                ),
+                cp_name=self.currency_pair_name,
+                specs=[
+                    {
+                        "range_start": time(hour=17, minute=49),
+                        "range_end": time(hour=18, minute=2),
+                        "include": ["Close"]
+                    },
+                    {
+                        "range_start": time(hour=18, minute=30),
+                        "range_end": time(hour=18, minute=30),
+                        "include": ['Close']
+                    },
+                    {
+                        "range_start": time(hour=18, minute=45),
+                        "range_end": time(hour=18, minute=45),
+                        "include": ['Close']
+                    },
+            ]).to_df()
+
 
         minute_data.columns = pd.MultiIndex.from_product(
             [["Selected Minute Data"], minute_data.columns])
