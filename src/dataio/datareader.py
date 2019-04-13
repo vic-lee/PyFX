@@ -36,6 +36,12 @@ class DataReader:
         fpath = self.fpaths[self.DAILY]
         df = pd.read_excel(fpath)
         df.rename(columns={'Date': 'datetime'}, inplace=True)
+
+        print('len is ' + str(len(df.columns)))
+
+        if (len(df.columns) == 11):
+            df = df.drop(columns=['O'])            
+
         df = self._filter_ohlc_in_daily(df)
 
         mask = (df['datetime'] > "2018-01-02") & (df['datetime'] <= "2019-01-01")
