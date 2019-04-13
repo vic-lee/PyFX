@@ -33,7 +33,6 @@ def analyze_currency_pair(currency_pair_name) -> None:
     price_movements = setup_price_movement_obj(
         data=price_data, cp_name=currency_pair_name)
     price_movements.find_max_price_movements()
-    price_movements.to_string()
     price_movements.to_excel()
 
 

@@ -141,7 +141,6 @@ class MaxPriceMovements(Metric):
     def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None:
             day_objs[prior_day_obj.date] = prior_day_obj
-            print(prior_day_obj.to_string())
         return day_objs
 
     def _update_current_date(self, newdate: datetime) -> datetime.date:
@@ -195,7 +194,6 @@ class MaxPriceMovements(Metric):
         # df = df[np.isfinite(df['GBP-USD'])]
         df = df.dropna(how='all')
 
-        print(df)
         return df
 
     def _generate_benchmarked_df_list(self):
@@ -206,8 +204,6 @@ class MaxPriceMovements(Metric):
             for _, data_on_date in data.items():
                 exported_df = data_on_date.to_df()
                 df_list.append(exported_df)
-                if data_on_date.date == date(year=2018, month=12, day=31):
-                    print(data_on_date.to_df())
 
             df_for_benchmark = pd.concat(df_list, sort=False)
 
@@ -221,7 +217,6 @@ class MaxPriceMovements(Metric):
 
             benchmarked_df_list.append(df_for_benchmark)
 
-        print(benchmarked_df_list[0])
         return benchmarked_df_list
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
@@ -234,7 +229,6 @@ class MaxPriceMovements(Metric):
         current_day_fix_df.columns = ['Current Day Fix']
         # print(current_day_fix_df.loc['2018-12-23'])
         # current_day_fix_df = current_day_fix_df.drop(index=['2018-12-23 00:00:00'])
-        print(current_day_fix_df)
 
         df_for_benchmark = pd.merge(
             left=current_day_fix_df,
