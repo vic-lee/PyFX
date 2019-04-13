@@ -27,29 +27,38 @@ def main():
     for currency_pair in currency_pairs:
         analyze_currency_pair(currency_pair, fname_suffix)
 
-    # analyze_currency_pair("AUDUSD")
+    # analyze_currency_pair("AUDUSD", fname_suffix)
 
     end_time = datetime.now()
     print("\nProgram runtime: {}".format((end_time - start_time)))
 
 
 def analyze_currency_pair(currency_pair_name, timestamp) -> None:
+    df_dict = {}
+
     '''Read data'''
     price_data = read_price_data(currency_pair_name)
 
-    df_dict = {}
-
     '''Generate data analysis'''
+    '''2.0 Daily OHLC Prices'''
+    df_dict["OHLC"] = price_data[DataReader.DAILY]
+
+    '''2.1 Max Pip Movements'''
     price_movements = setup_price_movement_obj(
         data=price_data, cp_name=currency_pair_name)
 
     price_movements.find_max_price_movements()
-    price_movements.to_excel(time_suffix=timestamp)
+    price_movement_analyses = price_movements.to_benchmarked_results()
+    df_dict = {**df_dict, **price_movement_analyses}
 
+    # price_movements.to_excel(time_suffix=timestamp)
+
+    '''2.2 Selected Minute Data'''
     selected_minute_data = include_minutely_data(
         data=price_data, cp_name=currency_pair_name)
     df_dict["Selected Minute Data"] = selected_minute_data
 
+    '''2.3 Price Average data from range'''
     price_avg_data, timerange = include_period_avg_data(
         price_data, currency_pair_name)
     column_str = str(timerange.start_time) + "_" + str(timerange.end_time)
