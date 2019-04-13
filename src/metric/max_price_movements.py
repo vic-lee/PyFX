@@ -11,9 +11,9 @@ from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
 
 from metric.metric import Metric
-from metric.daymvmt import DayPipMovmentToPrice
-from metric.periodpriceavg import PeriodPriceAvg
-from metric.minutelydata import MinutelyData
+from metric.day_movement import DayPipMovmentToPrice
+from metric.period_price_avg import PeriodPriceAvg
+from metric.minutely_data import MinutelyData
 
 
 class MaxPriceMovements(Metric):
