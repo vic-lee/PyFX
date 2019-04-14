@@ -5,8 +5,8 @@ from metrics.metric import Metric
 
 class MinutelyData(Metric):
 
-    def __init__(self, price_dfs, time_range, cp_name, specs):
-        Metric.__init__(self, time_range, price_dfs, cp_name)
+    def __init__(self, price_dfs, time_range, date_range, cp_name, specs):
+        Metric.__init__(self, time_range, date_range, price_dfs, cp_name)
         self.specs = specs
         self.df = self._generate_output_df()
 

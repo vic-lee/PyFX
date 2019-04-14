@@ -3,11 +3,14 @@ from datetime import datetime, timedelta
 
 from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
+from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daterange import DateRange
 
 
 class Metric:
-    def __init__(self, time_range, price_dfs, currency_pair_name: str):
+    def __init__(self, time_range: TimeRangeInDay, date_range: DateRange, price_dfs, currency_pair_name: str):
         self.time_range = time_range
+        self.date_range = date_range
         self.currency_pair_name = currency_pair_name
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
@@ -23,17 +26,23 @@ class Metric:
         def daydelta(d, delta): return d - timedelta(days=delta)
 
         fx = None
-        try:
-            cp_identifier = self.currency_pair_name[:3] + \
-                '-' + self.currency_pair_name[3:]
-            fx = self.fix_price_df.loc[str(d)][cp_identifier]
-        except Exception as e:
-            print(
-                "Could not locate the previous location, possibly due to out of bounds." + str(e))
-            return None
-        if not np.isnan(fx):
-            index = datetime(year=d.year, month=d.month,
-                             day=d.day, hour=0, minute=0, second=0)
-            return PriceTime(price=fx, datetime=index)
+
+        if self.date_range.is_datetime_in_range(d):
+
+            try:
+                cp_identifier = self.currency_pair_name[:3] + \
+                    '-' + self.currency_pair_name[3:]
+                fx = self.fix_price_df.loc[str(d)][cp_identifier]
+            except Exception as e:
+                print(
+                    "Could not locate the previous location, possibly due to out of bounds." + str(e))
+                return None
+            if not np.isnan(fx):
+                index = datetime(year=d.year, month=d.month,
+                                day=d.day, hour=0, minute=0, second=0)
+                return PriceTime(price=fx, datetime=index)
+            else:
+                return self._get_prior_fix_recursive(daydelta(d, 1))
+
         else:
-            return self._get_prior_fix_recursive(daydelta(d, 1))
+            return None

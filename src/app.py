@@ -1,5 +1,5 @@
 from os.path import abspath
-from datetime import datetime, time
+from datetime import datetime, time, date
 import pandas as pd
 
 from dataio.datareader import DataReader
@@ -11,6 +11,7 @@ from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
 from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daterange import DateRange
 
 
 def main():
@@ -78,6 +79,10 @@ def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
             start_time=time(hour=14, minute=30),
             end_time=time(hour=15, minute=2)
         ),
+        MaxPriceMovements.DATE_RANGE: DateRange(
+            start_date=date(year=2018, month=1, day=1),
+            end_date=date(year=2018, month=12, day=31)
+        ),
         MaxPriceMovements.BENCHMARK_TIMES: [
             time(hour=14, minute=30),
             time(hour=14, minute=45)
@@ -94,6 +99,10 @@ def include_minutely_data(data, cp_name: str) -> pd.DataFrame:
         time_range=TimeRangeInDay(
             start_time=time(hour=14, minute=30),
             end_time=time(hour=15, minute=2)
+        ),
+        date_range=DateRange(
+            start_date=date(year=2018, month=1, day=1),
+            end_date=date(year=2018, month=12, day=31)
         ),
         cp_name=cp_name,
         specs=[
@@ -126,6 +135,10 @@ def include_period_avg_data(data, cp_name: str):
         time_range=TimeRangeInDay(
             start_time=time(hour=14, minute=30),
             end_time=time(hour=15, minute=2)
+        ),
+        date_range=DateRange(
+            start_date=date(year=2018, month=1, day=1),
+            end_date=date(year=2018, month=12, day=31)
         ),
         time_range_for_avg=TimeRangeInDay(
             start_time=avg_time_range_start,

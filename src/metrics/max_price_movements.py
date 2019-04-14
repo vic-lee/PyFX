@@ -20,6 +20,7 @@ class MaxPriceMovements(Metric):
     It is used in conjunction with DayPipMovmentToPrice class.
     """
 
+    DATE_RANGE = "date range"
     TIME_RANGE = "time range"
     BENCHMARK_TIMES = "benchmark_times"
     CURRENCY_PAIR = "currency_pair"
@@ -45,6 +46,7 @@ class MaxPriceMovements(Metric):
         Metric.__init__(
             self,
             time_range=config[self.TIME_RANGE],
+            date_range=config[self.DATE_RANGE],
             price_dfs=price_dfs,
             currency_pair_name=config[self.CURRENCY_PAIR]
         )
