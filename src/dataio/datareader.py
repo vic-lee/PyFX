@@ -1,6 +1,9 @@
+import logging
 import pandas as pd
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class DataReader:
 
@@ -87,7 +90,7 @@ class DataReader:
         return df
 
     def _log_read_error(self, mode):
-        print("Error in reading {} data. Aborting...".format(mode))
+        logger.error("Error in reading {} data. Aborting...".format(mode))
 
     def _filter_ohlc_in_daily(self, df):
         """This function returns only bid prices and removes ask prices. 

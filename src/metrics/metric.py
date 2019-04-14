@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 from datetime import datetime, timedelta
 
@@ -5,6 +6,9 @@ from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
 from datastructure.daytimerange import TimeRangeInDay
 from datastructure.daterange import DateRange
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class Metric:
@@ -34,12 +38,12 @@ class Metric:
                     '-' + self.currency_pair_name[3:]
                 fx = self.fix_price_df.loc[str(d)][cp_identifier]
             except Exception as e:
-                print(
-                    "Could not locate the previous location, possibly due to out of bounds." + str(e))
+                logger.error(
+                    "Could not locate the previous fix price, possibly due to out of bounds." + str(e))
                 return None
             if not np.isnan(fx):
                 index = datetime(year=d.year, month=d.month,
-                                day=d.day, hour=0, minute=0, second=0)
+                                 day=d.day, hour=0, minute=0, second=0)
                 return PriceTime(price=fx, datetime=index)
             else:
                 return self._get_prior_fix_recursive(daydelta(d, 1))

@@ -1,6 +1,7 @@
 from os.path import abspath
 from datetime import datetime, time, date
 import pandas as pd
+import logging
 
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
@@ -12,6 +13,15 @@ from metrics.minutely_data import MinutelyData
 
 from datastructure.daytimerange import TimeRangeInDay
 from datastructure.daterange import DateRange
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler('app.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 
 def main():
@@ -30,10 +40,12 @@ def main():
     # analyze_currency_pair("AUDUSD", fname_suffix)
 
     end_time = datetime.now()
-    print("\nProgram runtime: {}".format((end_time - start_time)))
+    logger.info("\nProgram runtime: {}".format((end_time - start_time)))
 
 
 def analyze_currency_pair(currency_pair_name, timestamp) -> None:
+    logger.info("Initialize analysis for {}".format(currency_pair_name))
+
     df_dict = {}
 
     '''Read data'''

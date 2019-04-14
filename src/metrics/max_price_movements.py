@@ -2,6 +2,7 @@ from datetime import datetime, date, time, timedelta
 import pandas as pd
 import numpy as np
 from os.path import abspath
+import logging
 
 from datastructure.daytimerange import TimeRangeInDay
 from datastructure.pricetime import PriceTime
@@ -14,6 +15,8 @@ from metrics.day_movement import DayPipMovmentToPrice
 from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class MaxPriceMovements(Metric):
     """This class finds the daily price movements within a period of time.
@@ -56,8 +59,6 @@ class MaxPriceMovements(Metric):
             self._generate_price_movements_obj_from_benchmark_times()
 
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
-
-        print("\nInitialize analysis for pair {}".format(self.currency_pair_name))
 
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
@@ -129,7 +130,7 @@ class MaxPriceMovements(Metric):
             return PriceTime(price=price, datetime=index)
 
         except:
-            print("Could not locate price for " + str(index))
+            logger.error("Could not locate price for " + str(index))
             return None
 
     def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime,
@@ -193,8 +194,6 @@ class MaxPriceMovements(Metric):
         current_day_fix_df = current_day_fix_df[np.isfinite(
             current_day_fix_df[cp_identifier])]
         current_day_fix_df.columns = ['Current Day Fix']
-        # print(current_day_fix_df.loc['2018-12-23'])
-        # current_day_fix_df = current_day_fix_df.drop(index=['2018-12-23 00:00:00'])
 
         df_for_benchmark = pd.merge(
             left=current_day_fix_df,
