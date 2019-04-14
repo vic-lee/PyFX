@@ -73,133 +73,71 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
 
 def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
 
-    if (cp_name == "GBPUSD"):
-        pip_movement_config = {
-            MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            MaxPriceMovements.BENCHMARK_TIMES: [
-                time(hour=10, minute=30),
-                time(hour=10, minute=45)
-            ],
-            MaxPriceMovements.CURRENCY_PAIR: cp_name
-        }
-    else:
-        pip_movement_config = {
-            MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
-                start_time=time(hour=17, minute=30),
-                end_time=time(hour=18, minute=2)
-            ),
-            MaxPriceMovements.BENCHMARK_TIMES: [
-                time(hour=17, minute=30),
-                time(hour=17, minute=45)
-            ],
-            MaxPriceMovements.CURRENCY_PAIR: cp_name
-        }
+    pip_movement_config = {
+        MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
+            start_time=time(hour=14, minute=30),
+            end_time=time(hour=15, minute=2)
+        ),
+        MaxPriceMovements.BENCHMARK_TIMES: [
+            time(hour=14, minute=30),
+            time(hour=14, minute=45)
+        ],
+        MaxPriceMovements.CURRENCY_PAIR: cp_name
+    }
 
     return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
 
 
 def include_minutely_data(data, cp_name: str) -> pd.DataFrame:
-    if cp_name == "GBPUSD":
-        """HACK: Think of a solution to remove dual time standards."""
-        minute_data = MinutelyData(
-            price_dfs=data,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            cp_name=cp_name,
-            specs=[
-                {
-                    "range_start": time(hour=10, minute=49),
-                    "range_end": time(hour=11, minute=2),
-                    "include": ["Close"]
-                },
-                {
-                    "range_start": time(hour=11, minute=30),
-                    "range_end": time(hour=11, minute=30),
-                    "include": ['Close']
-                },
-                {
-                    "range_start": time(hour=11, minute=45),
-                    "range_end": time(hour=11, minute=45),
-                    "include": ['Close']
-                },
-            ]).to_df()
-
-    else:
-        minute_data = MinutelyData(
-            price_dfs=data,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            cp_name=cp_name,
-            specs=[
-                {
-                    "range_start": time(hour=17, minute=49),
-                    "range_end": time(hour=18, minute=2),
-                    "include": ["Close"]
-                },
-                {
-                    "range_start": time(hour=18, minute=30),
-                    "range_end": time(hour=18, minute=30),
-                    "include": ['Close']
-                },
-                {
-                    "range_start": time(hour=18, minute=45),
-                    "range_end": time(hour=18, minute=45),
-                    "include": ['Close']
-                },
-            ]).to_df()
+    minute_data = MinutelyData(
+        price_dfs=data,
+        time_range=TimeRangeInDay(
+            start_time=time(hour=14, minute=30),
+            end_time=time(hour=15, minute=2)
+        ),
+        cp_name=cp_name,
+        specs=[
+            {
+                "range_start": time(hour=14, minute=49),
+                "range_end": time(hour=15, minute=2),
+                "include": ["Close"]
+            },
+            {
+                "range_start": time(hour=15, minute=30),
+                "range_end": time(hour=15, minute=30),
+                "include": ['Close']
+            },
+            {
+                "range_start": time(hour=15, minute=45),
+                "range_end": time(hour=15, minute=45),
+                "include": ['Close']
+            },
+        ]).to_df()
 
     return minute_data
 
 
 def include_period_avg_data(data, cp_name: str):
-    if cp_name == "GBPUSD":
-        time_range_start = time(hour=10, minute=58)
-        time_range_end = time(hour=11, minute=2)
-        df = PeriodPriceAvg(
-            price_dfs=data,
-            cp_name=cp_name,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=10, minute=30),
-                end_time=time(hour=11, minute=2)
-            ),
-            time_range_for_avg=TimeRangeInDay(
-                start_time=time_range_start,
-                end_time=time_range_end
-            ),
-            include_open={
-                time(hour=10, minute=55),
-                time(hour=10, minute=56),
-            }
-        ).to_df()
+    avg_time_range_start = time(hour=14, minute=58)
+    avg_time_range_end = time(hour=15, minute=2)
+    df = PeriodPriceAvg(
+        price_dfs=data,
+        cp_name=cp_name,
+        time_range=TimeRangeInDay(
+            start_time=time(hour=14, minute=30),
+            end_time=time(hour=15, minute=2)
+        ),
+        time_range_for_avg=TimeRangeInDay(
+            start_time=avg_time_range_start,
+            end_time=avg_time_range_end
+        ),
+        include_open={
+            time(hour=14, minute=55),
+            time(hour=14, minute=56),
+        }
+    ).to_df()
 
-    else:
-        time_range_start = time(hour=17, minute=58)
-        time_range_end = time(hour=18, minute=2)
-        df = PeriodPriceAvg(
-            price_dfs=data,
-            cp_name=cp_name,
-            time_range=TimeRangeInDay(
-                start_time=time(hour=17, minute=30),
-                end_time=time(hour=18, minute=2)
-            ),
-            time_range_for_avg=TimeRangeInDay(
-                start_time=time_range_start,
-                end_time=time_range_end
-            ),
-            include_open={
-                time(hour=17, minute=55),
-                time(hour=17, minute=56),
-            }
-        ).to_df()
-
-    return df, TimeRangeInDay(start_time=time_range_start, end_time=time_range_end)
+    return df, TimeRangeInDay(start_time=avg_time_range_start, end_time=avg_time_range_end)
 
 
 def read_price_data(currency_pair_name) -> dict:
