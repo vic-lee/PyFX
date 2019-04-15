@@ -48,8 +48,8 @@ class MinutelyData(Metric):
             df_out = df_out.join(right_df, how="outer")
         return df_out
 
-
-    def incr_one_min(self, time_cur):
+    @staticmethod
+    def incr_one_min(time_cur):
         old_min = time_cur.minute
         if old_min == 59: 
             new_min = 0
