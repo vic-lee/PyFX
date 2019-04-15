@@ -141,15 +141,18 @@ class MaxPriceMovements(Metric):
             time_range_start_pricetime=time_range_start_pricetime,
             time_range=self.time_range)
 
-    def _save_prior_day_obj(self, prior_day_obj: DayPipMovmentToPrice, day_objs):
+    @staticmethod
+    def _save_prior_day_obj(prior_day_obj: DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None:
             day_objs[prior_day_obj.date] = prior_day_obj
         return day_objs
 
-    def _update_current_date(self, newdate: datetime) -> datetime.date:
+    @staticmethod
+    def _update_current_date(newdate: datetime) -> datetime.date:
         return newdate.date()
 
-    def _is_row_new_day(self, date: datetime.date, index: datetime) -> bool:
+    @staticmethod
+    def _is_row_new_day(date: datetime.date, index: datetime) -> bool:
         if date == None:
             return True
         if index.date() != date:
