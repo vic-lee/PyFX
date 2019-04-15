@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
@@ -50,3 +50,15 @@ class Metric:
 
         else:
             return None
+
+    @staticmethod
+    def incr_one_min(time_cur):
+        old_min = time_cur.minute
+        if old_min == 59:
+            new_min = 0
+            new_hour = time_cur.hour + 1
+        else:
+            new_min = old_min + 1
+            new_hour = time_cur.hour
+        time_cur = time(hour=new_hour, minute=new_min, second=time_cur.second)
+        return time_cur
