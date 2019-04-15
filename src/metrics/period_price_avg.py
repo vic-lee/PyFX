@@ -27,7 +27,8 @@ class PeriodPriceAvg(Metric):
 
         return df_stats
 
-    def _find_time_for_min(self, row):
+    @staticmethod
+    def _find_time_for_min(row):
         min_price = None
         min_time = None
         for time, price in row.iteritems():
@@ -36,7 +37,8 @@ class PeriodPriceAvg(Metric):
                 min_time = time
         return min_time[:-6]
 
-    def _find_time_for_max(self, row):
+    @staticmethod
+    def _find_time_for_max(row):
         max_price = None
         max_time = None
         for time, price in row.iteritems():
@@ -62,13 +64,15 @@ class PeriodPriceAvg(Metric):
 
         return df
 
-    def _join_minute_dfs(self, df_list):
+    @staticmethod
+    def _join_minute_dfs(df_list):
         df_out = pd.DataFrame()
         for _, right_df in df_list.items():
             df_out = df_out.join(right_df, how="outer")
         return df_out
 
-    def incr_one_min(self, time_cur):
+    @staticmethod
+    def incr_one_min(time_cur):
         old_min = time_cur.minute
         if old_min == 59:
             new_min = 0
