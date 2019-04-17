@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import datetime, time
 
 class TimeRangeInDay:
     """This class denotes the range within which the algorithm performs
@@ -12,7 +12,7 @@ class TimeRangeInDay:
         self.end_time = end_time
 
 
-    def is_datetime_in_range(self, datetime):
+    def is_datetime_in_range(self, datetime: datetime):
         return datetime.time() >= self.start_time and datetime.time() <= self.end_time
 
 
