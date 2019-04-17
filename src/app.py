@@ -1,3 +1,8 @@
+"""
+This file is the starting point of the program. It provides a bird's eye view 
+of the operations carried out to generate key metrics and to export to excel. 
+"""
+
 from os.path import abspath
 from datetime import datetime, time, date
 import pandas as pd
@@ -25,6 +30,11 @@ logger.addHandler(handler)
 
 
 def main():
+    """
+    This function houses the application logic. At the highest level, the 
+    program performs the same analysis for each currency pair, stored in 
+    the array. 
+    """
     start_time = datetime.now()
 
     currency_pairs = [
@@ -44,6 +54,11 @@ def main():
 
 
 def analyze_currency_pair(currency_pair_name, timestamp) -> None:
+    """
+    This function encapsulates the key steps to perform to generate metrics for 
+    the output. Comments below detail the steps. 
+    """
+
     logger.info("Initialize analysis for {}".format(currency_pair_name))
 
     df_dict = {}
@@ -85,6 +100,25 @@ def analyze_currency_pair(currency_pair_name, timestamp) -> None:
 
 
 def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
+    """
+    This function encapsulates the definition of a `MaxPriceMovements` class, 
+    which iterates to find the max pips for each day. To do this, it defines 
+    the `MaxPriceMovements` class by specifying: 
+
+        1) the starting time, ending time of the range to search for, 
+        2) the starting date, ending date to search for, and 
+        3) the benchmark prices. 
+
+    The choice to hard-code the config parameters, rather than passing in the 
+    specifications, is intentional. 
+    First, the config should ideally not be tampered with very often, once the 
+    workflow is appropriately set up. 
+    Second, passing in all the params make this function no different from the 
+    class's default constructor. 
+
+    For detailed implementation of `MaxPriceMovements`, see 
+    `metrics/max_price_movements.py`.
+    """
 
     pip_movement_config = {
         MaxPriceMovements.TIME_RANGE: TimeRangeInDay(
@@ -106,6 +140,19 @@ def setup_price_movement_obj(data, cp_name) -> MaxPriceMovements:
 
 
 def include_minutely_data(data, cp_name: str) -> pd.DataFrame:
+    """
+    This function defines what minutely data to include in the output. 
+    The minutely data to include can be specified by two dimensions: 
+
+        1) the time range of prices to include (e.g. 3:20-3:40PM)
+        2) the type of price to include (OHLC)
+
+    Additional details, such as starting time, ending time, starting date, and
+    ending date, are also defined. 
+
+    Please see `metrics/minutely_data.py` for detailed implementation. 
+    """
+
     minute_data = MinutelyData(
         price_dfs=data,
         time_range=TimeRangeInDay(
@@ -139,6 +186,11 @@ def include_minutely_data(data, cp_name: str) -> pd.DataFrame:
 
 
 def include_period_avg_data(data, cp_name: str):
+    """
+    This function calculates and returns a series of average prices, given the
+    starting time and ending time for the calculation period. 
+    """
+
     avg_time_range_start = time(hour=14, minute=58)
     avg_time_range_end = time(hour=15, minute=2)
     df = PeriodPriceAvg(
@@ -166,6 +218,19 @@ def include_period_avg_data(data, cp_name: str):
 
 
 def read_price_data(currency_pair_name) -> dict:
+    """
+    This function reads in data from the data source directory. 
+
+    The input files follow a specific naming convention, to make this function's 
+    implementation easier. 
+
+    Specifically, the convention is as follows:
+
+        * file for fix price (in CSV):      fix1819.csv
+        * file for minutely data (in CSV):  {CurrencyPairName}_Minute.csv
+        * file for daily data (in xlsx):    {CurrencyPairName}_Daily.xslx
+    """
+
     in_fpaths = {
         DataReader.FIX: abspath("../data/datasrc/fix1819.csv"),
         DataReader.MINUTELY: abspath("../data/datasrc/{}_Minute.csv".format(currency_pair_name)),
@@ -179,6 +244,13 @@ def read_price_data(currency_pair_name) -> dict:
 
 
 def generate_folder_timestamp() -> str:
+    """
+    This is a helper function that generates a timestamp that will be appended
+    to an output's folder name. Appending timestamps to a folder name 
+    containing outputs prevent old outputs from being overriden (thus wiping 
+    out the output history). 
+    """
+
     now = datetime.now()
     fname_suffix = now.strftime("_%Y%m%d_%H%M%S")
     return fname_suffix
