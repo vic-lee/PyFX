@@ -1,5 +1,7 @@
+from datetime import datetime
+
 class PriceTime:
-    def __init__(self, price, datetime):
+    def __init__(self, price: float, datetime: datetime):
         self._price = price
         self._datetime = datetime
 
@@ -11,11 +13,11 @@ class PriceTime:
     def price(self):
         return self._price
 
-    def delta_from(self, other_price):
+    def _delta_from(self, other_price):
         return (self._price - other_price.price)
 
     def pip_movement_from(self, other_price):
-        return round(self.delta_from(other_price) * 10000, 1)
+        return round(self._delta_from(other_price) * 10000, 1)
 
     def is_earlier_than(self, other_price) -> bool:
         return self._datetime < other_price.datetime
