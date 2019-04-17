@@ -26,9 +26,7 @@ class TestTimeRangeInDay(unittest.TestCase):
         )
         self.assertFalse(result)
 
-        self._test_raise_err_on_endtime_earlier_than_starttime()
-
-    def _test_raise_err_on_endtime_earlier_than_starttime(self):
+    def test_raise_err_on_endtime_earlier_than_starttime(self):
         with self.assertRaises(ValueError):
             TimeRangeInDay(
                 start_time=time(hour=9, minute=11, second=0),
