@@ -30,22 +30,6 @@ class MaxPriceMovements(Metric):
     CURRENCY_PAIR = "currency_pair"
 
     def __init__(self, price_dfs, config):
-        '''
-        Note: the initialization is highly coupled. Later initializations may
-        depend on earlier initializations. Change the sequence of initialization
-        with caution.
-        '''
-        '''
-        TODO: Data structure choice for max_price_movements is subject to change.
-        Consider multilevel dataframe (possible difficulty in excel exporting).
-
-        Current implementation:
-        "benchmark_time": {
-            "date": {
-                pip_info
-            }
-        }
-        '''
 
         Metric.__init__(
             self,
@@ -93,7 +77,9 @@ class MaxPriceMovements(Metric):
         daily_max_pips = None
         current_date = None
         for time_index, row in self.minute_price_df.iterrows():
+
             current_price = PriceTime(price=row['Close'], datetime=time_index)
+            
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
