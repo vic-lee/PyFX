@@ -73,7 +73,7 @@ class MaxPriceMovements(Metric):
     def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
 
         day_objs = {}
-        daily_max_pips = None
+        daily_max_pips_obj = None
         current_date = None
 
         for time_index, row in self.minute_price_df.iterrows():
@@ -82,7 +82,8 @@ class MaxPriceMovements(Metric):
 
             if self._is_row_new_day(date=current_date, index=time_index):
 
-                day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
+                day_objs = self._save_prior_day_obj(daily_max_pips_obj,
+                                                    day_objs)
                 current_date = self._update_current_date(newdate=time_index)
 
                 if pdfx_benchmark == False:
@@ -97,17 +98,14 @@ class MaxPriceMovements(Metric):
                     time_range_start_pricetime = self._get_benchmark_price(date=time_index.date(),
                                                                            benchmark_time=self.time_range.start_time)
 
-                if benchmark_price is not None and time_range_start_pricetime is not None:
-                    daily_max_pips = self._init_new_day_obj(current_date,
+                daily_max_pips_obj = self._init_new_day_obj(current_date,
                                                             benchmark_price,
                                                             time_range_start_pricetime)
-                else:
-                    daily_max_pips = None
 
-            if daily_max_pips is not None:
-                daily_max_pips.update_max_pip(current_price)
+            if daily_max_pips_obj is not None:
+                daily_max_pips_obj.update_max_pip(current_price)
 
-        day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
+        day_objs = self._save_prior_day_obj(daily_max_pips_obj, day_objs)
 
         return day_objs
 
@@ -127,10 +125,15 @@ class MaxPriceMovements(Metric):
     def _init_new_day_obj(self, current_date: datetime.date, benchmark_pricetime: PriceTime,
                           time_range_start_pricetime: PriceTime) -> DayPipMovmentToPrice:
 
-        return DayPipMovmentToPrice(date=current_date,
-                                    benchmark_pricetime=benchmark_pricetime,
-                                    time_range_start_pricetime=time_range_start_pricetime,
-                                    time_range=self.time_range)
+        if benchmark_pricetime is not None and time_range_start_pricetime is not None:
+
+            return DayPipMovmentToPrice(date=current_date,
+                                        benchmark_pricetime=benchmark_pricetime,
+                                        time_range_start_pricetime=time_range_start_pricetime,
+                                        time_range=self.time_range)
+
+        else:
+            return None
 
     @staticmethod
     def _save_prior_day_obj(prior_day_obj: DayPipMovmentToPrice, day_objs):
