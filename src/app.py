@@ -50,6 +50,16 @@ def main():
 
 
 def analyze_currency_pair(currency_pair_name, timestamp, config: ConfigReader) -> None:
+
+    master_df = perform_analysis(currency_pair_name, config)
+
+    '''Output to excel'''
+    output_writer = DataWriter(
+        df=master_df, currency_pair_name=currency_pair_name, timestamp=timestamp)
+    output_writer.df_to_xlsx()
+
+
+def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     """
     This function encapsulates the key steps to perform to generate metrics for 
     the output. Comments below detail the steps. 
@@ -101,10 +111,7 @@ def analyze_currency_pair(currency_pair_name, timestamp, config: ConfigReader) -
     dfbundler = DataFrameBundler(df_dict)
     master_df = dfbundler.output()
 
-    '''Output to excel'''
-    output_writer = DataWriter(
-        df=master_df, currency_pair_name=currency_pair_name, timestamp=timestamp)
-    output_writer.df_to_xlsx()
+    return master_df
 
 
 def setup_price_movement_obj(data, cp_name, config: ConfigReader) -> MaxPriceMovements:
