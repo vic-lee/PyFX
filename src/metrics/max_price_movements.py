@@ -80,7 +80,7 @@ class MaxPriceMovements(Metric):
 
             current_price = PriceTime(price=row['Close'], datetime=time_index)
 
-            if self._is_row_new_day(date=current_date, index=time_index):
+            if self._is_row_new_day(known_date=current_date, new_date=time_index):
 
                 day_objs, current_date = self._switch_day(daily_max_pips_obj,
                                                           day_objs,
@@ -163,10 +163,10 @@ class MaxPriceMovements(Metric):
         return newdate.date()
 
     @staticmethod
-    def _is_row_new_day(date: datetime.date, index: datetime) -> bool:
-        if date == None:
+    def _is_row_new_day(known_date: datetime.date, new_date: datetime) -> bool:
+        if known_date == None:
             return True
-        if index.date() != date:
+        if new_date.date() != known_date:
             return True
         return False
 
