@@ -42,10 +42,8 @@ def main():
 
     fname_suffix = generate_folder_timestamp()
 
-    # for currency_pair in currency_pairs:
-    #     analyze_currency_pair(currency_pair, fname_suffix)
-
-    analyze_currency_pair("GBPUSD", fname_suffix, config)
+    for currency_pair in config.currency_pairs:
+        analyze_currency_pair(currency_pair, fname_suffix, config)
 
     end_time = datetime.now()
     logger.info("\nProgram runtime: {}".format((end_time - start_time)))
