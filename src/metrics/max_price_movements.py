@@ -50,7 +50,9 @@ class MaxPriceMovements(Metric):
         return ret
 
     def _filter_df_to_time_range(self, df):
-        return df.between_time(self.time_range.start_time, self.time_range.end_time)
+        
+        return df.between_time(self.time_range.start_time,
+                               self.time_range.end_time)
 
     def _generate_benchmark_prices_matrix(self):
         ret = {}
@@ -64,8 +66,8 @@ class MaxPriceMovements(Metric):
         For each day, perform max day price movement check.
         """
         for btime in self.max_price_movements:
-            self.max_price_movements[btime] = self._find_max_price_movement_against_benchmark(
-                benchmark_time=btime)
+            self.max_price_movements[btime] \
+                = self._find_max_price_movement_against_benchmark(benchmark_time=btime)
 
         self.max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None,
                                                                                            pdfx_benchmark=True)
