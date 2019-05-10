@@ -67,8 +67,8 @@ class MaxPriceMovements(Metric):
             self.max_price_movements[btime] = self._find_max_price_movement_against_benchmark(
                 benchmark_time=btime)
 
-        self.max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(
-            benchmark_time=None, pdfx_benchmark=True)
+        self.max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None,
+                                                                                           pdfx_benchmark=True)
 
     def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
 
@@ -82,9 +82,9 @@ class MaxPriceMovements(Metric):
 
             if self._is_row_new_day(known_date=current_date, new_date=time_index):
 
-                day_objs, current_date = self._switch_day(daily_max_pips_obj,
-                                                          day_objs,
-                                                          time_index)
+                day_objs, current_date = self._incr_one_day(daily_max_pips_obj,
+                                                            day_objs,
+                                                            time_index)
 
                 daily_max_pips_obj = self._init_new_day_obj(pdfx_benchmark,
                                                             time_index,
@@ -98,7 +98,7 @@ class MaxPriceMovements(Metric):
 
         return day_objs
 
-    def _switch_day(self, prior_day_obj: DayPipMovmentToPrice, day_objs, time_index):
+    def _incr_one_day(self, prior_day_obj: DayPipMovmentToPrice, day_objs, time_index):
 
         day_objs = self._save_prior_day_obj(prior_day_obj, day_objs)
         current_date = self._update_current_date(newdate=time_index)
