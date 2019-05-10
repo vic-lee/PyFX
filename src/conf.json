@@ -1,0 +1,59 @@
+{
+    "currency_pairs": [
+        "AUDUSD",
+        "EURUSD",
+        "GBPUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDJPY",
+        "USDMXN",
+        "USDTRY",
+        "USDZAR"
+    ],
+    "time_range": {
+        "start_time": "11:30",
+        "end_time": "12:02"
+    },
+    "date_range": {
+        "start_date": "2018/01/01",
+        "end_date": "2018/12/31"
+    },
+    "benchmark_time": [
+        "11:30",
+        "11:45"
+    ],
+    "minutely_data": {
+        "include_minutely_data": true,
+        "included_sections": [
+            {
+                "start_time": "11:49",
+                "end_time": "12:02",
+                "metric": [
+                    "Close"
+                ]
+            },
+            {
+                "time": "12:30",
+                "metric": [
+                    "Close"
+                ]
+            },
+            {
+                "time": "12:45",
+                "metric": [
+                    "Close"
+                ]
+            }
+        ]
+    },
+    "period_avg_data": {
+        "include_period_avg_data": true,
+        "included_sections": [
+            {
+                "start_time": "11:58", 
+                "end_time": "12:02"
+            }
+        ]
+    }
+}
