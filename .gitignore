@@ -6,3 +6,4 @@
 __pycache__/
 dataout/
 src/app.log
+src/app.legacy.py
