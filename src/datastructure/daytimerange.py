@@ -1,7 +1,7 @@
 from datetime import datetime, time
 
 
-class TimeRangeInDay:
+class DayTimeRange:
     """This class denotes the range within which the algorithm performs
     its analysis. It has two attributes / reasons to change: 
     starting time, ending time. 
