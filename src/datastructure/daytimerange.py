@@ -13,7 +13,7 @@ class DayTimeRange:
         self.start_time = start_time
         self.end_time = end_time
 
-        if start_time > end_time: 
+        if start_time > end_time:
             raise ValueError("End time cannot be earlier than start time.")
 
     def is_datetime_in_range(self, datetime: datetime):
@@ -25,3 +25,9 @@ class DayTimeRange:
             self.start_time.minute,
             self.end_time.hour,
             self.end_time.minute)
+
+    def __str__(self):
+        return "start time: {}:{} \tend time: {}:{}".format(self.start_time.hour,
+                                                            self.start_time.minute,
+                                                            self.end_time.hour,
+                                                            self.end_time.minute)
