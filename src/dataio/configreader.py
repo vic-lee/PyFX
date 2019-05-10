@@ -63,6 +63,30 @@ class ConfigReader:
         return benchmark_times
 
     @property
+    def should_enable_daylight_saving_mode(self) -> bool:
+        return self._data["daylight_saving_mode"]["daylight_saving_time"]
+
+    @property
+    def dst_hour_ahead_period(self) -> DateRange:
+        start_date_str = self._data['daylight_saving_mode']['hour_ahead_period']['start_date']
+        end_date_str = self._data['daylight_saving_mode']['hour_ahead_period']['end_date']
+
+        start_date = self._str_to_date(start_date_str)
+        end_date = self._str_to_date(end_date_str)
+
+        return DateRange(start_date=start_date, end_date=end_date)
+
+    @property
+    def dst_hour_behind_period(self) -> DateRange:
+        start_date_str = self._data['daylight_saving_mode']['hour_behind_period']['start_date']
+        end_date_str = self._data['daylight_saving_mode']['hour_behind_period']['end_date']
+
+        start_date = self._str_to_date(start_date_str)
+        end_date = self._str_to_date(end_date_str)
+
+        return DateRange(start_date=start_date, end_date=end_date)
+
+    @property
     def should_include_minutely_data(self) -> bool:
         return self._data["minutely_data"]["include_minutely_data"]
 

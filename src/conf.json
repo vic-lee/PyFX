@@ -1,5 +1,5 @@
 {
-    "currency_pairs": [
+    "currency_pairs_temp": [
         "AUDUSD",
         "EURUSD",
         "GBPUSD",
@@ -10,6 +10,9 @@
         "USDMXN",
         "USDTRY",
         "USDZAR"
+    ],
+    "currency_pairs": [
+        "GBPUSD"
     ],
     "time_range": {
         "start_time": "11:30",
@@ -23,6 +26,17 @@
         "11:30",
         "11:45"
     ],
+    "daylight_saving_mode": {
+        "daylight_saving_time": true,
+        "hour_behind_period": {
+            "start_date": "2018/10/28",
+            "end_date": "2018/11/03"
+        },
+        "hour_ahead_period": {
+            "start_date": "2018/03/11",
+            "end_date": "2018/03/24"
+        }
+    },
     "minutely_data": {
         "include_minutely_data": true,
         "included_sections": [
@@ -51,7 +65,7 @@
         "include_period_avg_data": true,
         "included_sections": [
             {
-                "start_time": "11:58", 
+                "start_time": "11:58",
                 "end_time": "12:02"
             }
         ]
