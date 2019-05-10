@@ -5,4 +5,4 @@
 *.numbers
 __pycache__/
 dataout/
-app.log
+src/app.log
