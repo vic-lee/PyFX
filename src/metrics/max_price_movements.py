@@ -82,9 +82,9 @@ class MaxPriceMovements(Metric):
 
             if self._is_row_new_day(date=current_date, index=time_index):
 
-                day_objs = self._save_prior_day_obj(daily_max_pips_obj,
-                                                    day_objs)
-                current_date = self._update_current_date(newdate=time_index)
+                day_objs, current_date = self._switch_day(daily_max_pips_obj,
+                                                          day_objs,
+                                                          time_index)
 
                 daily_max_pips_obj = self._init_new_day_obj(pdfx_benchmark,
                                                             time_index,
@@ -98,18 +98,12 @@ class MaxPriceMovements(Metric):
 
         return day_objs
 
-    def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
-        price_df = self.benchmark_prices_matrix[benchmark_time]
-        index = datetime(year=date.year, month=date.month, day=date.day,
-                         hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
+    def _switch_day(self, prior_day_obj: DayPipMovmentToPrice, day_objs, time_index):
 
-        try:
-            price = price_df.loc[index]['Close']
-            return PriceTime(price=price, datetime=index)
+        day_objs = self._save_prior_day_obj(prior_day_obj, day_objs)
+        current_date = self._update_current_date(newdate=time_index)
 
-        except:
-            logger.error("Could not locate price for " + str(index))
-            return None
+        return day_objs, current_date
 
     def _init_new_day_obj(self, pdfx_benchmark: bool, time_index,
                           current_date: datetime.date, benchmark_time) -> DayPipMovmentToPrice:
@@ -143,6 +137,20 @@ class MaxPriceMovements(Metric):
                                                           benchmark_time=self.time_range.start_time)
 
         return benchmark_pricetime, initial_pricetime
+
+    def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
+
+        price_df = self.benchmark_prices_matrix[benchmark_time]
+        index = datetime(year=date.year, month=date.month, day=date.day,
+                         hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
+
+        try:
+            price = price_df.loc[index]['Close']
+            return PriceTime(price=price, datetime=index)
+
+        except:
+            logger.error("Could not locate price for " + str(index))
+            return None
 
     @staticmethod
     def _save_prior_day_obj(prior_day_obj: DayPipMovmentToPrice, day_objs):
