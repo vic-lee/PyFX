@@ -1,12 +1,12 @@
 import unittest
 from datetime import time, datetime
-from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daytimerange import DayTimeRange
 
 
-class TestTimeRangeInDay(unittest.TestCase):
+class TestDayTimeRange(unittest.TestCase):
 
     def setUp(self):
-        self.timerange = TimeRangeInDay(
+        self.timerange = DayTimeRange(
             start_time=time(hour=9, minute=11, second=0),
             end_time=time(hour=10, minute=20, second=0)
         )
@@ -28,7 +28,7 @@ class TestTimeRangeInDay(unittest.TestCase):
 
     def test_raise_err_on_endtime_earlier_than_starttime(self):
         with self.assertRaises(ValueError):
-            TimeRangeInDay(
+            DayTimeRange(
                 start_time=time(hour=9, minute=11, second=0),
                 end_time=time(hour=7, minute=11, second=0)
             )

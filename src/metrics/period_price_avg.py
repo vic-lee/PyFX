@@ -3,13 +3,13 @@ import pandas as pd
 
 from metrics.metric import Metric
 from dataio.datareader import DataReader
-from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
 
 
 class PeriodPriceAvg(Metric):
-    def __init__(self, price_dfs, cp_name: str, time_range: TimeRangeInDay,
-                 date_range: DateRange, time_range_for_avg: TimeRangeInDay,
+    def __init__(self, price_dfs, cp_name: str, time_range: DayTimeRange,
+                 date_range: DateRange, time_range_for_avg: DayTimeRange,
                  include_open=None):
 
         Metric.__init__(self, time_range, date_range, price_dfs, cp_name)

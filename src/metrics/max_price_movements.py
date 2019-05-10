@@ -4,7 +4,7 @@ import numpy as np
 from os.path import abspath
 import logging
 
-from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daytimerange import DayTimeRange
 from datastructure.pricetime import PriceTime
 
 from dataio.datawriter import DataWriter
@@ -17,6 +17,7 @@ from metrics.minutely_data import MinutelyData
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 class MaxPriceMovements(Metric):
     """This class finds the daily price movements within a period of time.
@@ -204,4 +205,5 @@ class MaxPriceMovements(Metric):
             left_index=True,
             right_index=True,
             how='outer')
+
         return df_for_benchmark

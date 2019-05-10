@@ -1,5 +1,5 @@
 from datastructure.pricetime import PriceTime
-from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daytimerange import DayTimeRange
 import pandas as pd
 import datetime
 
@@ -20,7 +20,7 @@ class DayPipMovmentToPrice:
     UP = "up"
     DOWN = "down"
 
-    def __init__(self, date, benchmark_pricetime: PriceTime, time_range_start_pricetime: PriceTime, time_range: TimeRangeInDay):
+    def __init__(self, date, benchmark_pricetime: PriceTime, time_range_start_pricetime: PriceTime, time_range: DayTimeRange):
         self.date = date
         self.benchmark_pricetime = benchmark_pricetime
         self.time_range_start_pricetime = time_range_start_pricetime

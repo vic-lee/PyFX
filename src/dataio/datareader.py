@@ -5,6 +5,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 class DataReader:
 
     FIX = "fix"
@@ -40,8 +41,8 @@ class DataReader:
         df = pd.read_excel(fpath)
         df.rename(columns={'Date': 'datetime'}, inplace=True)
 
-        if (len(df.columns) == 11):     #HACK
-            df = df.drop(columns=['O'])            
+        if (len(df.columns) == 11):  # HACK
+            df = df.drop(columns=['O'])
 
         df = self._filter_ohlc_in_daily(df)
 
@@ -78,13 +79,19 @@ class DataReader:
             Note that it is an intentional decision to make column==5 or 7 
             mutually exclusive. We want the code to fail should there be a new format. 
             """
-            df.columns = ["datetime", "Open", "High", "Low", "Close"]
+            # df.columns = ["datetime", "Open", "High", "Low", "Close"]
+            df.columns = ["datetime", "Open", "High", "Low", "Close", "E"]
+            df = df.drop(columns=['E'])
 
-            df['datetime'] = df['datetime'].map(
-                lambda s: s[25:] + s[5:14])
+            # df['datetime'] = df['datetime'].map(
+            #     lambda s: s[25:] + s[5:14])
 
+            # df["datetime"] = pd.to_datetime(
+            #     df["datetime"], format="%Y-%m-%d %H:%M:%S")
+
+            # Accomodating for new format
             df["datetime"] = pd.to_datetime(
-                df["datetime"], format="%Y-%m-%d %H:%M:%S")
+                df["datetime"], format="%Y-%m-%d %H:%M")
 
         df = df.set_index('datetime')
         return df

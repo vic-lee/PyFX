@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, time
 
 from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
-from datastructure.daytimerange import TimeRangeInDay
+from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class Metric:
-    def __init__(self, time_range: TimeRangeInDay, date_range: DateRange, price_dfs, currency_pair_name: str):
+    def __init__(self, time_range: DayTimeRange, date_range: DateRange, price_dfs, currency_pair_name: str):
         self.time_range = time_range
         self.date_range = date_range
         self.currency_pair_name = currency_pair_name
