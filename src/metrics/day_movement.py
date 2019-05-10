@@ -77,7 +77,7 @@ class DayPipMovmentToPrice:
             self.price_at_max_pip_down = current_price.price
 
 
-    def to_string(self):
+    def __str__(self):
         f_max_pip_up_time = self._format_max_pip_up_time()
         f_max_pip_down_time = self._format_max_pip_down_time()
 

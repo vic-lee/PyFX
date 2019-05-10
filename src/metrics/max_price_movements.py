@@ -50,7 +50,7 @@ class MaxPriceMovements(Metric):
         return ret
 
     def _filter_df_to_time_range(self, df):
-        
+
         return df.between_time(self.time_range.start_time,
                                self.time_range.end_time)
 
@@ -172,7 +172,7 @@ class MaxPriceMovements(Metric):
             return True
         return False
 
-    def to_string(self):
+    def __str__(self):
         benchmark_time_header_template = \
             "\n/********************** Benchmark Time: {} **********************/\n"
 
@@ -184,7 +184,7 @@ class MaxPriceMovements(Metric):
 
             for day in max_pips_for_btime:
                 day_max_pips = max_pips_for_btime[day]
-                print(day_max_pips.to_string())
+                print(day_max_pips)
 
     def to_benchmarked_results(self):
         benchmarked_dfs = {}
