@@ -31,13 +31,11 @@ class MaxPriceMovements(Metric):
 
     def __init__(self, price_dfs, config):
 
-        Metric.__init__(
-            self,
-            time_range=config[self.TIME_RANGE],
-            date_range=config[self.DATE_RANGE],
-            price_dfs=price_dfs,
-            currency_pair_name=config[self.CURRENCY_PAIR]
-        )
+        Metric.__init__(self,
+                        time_range=config[self.TIME_RANGE],
+                        date_range=config[self.DATE_RANGE],
+                        price_dfs=price_dfs,
+                        currency_pair_name=config[self.CURRENCY_PAIR])
 
         self.benchmark_times = config[self.BENCHMARK_TIMES]
         self.max_price_movements = \
@@ -79,7 +77,7 @@ class MaxPriceMovements(Metric):
         for time_index, row in self.minute_price_df.iterrows():
 
             current_price = PriceTime(price=row['Close'], datetime=time_index)
-            
+
             if self._is_row_new_day(date=current_date, index=time_index):
                 day_objs = self._save_prior_day_obj(daily_max_pips, day_objs)
                 current_date = self._update_current_date(newdate=time_index)
