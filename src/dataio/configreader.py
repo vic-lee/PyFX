@@ -1,9 +1,13 @@
 from datetime import datetime, time
 import json
+import logging
 import os.path
 
 from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
+
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigReader:
@@ -15,7 +19,7 @@ class ConfigReader:
                 try:
                     func()
                 except:
-                    print("Property does not exist")
+                    logger.error("Property does not exist")
 
             return wrapper
 
@@ -26,7 +30,7 @@ class ConfigReader:
                 self._data = json.load(conf)
 
         else:
-            print("Read config failure")
+            logger.error("Read config failure")
 
     @property
     def currency_pairs(self) -> list:
