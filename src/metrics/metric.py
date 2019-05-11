@@ -24,12 +24,60 @@ class Metric:
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
-        self.minute_price_df = self._filter_df_to_time_range(self.full_minute_price_df, config)
+        self.minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
+                                                             config=config)
+        print(self.minute_price_df)
 
-    @staticmethod
-    def _filter_df_to_time_range(df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+    def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+
         if config.should_enable_daylight_saving_mode:
-            pass
+
+            df_list = []
+
+            '''Dates before the DST gap where there's 1 hr ahead: normal start & end time'''
+            before_hr_ahead_mask = df['date'] < self._to_datetime(
+                config.dst_hour_ahead_period.start_date)
+
+            before_hr_ahead_df = df.loc[before_hr_ahead_mask].between_time(config.time_range.start_time,
+                                                                           config.time_range.end_time)
+            df_list.append(before_hr_ahead_df)
+
+            '''Dates during the DST gap where there's 1 hr ahead: start & end time advance by 1hr'''
+            hr_ahead_mask = ((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
+                             (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date)))
+
+            hr_ahead_df = df.loc[hr_ahead_mask].between_time(config.dst_hour_ahead_time_range.start_time,
+                                                             config.dst_hour_ahead_time_range.end_time)
+            df_list.append(hr_ahead_df)
+
+            '''Dates b/t the 1-hr-ahead and 1-hr-lag DST gap: normal start & end time'''
+            between_hr_ahead_and_before_mask = ((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
+                                                (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date)))
+
+            between_hr_ahead_and_before_df = df.loc[between_hr_ahead_and_before_mask].between_time(config.time_range.start_time,
+                                                                                                   config.time_range.end_time)
+            df_list.append(between_hr_ahead_and_before_df)
+
+            '''Dates during the DST gap where there's 1 hr lag: start & end time delay by 1hr'''
+            hr_behind_mask = ((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
+                              (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date)))
+
+            hr_behind_df = df.loc[hr_behind_mask].between_time(config.dst_hour_behind_time_range.start_time,
+                                                               config.dst_hour_behind_time_range.end_time)
+            df_list.append(hr_behind_df)
+
+            '''Dates after the DST gap where there's 1 hr lag: normal start & end time'''
+            after_hr_behind_mask = df['date'] > self._to_datetime(
+                config.dst_hour_behind_period.end_date)
+
+            after_hr_behind_df = df.loc[after_hr_behind_mask].between_time(config.time_range.start_time,
+                                                                           config.time_range.end_time)
+            df_list.append(after_hr_behind_df)
+
+            '''Concatonate data and return'''
+            target = pd.concat(df_list)
+            return target
+
         else:
             return df.between_time(config.time_range.start_time, config.time_range.end_time)
 
@@ -70,3 +118,7 @@ class Metric:
             new_hour = time_cur.hour
         time_cur = time(hour=new_hour, minute=new_min, second=time_cur.second)
         return time_cur
+
+    @staticmethod
+    def _to_datetime(date: datetime.date) -> datetime:
+        return datetime.combine(date, datetime.min.time())
