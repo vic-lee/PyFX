@@ -1,7 +1,9 @@
 import logging
 import numpy as np
+import pandas as pd
 from datetime import datetime, timedelta, time
 
+from dataio.configreader import ConfigReader
 from dataio.datareader import DataReader
 from datastructure.pricetime import PriceTime
 from datastructure.daytimerange import DayTimeRange
@@ -12,18 +14,24 @@ logger.setLevel(logging.DEBUG)
 
 
 class Metric:
-    def __init__(self, time_range: DayTimeRange, date_range: DateRange, price_dfs, currency_pair_name: str):
-        self.time_range = time_range
-        self.date_range = date_range
+
+    def __init__(self, price_dfs, currency_pair_name: str, config: ConfigReader):
+
+        self.time_range = config.time_range
+        self.date_range = config.date_range
         self.currency_pair_name = currency_pair_name
+
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
-        self.minute_price_df = self._filter_df_to_time_range(
-            price_dfs[DataReader.MINUTELY])
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
+        self.minute_price_df = self._filter_df_to_time_range(self.full_minute_price_df, config)
 
-    def _filter_df_to_time_range(self, df):
-        return df.between_time(self.time_range.start_time, self.time_range.end_time)
+    @staticmethod
+    def _filter_df_to_time_range(df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+        if config.should_enable_daylight_saving_mode:
+            pass
+        else:
+            return df.between_time(config.time_range.start_time, config.time_range.end_time)
 
     def _get_prior_fix_recursive(self, d):
 
