@@ -83,6 +83,11 @@ class DataReader:
             df.columns = ["datetime", "Open", "High", "Low", "Close", "E"]
             df = df.drop(columns=['E'])
 
+            df["date"] = df['datetime'].map(lambda s: s[:10])
+            df['date'] = pd.to_datetime(df['date'])
+
+            df = df[["date", "datetime", "Open", "High", "Low", "Close"]]
+
             # df['datetime'] = df['datetime'].map(
             #     lambda s: s[25:] + s[5:14])
 
@@ -90,10 +95,11 @@ class DataReader:
             #     df["datetime"], format="%Y-%m-%d %H:%M:%S")
 
             # Accomodating for new format
-            df["datetime"] = pd.to_datetime(
-                df["datetime"], format="%Y-%m-%d %H:%M")
+            df["datetime"] = pd.to_datetime(df["datetime"],
+                                            format="%Y-%m-%d %H:%M")
 
         df = df.set_index('datetime')
+        print(df)
         return df
 
     def _log_read_error(self, mode):
