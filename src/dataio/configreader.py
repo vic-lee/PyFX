@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import json
 import logging
 import os.path
@@ -81,6 +81,17 @@ class ConfigReader:
         return DateRange(start_date=start_date, end_date=end_date)
 
     @property
+    def dst_hour_ahead_time_range(self) -> DayTimeRange:
+        original_time_range = self.time_range
+
+        new_start_time = self._timedelta_by_hour(time=original_time_range.start_time,
+                                                 hourdelta=1)
+        new_end_time = self._timedelta_by_hour(time=original_time_range.end_time,
+                                               hourdelta=1)
+
+        return DayTimeRange(new_start_time, new_end_time)
+
+    @property
     def dst_hour_behind_period(self) -> DateRange:
         start_date_str = self._data['daylight_saving_mode']['hour_behind_period']['start_date']
         end_date_str = self._data['daylight_saving_mode']['hour_behind_period']['end_date']
@@ -89,6 +100,19 @@ class ConfigReader:
         end_date = self._str_to_date(end_date_str)
 
         return DateRange(start_date=start_date, end_date=end_date)
+
+    @property
+    def dst_hour_behind_time_range(self) -> DayTimeRange:
+        original_time_range = self.time_range
+
+        new_start_time = self._timedelta_by_hour(time=original_time_range.start_time,
+                                                 hourdelta=1,
+                                                 decr=True)
+        new_end_time = self._timedelta_by_hour(time=original_time_range.end_time,
+                                               hourdelta=1,
+                                               decr=True)
+
+        return DayTimeRange(new_start_time, new_end_time)
 
     @property
     def should_include_minutely_data(self) -> bool:
@@ -147,3 +171,10 @@ class ConfigReader:
 
     def _str_to_date(self, datestr: str) -> datetime.date:
         return datetime.strptime(datestr, "%Y/%m/%d").date()
+
+    @staticmethod
+    def _timedelta_by_hour(time: time, hourdelta: int, decr=False) -> time:
+        if decr:
+            return (datetime.combine(datetime.today(), time) - timedelta(hours=hourdelta)).time()
+        else:
+            return (datetime.combine(datetime.today(), time) + timedelta(hours=hourdelta)).time()
