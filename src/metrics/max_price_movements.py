@@ -29,15 +29,14 @@ class MaxPriceMovements(Metric):
     BENCHMARK_TIMES = "benchmark_times"
     CURRENCY_PAIR = "currency_pair"
 
-    def __init__(self, price_dfs, config):
+    def __init__(self, price_dfs, config, currency_pair_name: str):
 
         Metric.__init__(self,
-                        time_range=config[self.TIME_RANGE],
-                        date_range=config[self.DATE_RANGE],
                         price_dfs=price_dfs,
-                        currency_pair_name=config[self.CURRENCY_PAIR])
+                        config=config,
+                        currency_pair_name=currency_pair_name)
 
-        self.benchmark_times = config[self.BENCHMARK_TIMES]
+        self.benchmark_times = config.benchmark_times
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
 
@@ -48,11 +47,6 @@ class MaxPriceMovements(Metric):
         for btime in self.benchmark_times:
             ret[btime] = {}
         return ret
-
-    def _filter_df_to_time_range(self, df):
-
-        return df.between_time(self.time_range.start_time,
-                               self.time_range.end_time)
 
     def _generate_benchmark_prices_matrix(self):
         ret = {}
