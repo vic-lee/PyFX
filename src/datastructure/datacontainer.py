@@ -17,14 +17,30 @@ class DataContainer:
 
     def __init__(self, price_dfs, currency_pair_name: str, config: ConfigReader):
 
-        self.fix_price_df = price_dfs[DataReader.FIX]
-        self.daily_price_df = price_dfs[DataReader.DAILY]
-        self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
+        self._fix_price_df = price_dfs[DataReader.FIX]
+        self._daily_price_df = price_dfs[DataReader.DAILY]
+        self._full_minute_price_df = price_dfs[DataReader.MINUTELY]
 
         self._dst_configs = self._init_dst_config(df=self.full_minute_price_df,
                                                   config=config)
-        self.minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
-                                                             config=config)
+        self._minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
+                                                              config=config)
+
+    @property
+    def fix_price_df(self) -> pd.DataFrame:
+        return self._fix_price_df
+
+    @property
+    def daily_price_df(self) -> pd.DataFrame:
+        return self._daily_price_df
+
+    @property
+    def full_minute_price_df(self) -> pd.DataFrame:
+        return self._full_minute_price_df
+
+    @property
+    def minute_price_df(self) -> pd.DataFrame:
+        return self._minute_price_df
 
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
