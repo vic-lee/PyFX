@@ -26,11 +26,6 @@ class MaxPriceMovements(Metric):
     It is used in conjunction with DayPipMovmentToPrice class.
     """
 
-    DATE_RANGE = "date range"
-    TIME_RANGE = "time range"
-    BENCHMARK_TIMES = "benchmark_times"
-    CURRENCY_PAIR = "currency_pair"
-
     def __init__(self, price_data: DataContainer, config: ConfigReader, currency_pair_name: str):
 
         Metric.__init__(self,
@@ -130,7 +125,8 @@ class MaxPriceMovements(Metric):
 
         else:
             prior_day = current_date - timedelta(days=1)
-            benchmark_pricetime = self._get_prior_fix_recursive(prior_day, self.prices)
+            benchmark_pricetime = self._get_prior_fix_recursive(
+                prior_day, self.prices)
             initial_pricetime = self._get_benchmark_price(date=time_index.date(),
                                                           benchmark_time=self.time_range.start_time)
 
