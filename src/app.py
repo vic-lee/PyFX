@@ -47,7 +47,7 @@ def main():
     """
     start_time = datetime.now()
 
-    config = ConfigReader('conf.json')
+    config = ConfigReader('config.json')
 
     fname_suffix = generate_folder_timestamp()
 
