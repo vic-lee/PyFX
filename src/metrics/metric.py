@@ -58,7 +58,7 @@ class Metric:
 
                 elif self._should_incr_hour(start_time, config):
                     df_segment.index = (df_segment.index +
-                                        pd.DateOffset(hours=-1))
+                                        pd.DateOffset(hours=1))
 
                 else:
                     logger.error("DST period identified but hr not normalized")
