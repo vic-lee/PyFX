@@ -25,7 +25,7 @@ class PeriodPriceAvg(Metric):
         self.time_range_for_avg = time_range_for_avg
         self.avgs = self._calc_avgs()
 
-        logger.info("Appending period price average data...")
+        print("Appending period price average data...")
 
     def _calc_avgs(self):
         df = self._generate_period_prices_df()

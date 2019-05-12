@@ -22,7 +22,7 @@ class MinutelyData(Metric):
         self.specs = config.minutely_data_sections
         self.df = self._generate_output_df()
 
-        logger.info("Appending minute data...")
+        print("Appending minute data...")
 
     def _generate_output_df(self):
         df_list = []
