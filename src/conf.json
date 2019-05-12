@@ -65,8 +65,8 @@
         "include_period_avg_data": true,
         "included_sections": [
             {
-                "start_time": "11:58",
-                "end_time": "12:02"
+                "start_time": "10:58",
+                "end_time": "11:02"
             }
         ]
     }
