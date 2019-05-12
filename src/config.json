@@ -41,20 +41,20 @@
         "include_minutely_data": true,
         "included_sections": [
             {
-                "start_time": "11:49",
-                "end_time": "12:02",
+                "start_time": "10:49",
+                "end_time": "11:02",
                 "metric": [
                     "Close"
                 ]
             },
             {
-                "time": "12:30",
+                "time": "11:30",
                 "metric": [
                     "Close"
                 ]
             },
             {
-                "time": "12:45",
+                "time": "11:45",
                 "metric": [
                     "Close"
                 ]
