@@ -39,6 +39,8 @@ class MaxPriceMovements(Metric):
 
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
+        logger.info("Analyzing maximum price movements...")
+
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
         for btime in self.benchmark_times:

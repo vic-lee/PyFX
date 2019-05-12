@@ -1,4 +1,5 @@
 from datetime import timedelta, time
+import logging
 import pandas as pd
 
 from metrics.metric import Metric
@@ -10,6 +11,9 @@ from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 class PeriodPriceAvg(Metric):
 
@@ -20,6 +24,8 @@ class PeriodPriceAvg(Metric):
         self.prices = prices
         self.time_range_for_avg = time_range_for_avg
         self.avgs = self._calc_avgs()
+
+        logger.info("Appending period price average data...")
 
     def _calc_avgs(self):
         df = self._generate_period_prices_df()

@@ -1,11 +1,16 @@
-import pandas as pd
 from datetime import time
+import logging
+import pandas as pd
 
 from metrics.metric import Metric
 
 from datastructure.datacontainer import DataContainer
 
 from dataio.configreader import ConfigReader
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 class MinutelyData(Metric):
 
@@ -16,6 +21,8 @@ class MinutelyData(Metric):
         self.prices = prices
         self.specs = config.minutely_data_sections
         self.df = self._generate_output_df()
+
+        logger.info("Appending minute data...")
 
     def _generate_output_df(self):
         df_list = []
