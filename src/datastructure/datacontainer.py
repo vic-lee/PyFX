@@ -74,7 +74,7 @@ class DataContainer:
             df_list.append(df_segment)
 
         target = pd.concat(df_list)
-        target.to_excel("out_norm.xlsx")
+
         return target
 
     def _init_dst_config(self, df: pd.DataFrame, config: ConfigReader) -> list:

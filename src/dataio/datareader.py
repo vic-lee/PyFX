@@ -99,7 +99,6 @@ class DataReader:
                                             format="%Y-%m-%d %H:%M")
 
         df = df.set_index('datetime')
-        print(df)
         return df
 
     def _log_read_error(self, mode):
