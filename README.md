@@ -1,5 +1,7 @@
 # FX Strategy Research
 
+Please see [config.doc.md](doc/config.doc.md) for documentation on the [configuration file](src/config.json).
+
 ## About this project
 
 This repository contains extensible and customizable python modules that help generate analysis output in excel. Key metrics generated include maximum pip movements against predefined benchmarks, average prices over a time period every day, and the times at which prices hit their low/high points. 
