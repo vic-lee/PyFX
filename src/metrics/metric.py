@@ -58,21 +58,21 @@ class Metric:
                 # DST hr ahead period
                 DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
                                 (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date))),
-                          config=timerange_ahead),
+                          timerange=timerange_ahead),
 
                 # Between DST hr ahead and DST hr delay period
                 DSTConfig(mask=((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
                                 (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date))),
-                          config=timerange_normal),
+                          timerange=timerange_normal),
 
                 # DST hr delay period
                 DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
                                 (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date))),
-                          config=timerange_delayed),
+                          timerange=timerange_delayed),
 
                 # After DST delay period
                 DSTConfig(mask=(df['date'] > self._to_datetime(config.dst_hour_behind_period.end_date)),
-                          config=timerange_normal)
+                          timerange=timerange_normal)
             ]
 
             return conf
