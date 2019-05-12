@@ -27,14 +27,14 @@ class Metric:
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
 
-        self._dst_masks = self._init_dst_masks(df=self.full_minute_price_df,
+        self._dst_masks = self._init_dst_config(df=self.full_minute_price_df,
                                                config=config)
         self.minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
                                                              config=config)
         print(self.minute_price_df)
 
-    def _init_dst_masks(self, df: pd.DataFrame, config: ConfigReader) -> list:
-        masks = []
+    def _init_dst_config(self, df: pd.DataFrame, config: ConfigReader) -> list:
+        conf = []
 
         timerange_normal = [config.time_range.start_time,
                             config.time_range.end_time]
@@ -46,10 +46,10 @@ class Metric:
                              config.dst_hour_behind_time_range.end_time]
 
         if not config.should_enable_daylight_saving_mode:
-            return masks
+            return conf
 
         else:
-            masks = [
+            conf = [
                 # Before DST hr ahead period
                 DSTConfig(mask=(df['date'] < self._to_datetime(config.dst_hour_ahead_period.start_date)),
                           timerange=timerange_normal),
@@ -74,7 +74,7 @@ class Metric:
                           config=timerange_normal)
             ]
 
-            return masks
+            return conf
 
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
