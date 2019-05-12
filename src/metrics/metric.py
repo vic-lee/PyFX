@@ -37,11 +37,11 @@ class Metric:
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
         if config.should_enable_daylight_saving_mode:
-            return self._adjust_df_for_dst(df)
+            return self._adjust_df_for_dst(df, config)
         else:
             return df.between_time(config.time_range.start_time, config.time_range.end_time)
 
-    def _adjust_df_for_dst(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _adjust_df_for_dst(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
         df_list = []
 
         for dst_config in self._dst_configs:
@@ -49,9 +49,24 @@ class Metric:
             df_segment = df.loc[dst_config.mask]
             df_segment = df_segment.between_time(*dst_config.timerange)
 
+            start_time = dst_config.timerange[0]
+            if self._should_normalize_time_index(start_time):
+
+                if self._should_decr_hour(start_time, config):
+                    df_segment.index = (df_segment.index +
+                                        pd.DateOffset(hours=-1))
+
+                elif self._should_incr_hour(start_time, config):
+                    df_segment.index = (df_segment.index +
+                                        pd.DateOffset(hours=-1))
+
+                else:
+                    logger.error("DST period identified but hr not normalized")
+
             df_list.append(df_segment)
 
         target = pd.concat(df_list)
+        target.to_excel("out_norm.xlsx")
         return target
 
     def _init_dst_config(self, df: pd.DataFrame, config: ConfigReader) -> list:
@@ -138,3 +153,14 @@ class Metric:
     @staticmethod
     def _to_datetime(date: datetime.date) -> datetime:
         return datetime.combine(date, datetime.min.time())
+
+    def _should_normalize_time_index(self, start_time: datetime.time) -> bool:
+        return start_time != self.time_range.start_time
+
+    @staticmethod
+    def _should_decr_hour(start_time, config: ConfigReader) -> bool:
+        return start_time == config.dst_hour_ahead_time_range.start_time
+
+    @staticmethod
+    def _should_incr_hour(start_time, config: ConfigReader) -> bool:
+        return start_time == config.dst_hour_behind_time_range.start_time
