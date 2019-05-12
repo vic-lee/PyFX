@@ -1,3 +1,4 @@
+from collections import namedtuple
 import logging
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ from datastructure.daterange import DateRange
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+DSTConfig = namedtuple('DSTConfig', 'mask timerange')
 
 class Metric:
 
@@ -34,30 +36,42 @@ class Metric:
     def _init_dst_masks(self, df: pd.DataFrame, config: ConfigReader) -> list:
         masks = []
 
+        timerange_normal = [config.time_range.start_time,
+                            config.time_range.end_time]
+
+        timerange_ahead = [config.dst_hour_ahead_time_range.start_time,
+                           config.dst_hour_ahead_time_range.end_time]
+
+        timerange_delayed = [config.dst_hour_behind_time_range.start_time,
+                             config.dst_hour_behind_time_range.end_time]
+
         if not config.should_enable_daylight_saving_mode:
             return masks
 
         else:
             masks = [
                 # Before DST hr ahead period
-                df['date'] < self._to_datetime(
-                    config.dst_hour_ahead_period.start_date),
+                DSTConfig(mask=(df['date'] < self._to_datetime(config.dst_hour_ahead_period.start_date)),
+                          timerange=timerange_normal),
 
                 # DST hr ahead period
-                ((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
-                 (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date))),
+                DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
+                                (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date))),
+                          config=timerange_ahead),
 
                 # Between DST hr ahead and DST hr delay period
-                ((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
-                 (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date))),
+                DSTConfig(mask=((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
+                                (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date))),
+                          config=timerange_normal),
 
                 # DST hr delay period
-                ((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
-                 (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date))),
+                DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
+                                (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date))),
+                          config=timerange_delayed),
 
                 # After DST delay period
-                df['date'] > self._to_datetime(
-                    config.dst_hour_behind_period.end_date)
+                DSTConfig(mask=(df['date'] > self._to_datetime(config.dst_hour_behind_period.end_date)),
+                          config=timerange_normal)
             ]
 
             return masks
