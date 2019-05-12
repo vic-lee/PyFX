@@ -34,6 +34,25 @@ class Metric:
                                                              config=config)
         print(self.minute_price_df)
 
+    def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+
+        if config.should_enable_daylight_saving_mode:
+
+            df_list = []
+
+            for dst_config in self._dst_configs:
+
+                df_segment = df.loc[dst_config.mask]
+                df_segment = df_segment.between_time(*dst_config.timerange)
+
+                df_list.append(df_segment)
+
+            target = pd.concat(df_list)
+            return target
+
+        else:
+            return df.between_time(config.time_range.start_time, config.time_range.end_time)
+
     def _init_dst_config(self, df: pd.DataFrame, config: ConfigReader) -> list:
         conf = []
 
@@ -76,25 +95,6 @@ class Metric:
             ]
 
             return conf
-
-    def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
-
-        if config.should_enable_daylight_saving_mode:
-
-            df_list = []
-
-            for dst_config in self._dst_configs:
-
-                df_segment = df.loc[dst_config.mask]
-                df_segment = df_segment.between_time(*dst_config.timerange)
-
-                df_list.append(df_segment)
-
-            target = pd.concat(df_list)
-            return target
-
-        else:
-            return df.between_time(config.time_range.start_time, config.time_range.end_time)
 
     def _get_prior_fix_recursive(self, d):
 
