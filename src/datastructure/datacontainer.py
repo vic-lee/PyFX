@@ -105,16 +105,16 @@ class DataContainer:
 
                 # Between DST hr ahead and DST hr delay period
                 DSTConfig(mask=((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
-                                (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date))),
+                                (df['date'] < self._to_datetime(config.dst_hour_delay_period.start_date))),
                           timerange=timerange_normal),
 
                 # DST hr delay period
-                DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
-                                (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date))),
+                DSTConfig(mask=((df['date'] >= self._to_datetime(config.dst_hour_delay_period.start_date)) &
+                                (df['date'] <= self._to_datetime(config.dst_hour_delay_period.end_date))),
                           timerange=timerange_delayed),
 
                 # After DST delay period
-                DSTConfig(mask=(df['date'] > self._to_datetime(config.dst_hour_behind_period.end_date)),
+                DSTConfig(mask=(df['date'] > self._to_datetime(config.dst_hour_delay_period.end_date)),
                           timerange=timerange_normal)
             ]
 

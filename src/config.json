@@ -28,7 +28,7 @@
     ],
     "daylight_saving_mode": {
         "daylight_saving_time": true,
-        "hour_behind_period": {
+        "hour_delay_period": {
             "start_date": "2018/10/28",
             "end_date": "2018/11/03"
         },

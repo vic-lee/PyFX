@@ -92,9 +92,9 @@ class ConfigReader:
         return DayTimeRange(new_start_time, new_end_time)
 
     @property
-    def dst_hour_behind_period(self) -> DateRange:
-        start_date_str = self._data['daylight_saving_mode']['hour_behind_period']['start_date']
-        end_date_str = self._data['daylight_saving_mode']['hour_behind_period']['end_date']
+    def dst_hour_delay_period(self) -> DateRange:
+        start_date_str = self._data['daylight_saving_mode']['hour_delay_period']['start_date']
+        end_date_str = self._data['daylight_saving_mode']['hour_delay_period']['end_date']
 
         start_date = self._str_to_date(start_date_str)
         end_date = self._str_to_date(end_date_str)
