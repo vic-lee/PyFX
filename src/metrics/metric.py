@@ -15,6 +15,7 @@ logger.setLevel(logging.DEBUG)
 
 DSTConfig = namedtuple('DSTConfig', 'mask timerange')
 
+
 class Metric:
 
     def __init__(self, price_dfs, currency_pair_name: str, config: ConfigReader):
@@ -27,8 +28,8 @@ class Metric:
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
 
-        self._dst_masks = self._init_dst_config(df=self.full_minute_price_df,
-                                               config=config)
+        self._dst_configs = self._init_dst_config(df=self.full_minute_price_df,
+                                                  config=config)
         self.minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
                                                              config=config)
         print(self.minute_price_df)
@@ -82,47 +83,13 @@ class Metric:
 
             df_list = []
 
-            '''Dates before the DST gap where there's 1 hr ahead: normal start & end time'''
-            before_hr_ahead_mask = df['date'] < self._to_datetime(
-                config.dst_hour_ahead_period.start_date)
+            for dst_config in self._dst_configs:
 
-            before_hr_ahead_df = df.loc[before_hr_ahead_mask].between_time(config.time_range.start_time,
-                                                                           config.time_range.end_time)
-            df_list.append(before_hr_ahead_df)
+                df_segment = df.loc[dst_config.mask]
+                df_segment = df_segment.between_time(*dst_config.timerange)
 
-            '''Dates during the DST gap where there's 1 hr ahead: start & end time advance by 1hr'''
-            hr_ahead_mask = ((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
-                             (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date)))
+                df_list.append(df_segment)
 
-            hr_ahead_df = df.loc[hr_ahead_mask].between_time(config.dst_hour_ahead_time_range.start_time,
-                                                             config.dst_hour_ahead_time_range.end_time)
-            df_list.append(hr_ahead_df)
-
-            '''Dates b/t the 1-hr-ahead and 1-hr-lag DST gap: normal start & end time'''
-            between_hr_ahead_and_before_mask = ((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
-                                                (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date)))
-
-            between_hr_ahead_and_before_df = df.loc[between_hr_ahead_and_before_mask].between_time(config.time_range.start_time,
-                                                                                                   config.time_range.end_time)
-            df_list.append(between_hr_ahead_and_before_df)
-
-            '''Dates during the DST gap where there's 1 hr lag: start & end time delay by 1hr'''
-            hr_behind_mask = ((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
-                              (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date)))
-
-            hr_behind_df = df.loc[hr_behind_mask].between_time(config.dst_hour_behind_time_range.start_time,
-                                                               config.dst_hour_behind_time_range.end_time)
-            df_list.append(hr_behind_df)
-
-            '''Dates after the DST gap where there's 1 hr lag: normal start & end time'''
-            after_hr_behind_mask = df['date'] > self._to_datetime(
-                config.dst_hour_behind_period.end_date)
-
-            after_hr_behind_df = df.loc[after_hr_behind_mask].between_time(config.time_range.start_time,
-                                                                           config.time_range.end_time)
-            df_list.append(after_hr_behind_df)
-
-            '''Concatonate data and return'''
             target = pd.concat(df_list)
             return target
 
