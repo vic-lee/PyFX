@@ -84,9 +84,9 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     df_dict["OHLC"] = price_data[DataReader.DAILY]
 
     '''2.1 Max Pip Movements'''
-    price_movements = setup_price_movement_obj(data=price_data,
-                                               cp_name=currency_pair_name,
-                                               config=config)
+    price_movements = MaxPriceMovements(price_dfs=price_data,
+                                        config=config,
+                                        currency_pair_name=currency_pair_name)
 
     price_movements.find_max_price_movements()
     price_movement_analyses = price_movements.to_benchmarked_results()
@@ -121,37 +121,6 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     master_df = dfbundler.output()
 
     return master_df
-
-
-def setup_price_movement_obj(data, cp_name, config: ConfigReader) -> MaxPriceMovements:
-    """
-    This function encapsulates the definition of a `MaxPriceMovements` class, 
-    which iterates to find the max pips for each day. To do this, it defines 
-    the `MaxPriceMovements` class by specifying: 
-
-        1) the starting time, ending time of the range to search for, 
-        2) the starting date, ending date to search for, and 
-        3) the benchmark prices. 
-
-    The choice to hard-code the config parameters, rather than passing in the 
-    specifications, is intentional. 
-    First, the config should ideally not be tampered with very often, once the 
-    workflow is appropriately set up. 
-    Second, passing in all the params make this function no different from the 
-    class's default constructor. 
-
-    For detailed implementation of `MaxPriceMovements`, see 
-    `metrics/max_price_movements.py`.
-    """
-
-    pip_movement_config = {
-        MaxPriceMovements.TIME_RANGE:       config.time_range,
-        MaxPriceMovements.DATE_RANGE:       config.date_range,
-        MaxPriceMovements.BENCHMARK_TIMES:  config.benchmark_times,
-        MaxPriceMovements.CURRENCY_PAIR:    cp_name
-    }
-
-    return MaxPriceMovements(price_dfs=data, config=pip_movement_config)
 
 
 def include_minutely_data(data, cp_name: str, config: ConfigReader) -> pd.DataFrame:
