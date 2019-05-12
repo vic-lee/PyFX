@@ -37,21 +37,22 @@ class Metric:
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
         if config.should_enable_daylight_saving_mode:
-
-            df_list = []
-
-            for dst_config in self._dst_configs:
-
-                df_segment = df.loc[dst_config.mask]
-                df_segment = df_segment.between_time(*dst_config.timerange)
-
-                df_list.append(df_segment)
-
-            target = pd.concat(df_list)
-            return target
-
+            return self._adjust_df_for_dst(df)
         else:
             return df.between_time(config.time_range.start_time, config.time_range.end_time)
+
+    def _adjust_df_for_dst(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_list = []
+
+        for dst_config in self._dst_configs:
+
+            df_segment = df.loc[dst_config.mask]
+            df_segment = df_segment.between_time(*dst_config.timerange)
+
+            df_list.append(df_segment)
+
+        target = pd.concat(df_list)
+        return target
 
     def _init_dst_config(self, df: pd.DataFrame, config: ConfigReader) -> list:
         conf = []
