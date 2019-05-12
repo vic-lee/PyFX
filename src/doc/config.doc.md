@@ -2,7 +2,7 @@
 
 Below is the documentation on how to configure the application:
 
-```json
+```
 {
     "currency_pairs": [                 // Names of the currency pairs to analyze
         "AUDUSD",
