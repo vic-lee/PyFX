@@ -1,13 +1,20 @@
 import pandas as pd
 from datetime import time
+
 from metrics.metric import Metric
 
+from datastructure.datacontainer import DataContainer
+
+from dataio.configreader import ConfigReader
 
 class MinutelyData(Metric):
 
-    def __init__(self, price_dfs, time_range, date_range, cp_name, specs):
-        Metric.__init__(self, time_range, date_range, price_dfs, cp_name)
-        self.specs = specs
+    def __init__(self, prices: DataContainer, cp_name: str, config: ConfigReader):
+
+        Metric.__init__(self, config=config, currency_pair_name=cp_name)
+
+        self.prices = prices
+        self.specs = config.minutely_data_sections
         self.df = self._generate_output_df()
 
     def _generate_output_df(self):
@@ -30,7 +37,7 @@ class MinutelyData(Metric):
         while time_cur <= end_time:
 
             for m in metric_to_include:
-                df = self.full_minute_price_df.between_time(
+                df = self.prices.full_minute_price_df.between_time(
                     time_cur, time_cur)[m]
                 df = df.rename("{} {}".format(str(time_cur), m))
                 df.index = df.index.normalize()

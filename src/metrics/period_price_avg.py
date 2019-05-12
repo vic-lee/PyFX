@@ -2,17 +2,22 @@ from datetime import timedelta, time
 import pandas as pd
 
 from metrics.metric import Metric
+
+from dataio.configreader import ConfigReader
 from dataio.datareader import DataReader
+
+from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
 
 
 class PeriodPriceAvg(Metric):
-    def __init__(self, price_dfs, cp_name: str, time_range: DayTimeRange,
-                 date_range: DateRange, time_range_for_avg: DayTimeRange,
-                 include_open=None):
 
-        Metric.__init__(self, time_range, date_range, price_dfs, cp_name)
+    def __init__(self, prices: DataContainer, cp_name: str, config: ConfigReader, time_range_for_avg: DayTimeRange):
+
+        Metric.__init__(self, config=config, currency_pair_name=cp_name)
+
+        self.prices = prices
         self.time_range_for_avg = time_range_for_avg
         self.avgs = self._calc_avgs()
 
@@ -52,7 +57,7 @@ class PeriodPriceAvg(Metric):
         df_list = {}
 
         while time_cur <= self.time_range_for_avg.end_time:
-            single_minute_df = self.minute_price_df.between_time(time_cur, time_cur)[
+            single_minute_df = self.prices.minute_price_df.between_time(time_cur, time_cur)[
                 'Close']
             single_minute_df = single_minute_df.rename(
                 str(time_cur) + " Close")
