@@ -4,9 +4,11 @@ import numpy as np
 from os.path import abspath
 import logging
 
+from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
 from datastructure.pricetime import PriceTime
 
+from dataio.configreader import ConfigReader
 from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
 
@@ -29,13 +31,13 @@ class MaxPriceMovements(Metric):
     BENCHMARK_TIMES = "benchmark_times"
     CURRENCY_PAIR = "currency_pair"
 
-    def __init__(self, price_dfs, config, currency_pair_name: str):
+    def __init__(self, price_data: DataContainer, config: ConfigReader, currency_pair_name: str):
 
         Metric.__init__(self,
-                        price_dfs=price_dfs,
                         config=config,
                         currency_pair_name=currency_pair_name)
 
+        self.prices = price_data
         self.benchmark_times = config.benchmark_times
         self.max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
@@ -51,7 +53,7 @@ class MaxPriceMovements(Metric):
     def _generate_benchmark_prices_matrix(self):
         ret = {}
         for btime in self.benchmark_times:
-            ret[btime] = self.minute_price_df.between_time(btime, btime)
+            ret[btime] = self.prices.minute_price_df.between_time(btime, btime)
         return ret
 
     def find_max_price_movements(self):
@@ -72,7 +74,7 @@ class MaxPriceMovements(Metric):
         daily_max_pips_obj = None
         current_date = None
 
-        for time_index, row in self.minute_price_df.iterrows():
+        for time_index, row in self.prices.minute_price_df.iterrows():
 
             current_price = PriceTime(price=row['Close'], datetime=time_index)
 
@@ -128,7 +130,7 @@ class MaxPriceMovements(Metric):
 
         else:
             prior_day = current_date - timedelta(days=1)
-            benchmark_pricetime = self._get_prior_fix_recursive(prior_day)
+            benchmark_pricetime = self._get_prior_fix_recursive(prior_day, self.prices)
             initial_pricetime = self._get_benchmark_price(date=time_index.date(),
                                                           benchmark_time=self.time_range.start_time)
 
@@ -206,7 +208,7 @@ class MaxPriceMovements(Metric):
             + '-' \
             + self.currency_pair_name[3:]
 
-        current_day_fix_df = self.fix_price_df[[cp_identifier]]
+        current_day_fix_df = self.prices.fix_price_df[[cp_identifier]]
 
         current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
         current_day_fix_df = current_day_fix_df[
