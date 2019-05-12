@@ -166,10 +166,12 @@ class ConfigReader:
 
         return avg_data_sections
 
-    def _str_to_time(self, timestr: str) -> time:
+    @staticmethod
+    def _str_to_time(timestr: str) -> time:
         return datetime.strptime(timestr, "%H:%M").time()
 
-    def _str_to_date(self, datestr: str) -> datetime.date:
+    @staticmethod
+    def _str_to_date(datestr: str) -> datetime.date:
         return datetime.strptime(datestr, "%Y/%m/%d").date()
 
     @staticmethod
