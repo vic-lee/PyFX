@@ -60,7 +60,7 @@ class ConfigReader:
     def benchmark_times(self) -> list:
         benchmark_times = []
 
-        for benchmark_time_str in self._data["benchmark_time"]:
+        for benchmark_time_str in self._data["benchmark_times"]:
             new_benchmark = self._str_to_time(benchmark_time_str)
             benchmark_times.append(new_benchmark)
 
