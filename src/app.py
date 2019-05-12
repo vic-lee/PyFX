@@ -17,9 +17,9 @@ from metrics.max_price_movements import MaxPriceMovements
 from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
-from datastructure.daytimerange import DayTimeRange
+from datastructure.datacontainer import DataContainer
 from datastructure.daterange import DateRange
-
+from datastructure.daytimerange import DayTimeRange
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -78,13 +78,16 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
 
     '''Read data'''
     price_data = read_price_data(currency_pair_name)
+    data_container = DataContainer(price_dfs=price_data,
+                                   config=config,
+                                   currency_pair_name=currency_pair_name)
 
     '''Generate data analysis'''
     '''2.0 Daily OHLC Prices'''
     df_dict["OHLC"] = price_data[DataReader.DAILY]
 
     '''2.1 Max Pip Movements'''
-    price_movements = MaxPriceMovements(price_dfs=price_data,
+    price_movements = MaxPriceMovements(price_data=data_container,
                                         config=config,
                                         currency_pair_name=currency_pair_name)
 
@@ -95,7 +98,7 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     '''2.2 Selected Minute Data'''
     if config.should_include_minutely_data:
 
-        selected_minute_data = include_minutely_data(data=price_data,
+        selected_minute_data = include_minutely_data(price_data=data_container,
                                                      cp_name=currency_pair_name,
                                                      config=config)
         df_dict["Selected Minute Data"] = selected_minute_data
@@ -105,7 +108,7 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
 
         for avg_data_section in config.period_average_data_sections:
 
-            price_avg_data, timerange = include_period_avg_data(price_data,
+            price_avg_data, timerange = include_period_avg_data(data_container,
                                                                 currency_pair_name,
                                                                 config=config,
                                                                 avgrange=avg_data_section)
@@ -123,7 +126,7 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     return master_df
 
 
-def include_minutely_data(data, cp_name: str, config: ConfigReader) -> pd.DataFrame:
+def include_minutely_data(price_data: DataContainer, cp_name: str, config: ConfigReader) -> pd.DataFrame:
     """
     This function defines what minutely data to include in the output. 
     The minutely data to include can be specified by two dimensions: 
@@ -137,26 +140,23 @@ def include_minutely_data(data, cp_name: str, config: ConfigReader) -> pd.DataFr
     Please see `metrics/minutely_data.py` for detailed implementation. 
     """
 
-    minute_data = MinutelyData(price_dfs=data,
-                               time_range=config.time_range,
-                               date_range=config.date_range,
+    minute_data = MinutelyData(prices=price_data,
+                               config=config,
                                cp_name=cp_name,
-                               specs=config.minutely_data_sections,
                                ).to_df()
 
     return minute_data
 
 
-def include_period_avg_data(data, cp_name: str, config: ConfigReader, avgrange: DayTimeRange):
+def include_period_avg_data(data: DataContainer, cp_name: str, config: ConfigReader, avgrange: DayTimeRange):
     """
     This function calculates and returns a series of average prices, given the
     starting time and ending time for the calculation period. 
     """
 
-    df = PeriodPriceAvg(price_dfs=data,
+    df = PeriodPriceAvg(prices=data,
                         cp_name=cp_name,
-                        time_range=config.time_range,
-                        date_range=config.date_range,
+                        config=config,
                         time_range_for_avg=avgrange,
                         ).to_df()
 
