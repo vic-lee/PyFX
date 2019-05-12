@@ -35,7 +35,7 @@ Below is the documentation on how to configure the application:
         }
     },
     "minutely_data": {
-        "include_minutely_data": true,  // if `true`, includes raw minute data based on the spec below
+        "include_minutely_data": true,  // if `true`, includes raw minute data based on spec below
         "included_sections": [          // there are 2 ways to include data:
             {                           // 1. you may include prices of a time period
                 "start_time": "10:49",
@@ -56,7 +56,7 @@ Below is the documentation on how to configure the application:
         ]
     },
     "period_avg_data": {
-        "include_period_avg_data": true,  // if `true`, includes the average of the time periods below
+        "include_period_avg_data": true,  // if `true`, includes the avg of the time periods below
         "included_sections": [
             {
                 "start_time": "10:58",
