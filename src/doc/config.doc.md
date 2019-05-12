@@ -1,8 +1,8 @@
 # Config Documentation
 
-Below is the documentation on how to configure the application:
+Below is the documentation on how to configure the application. `......` incidates user may add more specifications.
 
-```
+```javascript
 {
     "currency_pairs": [                 // Names of the currency pairs to analyze
         "AUDUSD",
