@@ -33,7 +33,10 @@ formatter = logging.Formatter(fmt)
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-logger.addHandler(logging.StreamHandler())
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+
+logger.addHandler(stream_handler)
 
 
 def main():
