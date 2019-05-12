@@ -1,8 +1,10 @@
 from datetime import datetime, date, time, timedelta
+import logging
 import pandas as pd
 import numpy as np
 from os.path import abspath
-import logging
+import sys
+from time import sleep
 
 from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
@@ -39,7 +41,7 @@ class MaxPriceMovements(Metric):
 
         self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
-        logger.info("Analyzing maximum price movements...")
+        print("Analyzing maximum price movements...")
 
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
@@ -67,9 +69,16 @@ class MaxPriceMovements(Metric):
 
     def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
 
+        bt_str = "PDFX" if benchmark_time == None else str(benchmark_time)
+        print("\tAnalyzing against benchmark time " + bt_str + "...")
+
         day_objs = {}
         daily_max_pips_obj = None
         current_date = None
+
+        data_size = len(self.prices.minute_price_df.index)
+        progress_ctr = 0
+        time_tracker = datetime.now()
 
         for time_index, row in self.prices.minute_price_df.iterrows():
 
@@ -88,6 +97,20 @@ class MaxPriceMovements(Metric):
 
             if daily_max_pips_obj is not None:
                 daily_max_pips_obj.update_max_pip(current_price)
+
+            progress_ctr += 1
+
+            if datetime.now().microsecond - time_tracker.microsecond >= 10000:
+                sys.stdout.write('\r')
+                sys.stdout.write("\t[%-20s] %d%%" % ('='*(int(20 * progress_ctr / data_size)),
+                                                     (int(100 * progress_ctr / data_size))))
+                sys.stdout.flush()
+                time_tracker = datetime.now()
+
+        sys.stdout.write('\r')
+        sys.stdout.write("\t[%-20s] %d%%" % ('='*(20), (100)))
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
         day_objs = self._save_prior_day_obj(daily_max_pips_obj, day_objs)
 
