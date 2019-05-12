@@ -24,9 +24,43 @@ class Metric:
         self.fix_price_df = price_dfs[DataReader.FIX]
         self.daily_price_df = price_dfs[DataReader.DAILY]
         self.full_minute_price_df = price_dfs[DataReader.MINUTELY]
+
+        self._dst_masks = self._init_dst_masks(df=self.full_minute_price_df,
+                                               config=config)
         self.minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
                                                              config=config)
         print(self.minute_price_df)
+
+    def _init_dst_masks(self, df: pd.DataFrame, config: ConfigReader) -> list:
+        masks = []
+
+        if not config.should_enable_daylight_saving_mode:
+            return masks
+
+        else:
+            masks = [
+                # Before DST hr ahead period
+                df['date'] < self._to_datetime(
+                    config.dst_hour_ahead_period.start_date),
+
+                # DST hr ahead period
+                ((df['date'] >= self._to_datetime(config.dst_hour_ahead_period.start_date)) &
+                 (df['date'] <= self._to_datetime(config.dst_hour_ahead_period.end_date))),
+
+                # Between DST hr ahead and DST hr delay period
+                ((df['date'] > self._to_datetime(config.dst_hour_ahead_period.end_date)) &
+                 (df['date'] < self._to_datetime(config.dst_hour_behind_period.start_date))),
+
+                # DST hr delay period
+                ((df['date'] >= self._to_datetime(config.dst_hour_behind_period.start_date)) &
+                 (df['date'] <= self._to_datetime(config.dst_hour_behind_period.end_date))),
+
+                # After DST delay period
+                df['date'] > self._to_datetime(
+                    config.dst_hour_behind_period.end_date)
+            ]
+
+            return masks
 
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
