@@ -72,13 +72,8 @@ class ConfigReader:
 
     @property
     def dst_hour_ahead_period(self) -> DateRange:
-        start_date_str = self._data['daylight_saving_mode']['hour_ahead_period']['start_date']
-        end_date_str = self._data['daylight_saving_mode']['hour_ahead_period']['end_date']
-
-        start_date = self._str_to_date(start_date_str)
-        end_date = self._str_to_date(end_date_str)
-
-        return DateRange(start_date=start_date, end_date=end_date)
+        time_period_def = self._data['daylight_saving_mode']['hour_ahead_period']
+        return self._read_date_range_obj(time_period_def)
 
     @property
     def dst_hour_ahead_time_range(self) -> DayTimeRange:
@@ -93,13 +88,8 @@ class ConfigReader:
 
     @property
     def dst_hour_delay_period(self) -> DateRange:
-        start_date_str = self._data['daylight_saving_mode']['hour_delay_period']['start_date']
-        end_date_str = self._data['daylight_saving_mode']['hour_delay_period']['end_date']
-
-        start_date = self._str_to_date(start_date_str)
-        end_date = self._str_to_date(end_date_str)
-
-        return DateRange(start_date=start_date, end_date=end_date)
+        time_period_def = self._data['daylight_saving_mode']['hour_delay_period']
+        return self._read_date_range_obj(time_period_def)
 
     @property
     def dst_hour_behind_time_range(self) -> DayTimeRange:
@@ -177,6 +167,25 @@ class ConfigReader:
     @staticmethod
     def _timedelta_by_hour(time: time, hourdelta: int, decr=False) -> time:
         if decr:
-            return (datetime.combine(datetime.today(), time) - timedelta(hours=hourdelta)).time()
+            return (datetime.combine(datetime.today(), time)
+                    - timedelta(hours=hourdelta)).time()
         else:
-            return (datetime.combine(datetime.today(), time) + timedelta(hours=hourdelta)).time()
+            return (datetime.combine(datetime.today(), time)
+                    + timedelta(hours=hourdelta)).time()
+
+    @classmethod
+    def _read_date_range_obj(cls, date_range_obj: dict) -> DateRange:
+
+        try:
+            if "start_date" not in date_range_obj or "end_date" not in date_range_obj:
+                raise KeyError
+
+            else:
+                start_date = cls._str_to_date(date_range_obj['start_date'])
+                end_date = cls._str_to_date(date_range_obj['end_date'])
+
+                return DateRange(start_date, end_date)
+
+        except KeyError:
+            logger.error(("Attempting to read date range",
+                          "from a non-date-range object."))
