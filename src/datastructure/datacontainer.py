@@ -61,12 +61,12 @@ class DataContainer:
             if self._should_normalize_time_index(start_time, config):
 
                 if self._should_decr_hour(start_time, config):
-                    df_segment.index = (df_segment.index +
-                                        pd.DateOffset(hours=-1))
+                    df_segment.index = (df_segment.index
+                                        + pd.DateOffset(hours=-1))
 
                 elif self._should_incr_hour(start_time, config):
-                    df_segment.index = (df_segment.index +
-                                        pd.DateOffset(hours=1))
+                    df_segment.index = (df_segment.index
+                                        + pd.DateOffset(hours=1))
 
                 else:
                     logger.error("DST period identified but hr not normalized")
@@ -125,13 +125,16 @@ class DataContainer:
         return datetime.combine(date, datetime.min.time())
 
     @staticmethod
-    def _should_normalize_time_index(start_time: datetime.time, config: ConfigReader) -> bool:
+    def _should_normalize_time_index(start_time: datetime.time,
+                                     config: ConfigReader) -> bool:
         return start_time != config.time_range.start_time
 
     @staticmethod
-    def _should_decr_hour(start_time, config: ConfigReader) -> bool:
+    def _should_decr_hour(start_time: datetime.time,
+                          config: ConfigReader) -> bool:
         return start_time == config.dst_hour_ahead_time_range.start_time
 
     @staticmethod
-    def _should_incr_hour(start_time, config: ConfigReader) -> bool:
+    def _should_incr_hour(start_time: datetime.time,
+                          config: ConfigReader) -> bool:
         return start_time == config.dst_hour_behind_time_range.start_time
