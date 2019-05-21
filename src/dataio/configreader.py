@@ -145,13 +145,14 @@ class ConfigReader:
         avg_data_sections = []
 
         for avg_obj in self._data["period_avg_data"]["included_sections"]:
-            start_time_str = avg_obj["start_time"]
-            end_time_str = avg_obj["end_time"]
+            # start_time_str = avg_obj["start_time"]
+            # end_time_str = avg_obj["end_time"]
 
-            start_time = self._str_to_time(start_time_str)
-            end_time = self._str_to_time(end_time_str)
+            # start_time = self._str_to_time(start_time_str)
+            # end_time = self._str_to_time(end_time_str)
 
-            new_section = DayTimeRange(start_time, end_time)
+            # new_section = DayTimeRange(start_time, end_time)
+            new_section = self._read_time_range_obj(avg_obj)
             avg_data_sections.append(new_section)
 
         return avg_data_sections
@@ -162,7 +163,11 @@ class ConfigReader:
 
     @staticmethod
     def _str_to_date(datestr: str) -> datetime.date:
-        return datetime.strptime(datestr, "%Y/%m/%d").date()
+        try:
+            return datetime.strptime(datestr, "%Y/%m/%d").date()
+        except ValueError:
+            logger.error(
+                "date string {} does not follow the %Y/%m/%d format.".format(datestr))
 
     @staticmethod
     def _timedelta_by_hour(time: time, hourdelta: int, decr=False) -> time:
@@ -188,4 +193,21 @@ class ConfigReader:
 
         except KeyError:
             logger.error(("Attempting to read date range",
+                          "from a non-date-range object."))
+
+    @classmethod
+    def _read_time_range_obj(cls, time_range_obj: dict) -> DateRange:
+
+        try:
+            if "start_time" not in time_range_obj or "end_time" not in time_range_obj:
+                raise KeyError
+
+            else:
+                start_time = cls._str_to_time(time_range_obj['start_time'])
+                end_time = cls._str_to_time(time_range_obj['end_time'])
+
+                return DayTimeRange(start_time, end_time)
+
+        except KeyError:
+            logger.error(("Attempting to read time range",
                           "from a non-date-range object."))
