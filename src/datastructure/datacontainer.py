@@ -23,8 +23,8 @@ class DataContainer:
 
         self._dst_configs = self._init_dst_config(df=self.full_minute_price_df,
                                                   config=config)
-        self._minute_price_df = self._filter_df_to_time_range(df=self.full_minute_price_df,
-                                                              config=config)
+        self._minute_price_df = self._dst_adjustments(df=self.full_minute_price_df,
+                                                      config=config)
 
     @property
     def fix_price_df(self) -> pd.DataFrame:
@@ -41,6 +41,27 @@ class DataContainer:
     @property
     def minute_price_df(self) -> pd.DataFrame:
         return self._minute_price_df
+
+    def _dst_adjustments(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+
+        filtered_df = df.between_time(config.time_range.start_time,
+                                      config.time_range.end_time)
+
+        if config.should_enable_daylight_saving_mode:
+
+            for ahead_period in config.dst_hour_ahead_periods:
+                mask = ((df['date'] >= self._to_datetime(ahead_period.start_date))
+                        & (df['date'] <= self._to_datetime(ahead_period.end_date)))
+
+                df_segment = df.loc[mask].copy()
+                df_segment = df_segment.between_time(config.dst_hour_ahead_time_range.start_time,
+                                                     config.dst_hour_ahead_time_range.end_time)
+
+                df_segment.index = (df_segment.index + pd.DateOffset(hours=-1))
+
+                filtered_df.loc[mask] = df_segment
+
+        return filtered_df
 
     def _filter_df_to_time_range(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
