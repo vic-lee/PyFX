@@ -16,5 +16,5 @@ class DateRange:
     def is_datetime_in_range(self, date):
         return date >= self.start_date and date <= self.end_date
 
-    def __str__(self):
-        return "start date: {} \tend date: {}".format(self.start_date, self.end_date)
+    def __repr__(self):
+        return "start date: {} \tend date: {}\n".format(self.start_date, self.end_date)
