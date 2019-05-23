@@ -29,8 +29,19 @@ class ConfigReader:
             with open(config_path) as conf:
                 self._data = json.load(conf)
 
+            self.process_dst_hour_ahead_periods()
+
         else:
             logger.error("Read config failure")
+
+    def process_dst_hour_ahead_periods(self):
+        hour_ahead_periods = []
+
+        for period in self._data["daylight_saving_mode"]["hour_ahead_periods"]:
+            date_range = self._read_date_range_obj(period)
+            hour_ahead_periods.append(date_range)
+
+        self._data["daylight_saving_mode"]["hour_ahead_periods"] = hour_ahead_periods
 
     @property
     def currency_pairs(self) -> list:
@@ -74,6 +85,10 @@ class ConfigReader:
     def dst_hour_ahead_period(self) -> DateRange:
         time_period_def = self._data['daylight_saving_mode']['hour_ahead_period']
         return self._read_date_range_obj(time_period_def)
+
+    @property
+    def dst_hour_ahead_periods(self) -> [DateRange]:
+        return self._data["daylight_saving_mode"]["hour_ahead_periods"]
 
     @property
     def dst_hour_ahead_time_range(self) -> DayTimeRange:
@@ -145,13 +160,6 @@ class ConfigReader:
         avg_data_sections = []
 
         for avg_obj in self._data["period_avg_data"]["included_sections"]:
-            # start_time_str = avg_obj["start_time"]
-            # end_time_str = avg_obj["end_time"]
-
-            # start_time = self._str_to_time(start_time_str)
-            # end_time = self._str_to_time(end_time_str)
-
-            # new_section = DayTimeRange(start_time, end_time)
             new_section = self._read_time_range_obj(avg_obj)
             avg_data_sections.append(new_section)
 
