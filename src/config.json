@@ -36,7 +36,17 @@
         "hour_ahead_period": {
             "start_date": "2018/03/11",
             "end_date": "2018/03/24"
-        }
+        },
+        "hour_ahead_periods": [
+            {
+                "start_date": "2018/03/11",
+                "end_date": "2018/03/24"
+            },
+            {
+                "start_date": "2018/10/28",
+                "end_date": "2018/11/03"
+            }
+        ]
     },
     "minutely_data": {
         "include_minutely_data": true,
