@@ -28,13 +28,22 @@ class ConfigReader:
 
             with open(config_path) as conf:
                 self._data = json.load(conf)
-
-            self.process_dst_hour_ahead_periods()
-
+                
+            self._process_data()
+           
         else:
             logger.error("Read config failure")
 
-    def process_dst_hour_ahead_periods(self):
+    def _process_data(self):
+        self._process_time_range()
+        self._process_dst_hour_ahead_periods()
+
+
+    def _process_time_range(self):
+        timerange = self._data["time_range"]
+        self._data["time_range"] = self._read_time_range_obj(timerange)
+
+    def _process_dst_hour_ahead_periods(self):
         hour_ahead_periods = []
 
         for period in self._data["daylight_saving_mode"]["hour_ahead_periods"]:
@@ -49,13 +58,7 @@ class ConfigReader:
 
     @property
     def time_range(self) -> DayTimeRange:
-        start_time_str = self._data['time_range']['start_time']
-        end_time_str = self._data['time_range']['end_time']
-
-        start_time = self._str_to_time(start_time_str)
-        end_time = self._str_to_time(end_time_str)
-
-        return DayTimeRange(start_time=start_time, end_time=end_time)
+        return self._data['time_range']
 
     @property
     def date_range(self) -> DateRange:
