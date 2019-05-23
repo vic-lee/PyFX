@@ -122,6 +122,7 @@ class DataContainer:
 
     @staticmethod
     def _to_datetime(date: datetime.date) -> datetime:
+        """Convert date to datetime."""
         return datetime.combine(date, datetime.min.time())
 
     @staticmethod
@@ -132,9 +133,11 @@ class DataContainer:
     @staticmethod
     def _should_decr_hour(start_time: datetime.time,
                           config: ConfigReader) -> bool:
+        """Should decrement hour if the time is within the hour_ahead range"""
         return start_time == config.dst_hour_ahead_time_range.start_time
 
     @staticmethod
     def _should_incr_hour(start_time: datetime.time,
                           config: ConfigReader) -> bool:
+        """Should increment hour if the time is within the hour_behind range"""
         return start_time == config.dst_hour_behind_time_range.start_time
