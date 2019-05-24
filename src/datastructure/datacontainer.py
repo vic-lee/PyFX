@@ -5,6 +5,7 @@ import pandas as pd
 
 from dataio.configreader import ConfigReader
 from dataio.datareader import DataReader
+from datastructure.daterange import DateRange
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -20,8 +21,7 @@ class DataContainer:
         self._fix_price_df = price_dfs[DataReader.FIX]
         self._daily_price_df = price_dfs[DataReader.DAILY]
         self._full_minute_price_df = price_dfs[DataReader.MINUTELY]
-        self._minute_price_df = self._adjust_for_dst(df=self.full_minute_price_df,
-                                                     config=config)
+        self._minute_price_df = self._adjust_for_dst(config=config)
 
     @property
     def fix_price_df(self) -> pd.DataFrame:
@@ -39,24 +39,33 @@ class DataContainer:
     def minute_price_df(self) -> pd.DataFrame:
         return self._minute_price_df
 
-    def _adjust_for_dst(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+    def _adjust_for_dst(self, config: ConfigReader) -> pd.DataFrame:
 
-        filtered_df = df.between_time(config.time_range.start_time,
-                                      config.time_range.end_time)
+        filtered_df = self.full_minute_price_df.between_time(config.time_range.start_time,
+                                                             config.time_range.end_time)
 
         if config.should_enable_daylight_saving_mode:
 
             for ahead_period in config.dst_hour_ahead_periods:
-                mask = ((df['date'] >= self._to_datetime(ahead_period.start_date))
-                        & (df['date'] <= self._to_datetime(ahead_period.end_date)))
+                filtered_df = self._adjust_for_ahead_period(
+                    filtered_df, ahead_period, config)
 
-                df_segment = df.loc[mask].copy()
-                df_segment = df_segment.between_time(config.dst_hour_ahead_time_range.start_time,
-                                                     config.dst_hour_ahead_time_range.end_time)
+        return filtered_df
 
-                df_segment.index = (df_segment.index + pd.DateOffset(hours=-1))
+    def _adjust_for_ahead_period(self, filtered_df: pd.DataFrame,
+                                 ahead_period: DateRange,
+                                 config: ConfigReader) -> pd.DataFrame:
 
-                filtered_df.loc[mask] = df_segment
+        mask = ((self.full_minute_price_df['date'] >= self._to_datetime(ahead_period.start_date))
+                & (self.full_minute_price_df['date'] <= self._to_datetime(ahead_period.end_date)))
+
+        df_segment = self.full_minute_price_df.loc[mask].copy()
+        df_segment = df_segment.between_time(config.dst_hour_ahead_time_range.start_time,
+                                             config.dst_hour_ahead_time_range.end_time)
+
+        df_segment.index = (df_segment.index + pd.DateOffset(hours=-1))
+
+        filtered_df.loc[mask] = df_segment
 
         return filtered_df
 
