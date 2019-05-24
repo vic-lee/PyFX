@@ -48,6 +48,7 @@ def main():
     start_time = datetime.now()
 
     config = ConfigReader('config.json')
+    print(config.dst_hour_ahead_periods)
 
     fname_suffix = generate_folder_timestamp()
 
