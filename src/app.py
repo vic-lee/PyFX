@@ -116,10 +116,9 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
                                                                 currency_pair_name,
                                                                 config=config,
                                                                 avgrange=avg_data_section)
-            column_str \
-                = str(timerange.start_time) \
-                + "_" \
-                + str(timerange.end_time)
+            column_str = (str(timerange.start_time)
+                          + "_"
+                          + str(timerange.end_time))
 
             df_dict[column_str] = price_avg_data
 
