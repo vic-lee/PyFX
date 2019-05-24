@@ -23,8 +23,8 @@ class DataContainer:
 
         self._dst_configs = self._init_dst_config(df=self.full_minute_price_df,
                                                   config=config)
-        self._minute_price_df = self._dst_adjustments(df=self.full_minute_price_df,
-                                                      config=config)
+        self._minute_price_df = self._adjust_for_dst(df=self.full_minute_price_df,
+                                                     config=config)
 
     @property
     def fix_price_df(self) -> pd.DataFrame:
@@ -42,7 +42,7 @@ class DataContainer:
     def minute_price_df(self) -> pd.DataFrame:
         return self._minute_price_df
 
-    def _dst_adjustments(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
+    def _adjust_for_dst(self, df: pd.DataFrame, config: ConfigReader) -> pd.DataFrame:
 
         filtered_df = df.between_time(config.time_range.start_time,
                                       config.time_range.end_time)
