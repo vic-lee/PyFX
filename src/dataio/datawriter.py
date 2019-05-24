@@ -12,11 +12,13 @@ class DataWriter:
         if not os.path.exists(self._default_fname):
             os.makedirs(self._default_fname)
 
-        self._default_fname_xlsx = self._default_fname + \
-            '/dataout_' + currency_pair_name + ".xlsx"
+        self._default_fname_xlsx = (self._default_fname
+                                    + '/dataout_'
+                                    + currency_pair_name + ".xlsx")
 
-        self._default_fname_csv = currency_pair_name + '/dataout_' + \
-            currency_pair_name + self._default_fname + ".csv"
+        self._default_fname_csv = (self._default_fname
+                                   + '/dataout_'
+                                   + currency_pair_name + ".csv")
 
     def df_to_xlsx(self):
         with pd.ExcelWriter(self._default_fname_xlsx, engine='xlsxwriter') as writer:
