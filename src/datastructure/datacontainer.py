@@ -18,32 +18,32 @@ class DataContainer:
 
     def __init__(self, price_dfs, currency_pair_name: str, config: ConfigReader):
 
-        self._fix_price_df = price_dfs[DataReader.FIX]
-        self._daily_price_df = price_dfs[DataReader.DAILY]
-        self._full_minute_price_df = price_dfs[DataReader.MINUTELY]
+        self.__fix_price_df = price_dfs[DataReader.FIX]
+        self.__daily_price_df = price_dfs[DataReader.DAILY]
+        self.__full_minute_price_df = price_dfs[DataReader.MINUTELY]
         self._adjust_for_time_shift(config=config)
-        self._minute_price_df = self._adjust_for_dst(config=config)
+        self.__minute_price_df = self._adjust_for_dst(config=config)
 
     @property
     def fix_price_df(self) -> pd.DataFrame:
-        return self._fix_price_df
+        return self.__fix_price_df
 
     @property
     def daily_price_df(self) -> pd.DataFrame:
-        return self._daily_price_df
+        return self.__daily_price_df
 
     @property
     def full_minute_price_df(self) -> pd.DataFrame:
-        return self._full_minute_price_df
+        return self.__full_minute_price_df
 
     @property
     def minute_price_df(self) -> pd.DataFrame:
-        return self._minute_price_df
+        return self.__minute_price_df
 
     def _adjust_for_time_shift(self, config: ConfigReader) -> pd.DataFrame:
         if config.should_time_shift:
             hourdelta = config.time_shift
-            self._full_minute_price_df.index = (self._full_minute_price_df.index
+            self.__full_minute_price_df.index = (self.__full_minute_price_df.index
                                                 + pd.DateOffset(hours=hourdelta))
 
     def _filter_minute_data(self, config: ConfigReader):
