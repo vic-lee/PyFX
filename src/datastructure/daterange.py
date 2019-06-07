@@ -2,9 +2,9 @@ from datetime import date
 
 
 class DateRange:
-    """This class denotes the range within which the algorithm performs
-    its analysis. It has two attributes / reasons to change: 
-    starting date, ending date. 
+    """
+    This class denotes the range within which the algorithm performs
+    its analysis. It has two attributes: starting date, ending date. 
 
     Args: both start_date and end_date are Date objects
     """
