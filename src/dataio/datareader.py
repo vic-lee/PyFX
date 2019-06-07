@@ -70,7 +70,20 @@ class DataReader:
             df = df.drop(columns=['E'])
             df['datetime'] = df["date"].map(str) + " " + df["time"]
             df["datetime"] = pd.to_datetime(df["datetime"])
-            df = df.drop(columns=['time', 'date'])
+            df['date'] = pd.to_datetime(df['date'])
+            df = df.drop(columns=['time'])
+
+        elif df.columns[0] == "Local time":
+            """HACK"""
+            df = df.drop(columns=['Volume'])
+            df.columns = ["datetime", "Open", "High", "Low", "Close"]
+            df['datetime'] = df['datetime'].map(lambda s: s[:19])
+            # original time "01.01.2018 00:00:00.000 GMT-0500"
+            df['date'] = df['datetime'].map(lambda s: s[:10])
+            df['date'] = pd.to_datetime(df['date'], format="%d.%m.%Y")
+            df = df[["date", "datetime", "Open", "High", "Low", "Close"]]
+            df['datetime'] = pd.to_datetime(
+                df['datetime'], format="%d.%m.%Y %H:%M:%S")
 
         else:
             """HACK: Otherwise source data has 5 columns; it is of the new format.
