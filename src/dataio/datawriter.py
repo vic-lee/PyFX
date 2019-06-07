@@ -6,23 +6,23 @@ from datetime import datetime
 class DataWriter:
 
     def __init__(self, df, currency_pair_name: str, timestamp: str, filename="../data/dataout/"):
-        self._df = df
-        self._default_fname = filename + "dataout_{}".format(timestamp)
+        self.__dfout = df
+        self.__default_fname = filename + "dataout_{}".format(timestamp)
 
-        if not os.path.exists(self._default_fname):
-            os.makedirs(self._default_fname)
+        if not os.path.exists(self.__default_fname):
+            os.makedirs(self.__default_fname)
 
-        self._default_fname_xlsx = (self._default_fname
+        self._default_fname_xlsx = (self.__default_fname
                                     + '/dataout_'
                                     + currency_pair_name + ".xlsx")
 
-        self._default_fname_csv = (self._default_fname
+        self._default_fname_csv = (self.__default_fname
                                    + '/dataout_'
                                    + currency_pair_name + ".csv")
 
     def df_to_xlsx(self):
         with pd.ExcelWriter(self._default_fname_xlsx, engine='xlsxwriter') as writer:
-            self._df.to_excel(writer, sheet_name="max_pip_mvmts")
+            self.__dfout.to_excel(writer, sheet_name="max_pip_mvmts")
             sheet = writer.sheets['max_pip_mvmts']
             wide_col = 20
-            sheet.set_column(0, len(self._df.columns), wide_col)
+            sheet.set_column(0, len(self.__dfout.columns), wide_col)
