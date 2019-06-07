@@ -21,6 +21,7 @@ class DataContainer:
         self._fix_price_df = price_dfs[DataReader.FIX]
         self._daily_price_df = price_dfs[DataReader.DAILY]
         self._full_minute_price_df = price_dfs[DataReader.MINUTELY]
+        self._adjust_for_time_shift(config=config)
         self._minute_price_df = self._adjust_for_dst(config=config)
 
     @property
@@ -38,6 +39,16 @@ class DataContainer:
     @property
     def minute_price_df(self) -> pd.DataFrame:
         return self._minute_price_df
+
+    def _adjust_for_time_shift(self, config: ConfigReader) -> pd.DataFrame:
+        if config.should_time_shift:
+            hourdelta = config.time_shift
+            self._full_minute_price_df.index = (self._full_minute_price_df.index
+                                                + pd.DateOffset(hours=hourdelta))
+
+    def _filter_minute_data(self, config: ConfigReader):
+        return self.full_minute_price_df.between_time(config.time_range.start_time,
+                                                      config.time_range.end_time)
 
     def _adjust_for_dst(self, config: ConfigReader) -> pd.DataFrame:
 
