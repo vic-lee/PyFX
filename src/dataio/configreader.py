@@ -28,16 +28,25 @@ class ConfigReader:
 
             with open(config_path) as conf:
                 self._data = json.load(conf)
-                
+
             self._process_data()
-           
+
         else:
             logger.error("Read config failure")
 
     def _process_data(self):
+        self._process_benchmark_times()
         self._process_time_range()
         self._process_dst_hour_ahead_periods()
 
+    def _process_benchmark_times(self):
+        benchmark_times = []
+
+        for benchmark_time_str in self._data["benchmark_times"]:
+            new_benchmark = self._str_to_time(benchmark_time_str)
+            benchmark_times.append(new_benchmark)
+
+        self._data["benchmark_times"] = benchmark_times
 
     def _process_time_range(self):
         timerange = self._data["time_range"]
@@ -72,13 +81,7 @@ class ConfigReader:
 
     @property
     def benchmark_times(self) -> list:
-        benchmark_times = []
-
-        for benchmark_time_str in self._data["benchmark_times"]:
-            new_benchmark = self._str_to_time(benchmark_time_str)
-            benchmark_times.append(new_benchmark)
-
-        return benchmark_times
+        return self._data["benchmark_times"]
 
     @property
     def should_enable_daylight_saving_mode(self) -> bool:
@@ -153,6 +156,14 @@ class ConfigReader:
             minute_sections.append(new_section)
 
         return minute_sections
+
+    @property
+    def should_time_shift(self) -> bool:
+        return self._data["time_shift"]["should_shift_time"]
+
+    @property
+    def time_shift(self) -> bool:
+        return self._data["time_shift"]["hour_delta"]
 
     @property
     def should_include_period_average_data(self) -> bool:
