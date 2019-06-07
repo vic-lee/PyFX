@@ -20,9 +20,9 @@ class Metric:
 
     def __init__(self, currency_pair_name: str, config: ConfigReader):
 
-        self.time_range = config.time_range
-        self.date_range = config.date_range
-        self.currency_pair_name = currency_pair_name
+        self.__time_range = config.time_range
+        self.__date_range = config.date_range
+        self.__currency_pair_name = currency_pair_name
 
     def _get_prior_fix_recursive(self, d, prices: DataContainer):
 
@@ -30,11 +30,11 @@ class Metric:
 
         fx = None
 
-        if self.date_range.is_datetime_in_range(d):
+        if self.__date_range.is_datetime_in_range(d):
 
             try:
-                cp_identifier = self.currency_pair_name[:3] + \
-                    '-' + self.currency_pair_name[3:]
+                cp_identifier = self.__currency_pair_name[:3] \
+                    + '-' + self.__currency_pair_name[3:]
                 fx = prices.fix_price_df.loc[str(d)][cp_identifier]
             except Exception as e:
                 logger.error(
