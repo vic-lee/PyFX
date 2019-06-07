@@ -183,7 +183,7 @@ def read_price_data(currency_pair_name) -> dict:
     in_fpaths = {
         DataReader.FIX: abspath("../data/datasrc/fix1819.csv"),
         # DataReader.MINUTELY: abspath("../data/datasrc/{}_Minute.csv".format(currency_pair_name)),
-        DataReader.MINUTELY: abspath("../data/datasrc/DAT_XLSX_GBPUSD_M1_2018.csv"),
+        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_Candlestick.csv"),
         DataReader.DAILY: abspath(
             "../data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
     }
