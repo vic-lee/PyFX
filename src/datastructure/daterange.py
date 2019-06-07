@@ -10,11 +10,19 @@ class DateRange:
     """
 
     def __init__(self, start_date: date, end_date: date):
-        self.start_date = start_date
-        self.end_date = end_date
+        self.__start_date = start_date
+        self.__end_date = end_date
+
+    @property
+    def start_date(self):
+        return self.__start_date
+
+    @property
+    def end_date(self):
+        return self.__end_date
 
     def is_datetime_in_range(self, date):
-        return date >= self.start_date and date <= self.end_date
+        return date >= self.__start_date and date <= self.__end_date
 
     def __repr__(self):
-        return "start date: {} \tend date: {}\n".format(self.start_date, self.end_date)
+        return "start date: {} \tend date: {}\n".format(self.__start_date, self.__end_date)
