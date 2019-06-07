@@ -34,25 +34,26 @@ class MaxPriceMovements(Metric):
                         config=config,
                         currency_pair_name=currency_pair_name)
 
-        self.prices = price_data
-        self.benchmark_times = config.benchmark_times
-        self.max_price_movements = \
+        self.__prices = price_data
+        self.__benchmark_times = config.benchmark_times
+        self.__max_price_movements = \
             self._generate_price_movements_obj_from_benchmark_times()
 
-        self.benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
+        self.__benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
 
         print("Analyzing maximum price movements...")
 
     def _generate_price_movements_obj_from_benchmark_times(self):
         ret = {}
-        for btime in self.benchmark_times:
+        for btime in self.__benchmark_times:
             ret[btime] = {}
         return ret
 
     def _generate_benchmark_prices_matrix(self):
         ret = {}
-        for btime in self.benchmark_times:
-            ret[btime] = self.prices.minute_price_df.between_time(btime, btime)
+        for btime in self.__benchmark_times:
+            ret[btime] = self.__prices.minute_price_df.between_time(start_time=btime,
+                                                                    end_time=btime)
         return ret
 
     def find_max_price_movements(self):
@@ -60,12 +61,12 @@ class MaxPriceMovements(Metric):
         Algorithm:
         For each day, perform max day price movement check.
         """
-        for btime in self.max_price_movements:
-            self.max_price_movements[btime] \
+        for btime in self.__max_price_movements:
+            self.__max_price_movements[btime] \
                 = self._find_max_price_movement_against_benchmark(benchmark_time=btime)
 
-        self.max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None,
-                                                                                           pdfx_benchmark=True)
+        self.__max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None,
+                                                                                             pdfx_benchmark=True)
 
     def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
 
@@ -76,11 +77,11 @@ class MaxPriceMovements(Metric):
         daily_max_pips_obj = None
         current_date = None
 
-        data_size = len(self.prices.minute_price_df.index)
+        data_size = len(self.__prices.minute_price_df.index)
         progress_ctr = 0
         time_tracker = datetime.now()
 
-        for time_index, row in self.prices.minute_price_df.iterrows():
+        for time_index, row in self.__prices.minute_price_df.iterrows():
 
             current_price = PriceTime(price=row['Close'], datetime=time_index)
 
@@ -151,7 +152,7 @@ class MaxPriceMovements(Metric):
         else:
             prior_day = current_date - timedelta(days=1)
             benchmark_pricetime = self._get_prior_fix_recursive(
-                prior_day, self.prices)
+                prior_day, self.__prices)
             initial_pricetime = self._get_benchmark_price(date=time_index.date(),
                                                           benchmark_time=self.time_range.start_time)
 
@@ -159,7 +160,7 @@ class MaxPriceMovements(Metric):
 
     def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
 
-        price_df = self.benchmark_prices_matrix[benchmark_time]
+        price_df = self.__benchmark_prices_matrix[benchmark_time]
         index = datetime(year=date.year, month=date.month, day=date.day,
                          hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
 
@@ -193,11 +194,11 @@ class MaxPriceMovements(Metric):
         benchmark_time_header_template = \
             "\n/********************** Benchmark Time: {} **********************/\n"
 
-        for btime in self.max_price_movements:
+        for btime in self.__max_price_movements:
 
             print(benchmark_time_header_template.format(btime))
 
-            max_pips_for_btime = self.max_price_movements[btime]
+            max_pips_for_btime = self.__max_price_movements[btime]
 
             for day in max_pips_for_btime:
                 day_max_pips = max_pips_for_btime[day]
@@ -206,7 +207,7 @@ class MaxPriceMovements(Metric):
     def to_benchmarked_results(self):
         benchmarked_dfs = {}
 
-        for benchmarked_time, data in self.max_price_movements.items():
+        for benchmarked_time, data in self.__max_price_movements.items():
             df_list = []
 
             for _, daily_analysis in data.items():
@@ -229,7 +230,7 @@ class MaxPriceMovements(Metric):
             + '-' \
             + self.currency_pair_name[3:]
 
-        current_day_fix_df = self.prices.fix_price_df[[cp_identifier]]
+        current_day_fix_df = self.__prices.fix_price_df[[cp_identifier]]
 
         current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
         current_day_fix_df = current_day_fix_df[
