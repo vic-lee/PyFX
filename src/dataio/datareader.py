@@ -13,8 +13,8 @@ class DataReader:
     DAILY = "daily"
 
     def __init__(self, fpaths, currency_pair_name: str):
-        self.fpaths = fpaths
-        self._currency_pair_name = currency_pair_name
+        self.__fpaths = fpaths
+        self.__currency_pair_name = currency_pair_name
 
     def read_data(self):
         return {
@@ -27,7 +27,7 @@ class DataReader:
         if not self._does_fpath_exist(mode=self.FIX):
             self._log_read_error(mode=self.FIX)
             return None
-        fpath = self.fpaths[self.FIX]
+        fpath = self.__fpaths[self.FIX]
         df = pd.read_csv(fpath)
         df['datetime'] = pd.to_datetime(df['datetime'])
         df = df.set_index('datetime')
@@ -37,7 +37,7 @@ class DataReader:
         if not self._does_fpath_exist(mode=self.DAILY):
             self._log_read_error(mode=self.DAILY)
             return None
-        fpath = self.fpaths[self.DAILY]
+        fpath = self.__fpaths[self.DAILY]
         df = pd.read_excel(fpath)
         df.rename(columns={'Date': 'datetime'}, inplace=True)
 
@@ -59,7 +59,7 @@ class DataReader:
         if not self._does_fpath_exist(mode=self.MINUTELY):
             self._log_read_error(mode=self.MINUTELY)
             return None
-        fpath = self.fpaths[self.MINUTELY]
+        fpath = self.__fpaths[self.MINUTELY]
         df = pd.read_csv(fpath)
 
         if len(df.columns) == 7:
@@ -125,8 +125,8 @@ class DataReader:
         print df.columns to see original column names. 
         """
 
-        cp_identifier = self._currency_pair_name[:3] + \
-            '/' + self._currency_pair_name[3:]
+        cp_identifier = self.__currency_pair_name[:3] + \
+            '/' + self.__currency_pair_name[3:]
 
         df = df.drop(columns=[
             '{}(Open, Ask)'.format(cp_identifier),
@@ -155,6 +155,6 @@ class DataReader:
         pass
 
     def _does_fpath_exist(self, mode):
-        if mode in self.fpaths:
+        if mode in self.__fpaths:
             return True
         return False
