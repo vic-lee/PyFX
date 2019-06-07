@@ -27,7 +27,7 @@ class ConfigReader:
         if os.path.isfile(config_path):
 
             with open(config_path) as conf:
-                self._data = json.load(conf)
+                self.__config = json.load(conf)
 
             self._process_data()
 
@@ -42,37 +42,37 @@ class ConfigReader:
     def _process_benchmark_times(self):
         benchmark_times = []
 
-        for benchmark_time_str in self._data["benchmark_times"]:
+        for benchmark_time_str in self.__config["benchmark_times"]:
             new_benchmark = self._str_to_time(benchmark_time_str)
             benchmark_times.append(new_benchmark)
 
-        self._data["benchmark_times"] = benchmark_times
+        self.__config["benchmark_times"] = benchmark_times
 
     def _process_time_range(self):
-        timerange = self._data["time_range"]
-        self._data["time_range"] = self._read_time_range_obj(timerange)
+        timerange = self.__config["time_range"]
+        self.__config["time_range"] = self._read_time_range_obj(timerange)
 
     def _process_dst_hour_ahead_periods(self):
         hour_ahead_periods = []
 
-        for period in self._data["daylight_saving_mode"]["hour_ahead_periods"]:
+        for period in self.__config["daylight_saving_mode"]["hour_ahead_periods"]:
             date_range = self._read_date_range_obj(period)
             hour_ahead_periods.append(date_range)
 
-        self._data["daylight_saving_mode"]["hour_ahead_periods"] = hour_ahead_periods
+        self.__config["daylight_saving_mode"]["hour_ahead_periods"] = hour_ahead_periods
 
     @property
     def currency_pairs(self) -> list:
-        return self._data["currency_pairs"]
+        return self.__config["currency_pairs"]
 
     @property
     def time_range(self) -> DayTimeRange:
-        return self._data['time_range']
+        return self.__config['time_range']
 
     @property
     def date_range(self) -> DateRange:
-        start_date_str = self._data['date_range']['start_date']
-        end_date_str = self._data['date_range']['end_date']
+        start_date_str = self.__config['date_range']['start_date']
+        end_date_str = self.__config['date_range']['end_date']
 
         start_date = self._str_to_date(start_date_str)
         end_date = self._str_to_date(end_date_str)
@@ -81,20 +81,20 @@ class ConfigReader:
 
     @property
     def benchmark_times(self) -> list:
-        return self._data["benchmark_times"]
+        return self.__config["benchmark_times"]
 
     @property
     def should_enable_daylight_saving_mode(self) -> bool:
-        return self._data["daylight_saving_mode"]["daylight_saving_time"]
+        return self.__config["daylight_saving_mode"]["daylight_saving_time"]
 
     @property
     def dst_hour_ahead_period(self) -> DateRange:
-        time_period_def = self._data['daylight_saving_mode']['hour_ahead_period']
+        time_period_def = self.__config['daylight_saving_mode']['hour_ahead_period']
         return self._read_date_range_obj(time_period_def)
 
     @property
     def dst_hour_ahead_periods(self) -> [DateRange]:
-        return self._data["daylight_saving_mode"]["hour_ahead_periods"]
+        return self.__config["daylight_saving_mode"]["hour_ahead_periods"]
 
     @property
     def dst_hour_ahead_time_range(self) -> DayTimeRange:
@@ -109,7 +109,7 @@ class ConfigReader:
 
     @property
     def dst_hour_delay_period(self) -> DateRange:
-        time_period_def = self._data['daylight_saving_mode']['hour_delay_period']
+        time_period_def = self.__config['daylight_saving_mode']['hour_delay_period']
         return self._read_date_range_obj(time_period_def)
 
     @property
@@ -127,13 +127,13 @@ class ConfigReader:
 
     @property
     def should_include_minutely_data(self) -> bool:
-        return self._data["minutely_data"]["include_minutely_data"]
+        return self.__config["minutely_data"]["include_minutely_data"]
 
     @property
     def minutely_data_sections(self) -> list:
         minute_sections = []
 
-        for section in self._data["minutely_data"]["included_sections"]:
+        for section in self.__config["minutely_data"]["included_sections"]:
             new_section = {}
 
             if "start_time" in section and "end_time" in section:
@@ -159,21 +159,21 @@ class ConfigReader:
 
     @property
     def should_time_shift(self) -> bool:
-        return self._data["time_shift"]["should_shift_time"]
+        return self.__config["time_shift"]["should_shift_time"]
 
     @property
     def time_shift(self) -> bool:
-        return self._data["time_shift"]["hour_delta"]
+        return self.__config["time_shift"]["hour_delta"]
 
     @property
     def should_include_period_average_data(self) -> bool:
-        return self._data["period_avg_data"]["include_period_avg_data"]
+        return self.__config["period_avg_data"]["include_period_avg_data"]
 
     @property
     def period_average_data_sections(self) -> list:
         avg_data_sections = []
 
-        for avg_obj in self._data["period_avg_data"]["included_sections"]:
+        for avg_obj in self.__config["period_avg_data"]["included_sections"]:
             new_section = self._read_time_range_obj(avg_obj)
             avg_data_sections.append(new_section)
 
