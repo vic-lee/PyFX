@@ -27,6 +27,10 @@
         "10:45",
         "10:50"
     ],
+    "time_shift": {
+        "should_shift_time": false,
+        "hour_delta": 7
+    },
     "daylight_saving_mode": {
         "daylight_saving_time": true,
         "hour_delay_periods": [],
