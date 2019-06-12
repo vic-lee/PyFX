@@ -6,5 +6,6 @@
 *.numbers
 __pycache__/
 dataout/
+cache/
 src/app.log
 src/app.legacy.py
