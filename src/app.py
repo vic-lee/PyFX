@@ -8,7 +8,7 @@ import logging
 from os.path import abspath
 import pandas as pd
 
-from analysis.metrics import PeriodPriceAvg, MinutelyData
+from analysis.metrics import PeriodPriceAvg, MinuteData
 from analysis.pricemvmts import MaxPriceMovements
 
 from dataio.configreader import ConfigReader
@@ -144,10 +144,10 @@ def include_minutely_data(price_data: DataContainer, cp_name: str,
     Please see `metrics/minutely_data.py` for detailed implementation. 
     """
 
-    minute_data = MinutelyData(prices=price_data,
-                               config=config,
-                               cp_name=cp_name,
-                               ).to_df()
+    minute_data = MinuteData(prices=price_data,
+                             config=config,
+                             cp_name=cp_name,
+                             ).to_df()
 
     return minute_data
 

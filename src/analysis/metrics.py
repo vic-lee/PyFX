@@ -67,7 +67,7 @@ class Metric:
         return time_cur
 
 
-class MinutelyData(Metric):
+class MinuteData(Metric):
 
     def __init__(self, prices: DataContainer, cp_name: str, config: ConfigReader):
 
