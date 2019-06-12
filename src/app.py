@@ -39,6 +39,9 @@ stream_handler.setFormatter(formatter)
 
 logger.addHandler(stream_handler)
 
+DEFAULT_CONFIG_FPATH = 'config.json'
+
+
 @timer
 def main():
     """
@@ -47,8 +50,7 @@ def main():
     the array.
     """
 
-    config = Config('config.json')
-    print(config.dst_hour_ahead_periods)
+    config = Config(DEFAULT_CONFIG_FPATH)
 
     fname_suffix = generate_folder_timestamp()
 
