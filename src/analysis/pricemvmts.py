@@ -5,6 +5,7 @@ import numpy as np
 from os.path import abspath
 import sys
 from time import sleep
+from typing import List
 
 from analysis.metrics import Metric
 
@@ -154,6 +155,46 @@ class _DayPipMovmentToPrice:
             return time.time()
 
 
+class BenchmarkPricesContainer():
+    """Provides read-only reference for all benchmark prices.
+
+    This class facilitates benchmark price querying by filtering down raw price
+    data to dataframes with just data at benchmark times.
+
+    `__setitem__` and `__delitem__` are not implemented, for BenchmarkPrices 
+    are read-only.
+
+    args:
+        price_data: data source, contained in `DataContainer`
+        benchmark_times: specifies which minute datas to keep
+    """
+
+    def __init__(self, price_data: DataContainer,
+                 benchmark_times: List[datetime.time]):
+        self.__benchmark_prices = {
+            bt: price_data.minute_price_df.at_time(bt)
+            for bt in benchmark_times
+        }
+
+    def __getitem__(self, key) -> pd.DataFrame:
+        try:
+            assert isinstance(key, time)
+        except TypeError:
+            logger.error("The key supplied for type BenchmarkPricesContainer "
+                         + "must be of type `datetime.time`. The key is of "
+                         + "{} type.".format(type(key)))
+        try:
+            return self.__benchmark_prices[key]
+        except IndexError:
+            logger.error("Key is not availabe.")
+
+    def __contains__(self, key):
+        return key in self.__benchmark_prices
+
+    def __len__(self):
+        return len(self.__benchmark_prices)
+
+
 class MaxPriceMovements(Metric):
     """This class finds the daily price movements within a period of time.
     It is used in conjunction with DayPipMovmentToPrice class.
@@ -171,10 +212,8 @@ class MaxPriceMovements(Metric):
         self.__max_price_movements = {
             bt: None for bt in self.__benchmark_times
         }
-        self.__benchmark_prices = {
-            bt: self.__price_data.minute_price_df.at_time(bt)
-            for bt in self.__benchmark_times
-        }
+        self.__benchmark_prices = BenchmarkPricesContainer(
+            price_data=price_data, benchmark_times=self.__benchmark_times)
 
         print("Analyzing maximum price movements...")
 
@@ -222,7 +261,6 @@ class MaxPriceMovements(Metric):
             benchmarked_dfs[str(benchmarked_time)] = df_at_benchmark
 
         return benchmarked_dfs
-
 
     def _find_max_price_movement(self, benchmark_time: time,
                                  pdfx_benchmark=False):
