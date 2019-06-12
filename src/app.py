@@ -59,7 +59,8 @@ def main():
     logger.info("\nProgram runtime: {}".format((end_time - start_time)))
 
 
-def analyze_currency_pair(currency_pair_name, timestamp, config: ConfigReader) -> None:
+def analyze_currency_pair(currency_pair_name: str,
+                          timestamp, config: ConfigReader) -> None:
 
     master_df = perform_analysis(currency_pair_name, config)
 
@@ -102,9 +103,9 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     '''2.2 Selected Minute Data'''
     if config.should_include_minutely_data:
 
-        selected_minute_data = include_minutely_data(price_data=data_container,
-                                                     cp_name=currency_pair_name,
-                                                     config=config)
+        selected_minute_data = include_minutely_data(
+            price_data=data_container, cp_name=currency_pair_name, config=config)
+
         df_dict["Selected Minute Data"] = selected_minute_data
 
     '''2.3 Price Average data from range'''
@@ -112,10 +113,10 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
 
         for avg_data_section in config.period_average_data_sections:
 
-            price_avg_data, timerange = include_period_avg_data(data_container,
-                                                                currency_pair_name,
-                                                                config=config,
-                                                                avgrange=avg_data_section)
+            price_avg_data, timerange = include_period_avg_data(
+                data_container, currency_pair_name,
+                config=config, avgrange=avg_data_section)
+
             column_str = (str(timerange.start_time)
                           + "_"
                           + str(timerange.end_time))
@@ -129,7 +130,8 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
     return master_df
 
 
-def include_minutely_data(price_data: DataContainer, cp_name: str, config: ConfigReader) -> pd.DataFrame:
+def include_minutely_data(price_data: DataContainer, cp_name: str,
+                          config: ConfigReader) -> pd.DataFrame:
     """
     This function defines what minutely data to include in the output. 
     The minutely data to include can be specified by two dimensions: 
@@ -151,7 +153,8 @@ def include_minutely_data(price_data: DataContainer, cp_name: str, config: Confi
     return minute_data
 
 
-def include_period_avg_data(data: DataContainer, cp_name: str, config: ConfigReader, avgrange: DayTimeRange):
+def include_period_avg_data(data: DataContainer, cp_name: str,
+                            config: ConfigReader, avgrange: DayTimeRange):
     """
     This function calculates and returns a series of average prices, given the
     starting time and ending time for the calculation period. 
@@ -163,7 +166,8 @@ def include_period_avg_data(data: DataContainer, cp_name: str, config: ConfigRea
                         time_range_for_avg=avgrange,
                         ).to_df()
 
-    return df, DayTimeRange(start_time=avgrange.start_time, end_time=avgrange.end_time)
+    return df, DayTimeRange(start_time=avgrange.start_time,
+                            end_time=avgrange.end_time)
 
 
 def read_price_data(currency_pair_name) -> dict:
@@ -181,11 +185,11 @@ def read_price_data(currency_pair_name) -> dict:
     """
 
     in_fpaths = {
-        DataReader.FIX: abspath("../data/datasrc/fix1819.csv"),
-        # DataReader.MINUTELY: abspath("../data/datasrc/{}_Minute.csv".format(currency_pair_name)),
-        DataReader.MINUTELY: abspath("../data/datasrc/GBPUSD_Candlestick.csv"),
+        DataReader.FIX: abspath("data/datasrc/fix1819.csv"),
+        # DataReader.MINUTELY: abspath("data/datasrc/{}_Minute.csv".format(currency_pair_name)),
+        DataReader.MINUTELY: abspath("data/datasrc/GBPUSD_Candlestick.csv"),
         DataReader.DAILY: abspath(
-            "../data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
+            "data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
     }
 
     fx_reader = DataReader(in_fpaths, currency_pair_name)

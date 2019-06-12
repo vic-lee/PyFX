@@ -5,7 +5,7 @@ from datetime import datetime
 
 class DataWriter:
 
-    def __init__(self, df, currency_pair_name: str, timestamp: str, filename="../data/dataout/"):
+    def __init__(self, df, currency_pair_name: str, timestamp: str, filename="data/dataout/"):
         self.__dfout = df
         self.__default_fname = filename + "dataout_{}".format(timestamp)
 
