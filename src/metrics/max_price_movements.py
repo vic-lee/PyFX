@@ -15,12 +15,137 @@ from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
 
 from metrics.metric import Metric
-from metrics.day_movement import DayPipMovmentToPrice
 from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+class DayPipMovmentToPrice:
+    """For a given day, this object encapsulates the maximum 
+    upward and downward pip movements to a given price. 
+
+    The benchmark price is not directly given; rather, it should
+    be passed in as a timestamp. The class then looks up the 
+    benchmark price using the timestamp. 
+
+    Foreseeably, in a for loop looping through each day, this class
+    can generate each day's daily pip movements. 
+
+    Initialized daily. 
+    """
+
+    UP = "up"
+    DOWN = "down"
+
+    def __init__(self, date, benchmark_pricetime: PriceTime, time_range_start_pricetime: PriceTime, time_range: DayTimeRange):
+        self.__date = date
+        self.__benchmark_pricetime = benchmark_pricetime
+        self.__time_range_start_pricetime = time_range_start_pricetime
+        self.__time_range = time_range
+
+        self.__max_pip_up = 0
+        self.__max_pip_up_time = self._initialize_datetime_for_max_min()
+        self.__price_at_max_pip_up = self._initialize_prices_for_max_min()
+
+        self.__max_pip_down = 0
+        self.__max_pip_down_time = self._initialize_datetime_for_max_min()
+        self.__price_at_max_pip_down = self._initialize_prices_for_max_min()
+
+    def _initialize_max_pips(self):
+        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+            return 0
+        else:
+            return None
+
+    def _initialize_datetime_for_max_min(self):
+        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+            return self.__benchmark_pricetime.datetime
+        else:
+            return self.__time_range_start_pricetime.datetime
+
+    def _initialize_prices_for_max_min(self):
+        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+            return self.__benchmark_pricetime.price
+        else:
+            return self.__time_range_start_pricetime.price
+
+    @property
+    def date(self):
+        return self.__date
+
+    def update_max_pip(self, current_price):
+        self._update_max_pip_up(current_price)
+        self._update_max_pip_down(current_price)
+
+    def _update_max_pip_up(self, current_price):
+        new_pip = current_price.pip_movement_from(self.__benchmark_pricetime)
+        if self._is_in_benchmark_period(current_price) and self._is_new_pip_greater(new_pip):
+            self.__max_pip_up = new_pip
+            self.__max_pip_up_time = current_price.datetime
+            self.__price_at_max_pip_up = current_price.price
+
+    def _update_max_pip_down(self, current_price):
+        new_pip = current_price.pip_movement_from(self.__benchmark_pricetime)
+        if self._is_in_benchmark_period(current_price) and self._is_new_pip_lower(new_pip):
+            self.__max_pip_down = new_pip
+            self.__max_pip_down_time = current_price.datetime
+            self.__price_at_max_pip_down = current_price.price
+
+    def __str__(self):
+        f_max_pip_up_time = self._format_max_pip_up_time()
+        f_max_pip_down_time = self._format_max_pip_down_time()
+
+        return ("{:20} {:20} {:30} {:24} {:30}".format(
+            "Date: {}".format(self.__date),
+            "Max pip up: {}".format(self.__max_pip_up),
+            "Max pip up time: {}".format(f_max_pip_up_time),
+            "Max pip down: {}".format(self.__max_pip_down),
+            "Max pip down time: {}".format(f_max_pip_down_time)))
+
+    def _is_new_pip_greater(self, new_pip):
+        if self.__max_pip_up is not None:
+            return (new_pip > self.__max_pip_up)
+        else:
+            return (new_pip > 0)
+
+    def _is_new_pip_lower(self, new_pip):
+        if self.__max_pip_down is not None:
+            return (new_pip < self.__max_pip_down)
+        else:
+            return (new_pip < 0)
+
+    def _format_max_pip_up_time(self):
+        return self._format_time(time=self.__max_pip_up_time)
+
+    def _format_max_pip_down_time(self):
+        return self._format_time(time=self.__max_pip_down_time)
+
+    def _format_time(self, time):
+        if time == None:
+            return None
+        else:
+            return time.time()
+
+    def _is_in_benchmark_period(self, current_price: PriceTime) -> bool:
+        return current_price.is_later_than(self.__benchmark_pricetime)
+
+    def to_df(self) -> pd.DataFrame:
+        f_max_pip_up_time = self._format_max_pip_up_time()
+        f_max_pip_down_time = self._format_max_pip_down_time()
+
+        df = pd.DataFrame({
+            "Benchmark Price": self.__benchmark_pricetime.price,
+            "Max Pip Up": self.__max_pip_up,
+            "Price at Max Pip Up": self.__price_at_max_pip_up,
+            "Time at Max Pip Up": f_max_pip_up_time,
+            "Max Pip Down": self.__max_pip_down,
+            "Price at Max Pip Down": self.__price_at_max_pip_down,
+            "Time at Max Pip Down": f_max_pip_down_time,
+        }, index=[self.__date])
+
+        return df
 
 
 class MaxPriceMovements(Metric):
@@ -34,15 +159,14 @@ class MaxPriceMovements(Metric):
         Metric.__init__(self, config=config,
                         currency_pair_name=currency_pair_name)
 
-        self.__prices = price_data
+        self.__price_data = price_data
         self.__benchmark_times = config.benchmark_times
-        
+
         self.__max_price_movements = {
             bt: None for bt in self.__benchmark_times
         }
-        self.__benchmark_prices_matrix = {
-            bt: self.__prices.minute_price_df.between_time(
-                start_time=bt, end_time=bt)
+        self.__benchmark_prices = {
+            bt: self.__price_data.minute_price_df.at_time(bt)
             for bt in self.__benchmark_times
         }
 
@@ -70,11 +194,11 @@ class MaxPriceMovements(Metric):
         daily_max_pips_obj = None
         current_date = None
 
-        data_size = len(self.__prices.minute_price_df.index)
+        data_size = len(self.__price_data.minute_price_df.index)
         progress_ctr = 0
         time_tracker = datetime.now()
 
-        for time_index, row in self.__prices.minute_price_df.iterrows():
+        for time_index, row in self.__price_data.minute_price_df.iterrows():
 
             current_price = PriceTime(price=row['Close'], datetime=time_index)
 
@@ -143,7 +267,7 @@ class MaxPriceMovements(Metric):
         else:
             prior_day = current_date - timedelta(days=1)
             benchmark_pricetime = self._get_prior_fix_recursive(
-                prior_day, self.__prices)
+                prior_day, self.__price_data)
             initial_pricetime = self._get_benchmark_price(
                 date=time_index.date(), benchmark_time=self.time_range.start_time)
 
@@ -151,7 +275,7 @@ class MaxPriceMovements(Metric):
 
     def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
 
-        price_df = self.__benchmark_prices_matrix[benchmark_time]
+        price_df = self.__benchmark_prices[benchmark_time]
         index = datetime(year=date.year, month=date.month,
                          day=date.day, hour=benchmark_time.hour,
                          minute=benchmark_time.minute, second=0)
@@ -222,7 +346,7 @@ class MaxPriceMovements(Metric):
             + '-' \
             + self.currency_pair_name[3:]
 
-        current_day_fix_df = self.__prices.fix_price_df[[cp_identifier]]
+        current_day_fix_df = self.__price_data.fix_price_df[[cp_identifier]]
 
         current_day_fix_df = current_day_fix_df.loc['2018-1-2':'2018-12-31']
         current_day_fix_df = current_day_fix_df[
