@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from datetime import datetime
 
+from common.utils import comp_xlsx
+
 
 class DataWriter:
 
@@ -26,3 +28,8 @@ class DataWriter:
             sheet = writer.sheets['max_pip_mvmts']
             wide_col = 20
             sheet.set_column(0, len(self.__dfout.columns), wide_col)
+
+        consistent = comp_xlsx(new_fname=self._default_fname_xlsx,
+                               original_fname="data/dataout/dataout__20190606_230751/dataout_GBPUSD.xlsx")
+
+        print("Consistency: {}".format(consistent))

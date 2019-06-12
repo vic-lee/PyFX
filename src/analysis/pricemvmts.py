@@ -6,6 +6,8 @@ from os.path import abspath
 import sys
 from time import sleep
 
+from analysis.metrics import Metric
+
 from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
 from datastructure.pricetime import PriceTime
@@ -13,10 +15,6 @@ from datastructure.pricetime import PriceTime
 from dataio.configreader import ConfigReader
 from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
-
-from metrics.metric import Metric
-from metrics.period_price_avg import PeriodPriceAvg
-from metrics.minutely_data import MinutelyData
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

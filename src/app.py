@@ -8,14 +8,13 @@ import logging
 from os.path import abspath
 import pandas as pd
 
+from analysis.metrics import PeriodPriceAvg, MinutelyData
+from analysis.pricemvmts import MaxPriceMovements
+
 from dataio.configreader import ConfigReader
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
 from dataio.dfbundler import DataFrameBundler
-
-from metrics.price_movements import MaxPriceMovements
-from metrics.period_price_avg import PeriodPriceAvg
-from metrics.minutely_data import MinutelyData
 
 from datastructure.datacontainer import DataContainer
 from datastructure.daterange import DateRange
