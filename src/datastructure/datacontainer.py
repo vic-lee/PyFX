@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, time
 import logging
 import pandas as pd
 
-from dataio.configreader import ConfigReader
+from common.config import Config
 from dataio.datareader import DataReader
 from datastructure.daterange import DateRange
 
@@ -16,7 +16,7 @@ DSTConfig = namedtuple('DSTConfig', 'mask timerange')
 
 class DataContainer:
 
-    def __init__(self, price_dfs, currency_pair_name: str, config: ConfigReader):
+    def __init__(self, price_dfs, currency_pair_name: str, config: Config):
 
         self.__fix_price_df = price_dfs[DataReader.FIX]
         self.__daily_price_df = price_dfs[DataReader.DAILY]
@@ -40,17 +40,17 @@ class DataContainer:
     def minute_price_df(self) -> pd.DataFrame:
         return self.__minute_price_df
 
-    def _adjust_for_time_shift(self, config: ConfigReader) -> pd.DataFrame:
+    def _adjust_for_time_shift(self, config: Config) -> pd.DataFrame:
         if config.should_time_shift:
             hourdelta = config.time_shift
             self.__full_minute_price_df.index = (self.__full_minute_price_df.index
                                                 + pd.DateOffset(hours=hourdelta))
 
-    def _filter_minute_data(self, config: ConfigReader):
+    def _filter_minute_data(self, config: Config):
         return self.full_minute_price_df.between_time(config.time_range.start_time,
                                                       config.time_range.end_time)
 
-    def _adjust_for_dst(self, config: ConfigReader) -> pd.DataFrame:
+    def _adjust_for_dst(self, config: Config) -> pd.DataFrame:
 
         filtered_df = self.full_minute_price_df.between_time(config.time_range.start_time,
                                                              config.time_range.end_time)
@@ -65,7 +65,7 @@ class DataContainer:
 
     def _adjust_for_ahead_period(self, filtered_df: pd.DataFrame,
                                  ahead_period: DateRange,
-                                 config: ConfigReader) -> pd.DataFrame:
+                                 config: Config) -> pd.DataFrame:
 
         mask = ((self.full_minute_price_df['date'] >= self._to_datetime(ahead_period.start_date))
                 & (self.full_minute_price_df['date'] <= self._to_datetime(ahead_period.end_date)))
@@ -87,17 +87,17 @@ class DataContainer:
 
     @staticmethod
     def _should_normalize_time_index(start_time: datetime.time,
-                                     config: ConfigReader) -> bool:
+                                     config: Config) -> bool:
         return start_time != config.time_range.start_time
 
     @staticmethod
     def _should_decr_hour(start_time: datetime.time,
-                          config: ConfigReader) -> bool:
+                          config: Config) -> bool:
         """Should decrement hour if the time is within the hour_ahead range"""
         return start_time == config.dst_hour_ahead_time_range.start_time
 
     @staticmethod
     def _should_incr_hour(start_time: datetime.time,
-                          config: ConfigReader) -> bool:
+                          config: Config) -> bool:
         """Should increment hour if the time is within the hour_behind range"""
         return start_time == config.dst_hour_behind_time_range.start_time

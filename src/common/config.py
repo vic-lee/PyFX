@@ -10,7 +10,7 @@ from datastructure.daterange import DateRange
 logger = logging.getLogger(__name__)
 
 
-class ConfigReader:
+class Config:
 
     class Decorators:
         @classmethod

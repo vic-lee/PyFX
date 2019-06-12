@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta, time
 
-from dataio.configreader import ConfigReader
+from common.config import Config
 from dataio.datareader import DataReader
 
 from datastructure.datacontainer import DataContainer
@@ -18,7 +18,7 @@ logger.setLevel(logging.INFO)
 
 class Metric:
 
-    def __init__(self, currency_pair_name: str, config: ConfigReader):
+    def __init__(self, currency_pair_name: str, config: Config):
 
         self.time_range = config.time_range
         self.date_range = config.date_range
@@ -69,7 +69,7 @@ class Metric:
 
 class MinuteData(Metric):
 
-    def __init__(self, prices: DataContainer, cp_name: str, config: ConfigReader):
+    def __init__(self, prices: DataContainer, cp_name: str, config: Config):
 
         Metric.__init__(self, config=config, currency_pair_name=cp_name)
 
@@ -131,7 +131,7 @@ class MinuteData(Metric):
 
 class PeriodPriceAvg(Metric):
 
-    def __init__(self, prices: DataContainer, cp_name: str, config: ConfigReader, time_range_for_avg: DayTimeRange):
+    def __init__(self, prices: DataContainer, cp_name: str, config: Config, time_range_for_avg: DayTimeRange):
 
         Metric.__init__(self, config=config, currency_pair_name=cp_name)
 

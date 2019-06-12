@@ -11,7 +11,7 @@ import pandas as pd
 from analysis.metrics import PeriodPriceAvg, MinuteData
 from analysis.pricemvmts import MaxPriceMovements
 
-from dataio.configreader import ConfigReader
+from common.config import Config
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
 from dataio.dfbundler import DataFrameBundler
@@ -46,7 +46,7 @@ def main():
     """
     start_time = datetime.now()
 
-    config = ConfigReader('config.json')
+    config = Config('config.json')
     print(config.dst_hour_ahead_periods)
 
     fname_suffix = generate_folder_timestamp()
@@ -59,7 +59,7 @@ def main():
 
 
 def analyze_currency_pair(currency_pair_name: str,
-                          timestamp, config: ConfigReader) -> None:
+                          timestamp, config: Config) -> None:
 
     master_df = perform_analysis(currency_pair_name, config)
 
@@ -70,7 +70,7 @@ def analyze_currency_pair(currency_pair_name: str,
     output_writer.df_to_xlsx()
 
 
-def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
+def perform_analysis(currency_pair_name, config: Config) -> pd.DataFrame:
     """
     This function encapsulates the key steps to perform to generate metrics for 
     the output. Comments below detail the steps. 
@@ -130,7 +130,7 @@ def perform_analysis(currency_pair_name, config: ConfigReader) -> pd.DataFrame:
 
 
 def include_minutely_data(price_data: DataContainer, cp_name: str,
-                          config: ConfigReader) -> pd.DataFrame:
+                          config: Config) -> pd.DataFrame:
     """
     This function defines what minutely data to include in the output. 
     The minutely data to include can be specified by two dimensions: 
@@ -153,7 +153,7 @@ def include_minutely_data(price_data: DataContainer, cp_name: str,
 
 
 def include_period_avg_data(data: DataContainer, cp_name: str,
-                            config: ConfigReader, avgrange: DayTimeRange):
+                            config: Config, avgrange: DayTimeRange):
     """
     This function calculates and returns a series of average prices, given the
     starting time and ending time for the calculation period. 

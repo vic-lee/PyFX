@@ -12,7 +12,7 @@ from datastructure.datacontainer import DataContainer
 from datastructure.daytimerange import DayTimeRange
 from datastructure.pricetime import PriceTime
 
-from dataio.configreader import ConfigReader
+from common.config import Config
 from dataio.datawriter import DataWriter
 from dataio.datareader import DataReader
 
@@ -160,7 +160,7 @@ class MaxPriceMovements(Metric):
     """
 
     def __init__(self, price_data: DataContainer,
-                 config: ConfigReader, currency_pair_name: str):
+                 config: Config, currency_pair_name: str):
 
         Metric.__init__(self, config=config,
                         currency_pair_name=currency_pair_name)
