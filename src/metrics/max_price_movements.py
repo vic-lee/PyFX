@@ -36,20 +36,18 @@ class MaxPriceMovements(Metric):
 
         self.__prices = price_data
         self.__benchmark_times = config.benchmark_times
-        self.__max_price_movements = \
-            self._generate_price_movements_obj_from_benchmark_times()
-
-        self.__benchmark_prices_matrix = self._generate_benchmark_prices_matrix()
+        self.__max_price_movements = self._make_price_movements_obj()
+        self.__benchmark_prices_matrix = self._make_benchmark_prices_matrix()
 
         print("Analyzing maximum price movements...")
 
-    def _generate_price_movements_obj_from_benchmark_times(self):
+    def _make_price_movements_obj(self):
         ret = {}
         for btime in self.__benchmark_times:
             ret[btime] = {}
         return ret
 
-    def _generate_benchmark_prices_matrix(self):
+    def _make_benchmark_prices_matrix(self):
         ret = {}
         for btime in self.__benchmark_times:
             ret[btime] = self.__prices.minute_price_df.between_time(
@@ -115,7 +113,8 @@ class MaxPriceMovements(Metric):
 
         return day_objs
 
-    def _incr_one_day(self, prior_day_obj: DayPipMovmentToPrice, day_objs, time_index):
+    def _incr_one_day(self, prior_day_obj: DayPipMovmentToPrice,
+                      day_objs, time_index: datetime):
 
         day_objs = self._save_prior_day_obj(prior_day_obj, day_objs)
         current_date = self._update_current_date(newdate=time_index)
