@@ -28,10 +28,10 @@ class MaxPriceMovements(Metric):
     It is used in conjunction with DayPipMovmentToPrice class.
     """
 
-    def __init__(self, price_data: DataContainer, config: ConfigReader, currency_pair_name: str):
+    def __init__(self, price_data: DataContainer,
+                 config: ConfigReader, currency_pair_name: str):
 
-        Metric.__init__(self,
-                        config=config,
+        Metric.__init__(self, config=config,
                         currency_pair_name=currency_pair_name)
 
         self.__prices = price_data
@@ -52,8 +52,8 @@ class MaxPriceMovements(Metric):
     def _generate_benchmark_prices_matrix(self):
         ret = {}
         for btime in self.__benchmark_times:
-            ret[btime] = self.__prices.minute_price_df.between_time(start_time=btime,
-                                                                    end_time=btime)
+            ret[btime] = self.__prices.minute_price_df.between_time(
+                start_time=btime, end_time=btime)
         return ret
 
     def find_max_price_movements(self):
@@ -63,12 +63,13 @@ class MaxPriceMovements(Metric):
         """
         for btime in self.__max_price_movements:
             self.__max_price_movements[btime] \
-                = self._find_max_price_movement_against_benchmark(benchmark_time=btime)
+                = self._find_max_price_movement(benchmark_time=btime)
 
-        self.__max_price_movements["PDFX"] = self._find_max_price_movement_against_benchmark(benchmark_time=None,
-                                                                                             pdfx_benchmark=True)
+        self.__max_price_movements["PDFX"] = self._find_max_price_movement(
+            benchmark_time=None, pdfx_benchmark=True)
 
-    def _find_max_price_movement_against_benchmark(self, benchmark_time: time, pdfx_benchmark=False):
+    def _find_max_price_movement(self, benchmark_time: time,
+                                 pdfx_benchmark=False):
 
         bt_str = "PDFX" if benchmark_time == None else str(benchmark_time)
         print("\tAnalyzing against benchmark time " + bt_str + "...")
@@ -87,14 +88,11 @@ class MaxPriceMovements(Metric):
 
             if self._is_row_new_day(known_date=current_date, new_date=time_index):
 
-                day_objs, current_date = self._incr_one_day(daily_max_pips_obj,
-                                                            day_objs,
-                                                            time_index)
+                day_objs, current_date = self._incr_one_day(
+                    daily_max_pips_obj, day_objs, time_index)
 
-                daily_max_pips_obj = self._init_new_day_obj(pdfx_benchmark,
-                                                            time_index,
-                                                            current_date,
-                                                            benchmark_time)
+                daily_max_pips_obj = self._init_new_day_obj(
+                    pdfx_benchmark, time_index, current_date, benchmark_time)
 
             if daily_max_pips_obj is not None:
                 daily_max_pips_obj.update_max_pip(current_price)
@@ -127,10 +125,8 @@ class MaxPriceMovements(Metric):
     def _init_new_day_obj(self, pdfx_benchmark: bool, time_index,
                           current_date: datetime.date, benchmark_time) -> DayPipMovmentToPrice:
 
-        benchmark_pricetime, initial_pricetime = self._init_pricetimes(pdfx_benchmark,
-                                                                       time_index,
-                                                                       current_date,
-                                                                       benchmark_time)
+        benchmark_pricetime, initial_pricetime = self._init_pricetimes(
+            pdfx_benchmark, time_index, current_date, benchmark_time)
 
         if benchmark_pricetime is not None and initial_pricetime is not None:
 
@@ -142,27 +138,29 @@ class MaxPriceMovements(Metric):
         else:
             return None
 
-    def _init_pricetimes(self, pdfx_benchmark: bool, time_index, current_date, benchmark_time):
+    def _init_pricetimes(self, pdfx_benchmark: bool,
+                         time_index, current_date, benchmark_time):
 
         if pdfx_benchmark == False:
-            benchmark_pricetime = self._get_benchmark_price(date=time_index.date(),
-                                                            benchmark_time=benchmark_time)
+            benchmark_pricetime = self._get_benchmark_price(
+                date=time_index.date(), benchmark_time=benchmark_time)
             initial_pricetime = benchmark_pricetime
 
         else:
             prior_day = current_date - timedelta(days=1)
             benchmark_pricetime = self._get_prior_fix_recursive(
                 prior_day, self.__prices)
-            initial_pricetime = self._get_benchmark_price(date=time_index.date(),
-                                                          benchmark_time=self.time_range.start_time)
+            initial_pricetime = self._get_benchmark_price(
+                date=time_index.date(), benchmark_time=self.time_range.start_time)
 
         return benchmark_pricetime, initial_pricetime
 
     def _get_benchmark_price(self, date, benchmark_time) -> PriceTime:
 
         price_df = self.__benchmark_prices_matrix[benchmark_time]
-        index = datetime(year=date.year, month=date.month, day=date.day,
-                         hour=benchmark_time.hour, minute=benchmark_time.minute, second=0)
+        index = datetime(year=date.year, month=date.month,
+                         day=date.day, hour=benchmark_time.hour,
+                         minute=benchmark_time.minute, second=0)
 
         try:
             price = price_df.loc[index]['Close']
@@ -192,7 +190,7 @@ class MaxPriceMovements(Metric):
 
     def __str__(self):
         benchmark_time_header_template = \
-            "\n/********************** Benchmark Time: {} **********************/\n"
+            "\n/******************** Benchmark Time: {} *******************/\n"
 
         for btime in self.__max_price_movements:
 
