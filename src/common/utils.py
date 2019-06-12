@@ -2,6 +2,19 @@ from itertools import zip_longest
 import xlrd
 
 
+def singleton(cls, *args, **kwargs):
+    """Class decorator that ensures decorated classes only have one instance."""
+
+    instances = {}
+
+    def wrapper():
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+        
+    return wrapper
+
+
 class SheetNotFoundException(BaseException):
     """Raised when an excel sheet does not exist."""
     pass
