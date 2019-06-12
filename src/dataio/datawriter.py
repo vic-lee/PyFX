@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from datetime import datetime
 
-from common.utils import comp_xlsx
+from common.decorators import comp_xlsx
 
 
 class DataWriter:
