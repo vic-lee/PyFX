@@ -155,7 +155,7 @@ class _DayPipMovmentToPrice:
             return time.time()
 
 
-class BenchmarkPricesContainer():
+class _BenchmarkPricesContainer():
     """Provides read-only reference for all benchmark prices.
 
     This class facilitates benchmark price querying by filtering down raw price
@@ -212,7 +212,7 @@ class MaxPriceMovements(Metric):
         self.__max_price_movements = {
             bt: None for bt in self.__benchmark_times
         }
-        self.__benchmark_prices = BenchmarkPricesContainer(
+        self.__benchmark_prices = _BenchmarkPricesContainer(
             price_data=price_data, benchmark_times=self.__benchmark_times)
 
         print("Analyzing maximum price movements...")
