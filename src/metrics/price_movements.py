@@ -39,7 +39,10 @@ class _DayPipMovmentToPrice:
     UP = "up"
     DOWN = "down"
 
-    def __init__(self, date, benchmark_pricetime: PriceTime, time_range_start_pricetime: PriceTime, time_range: DayTimeRange):
+    def __init__(self, date: datetime.date, benchmark_pricetime: PriceTime,
+                 time_range_start_pricetime: PriceTime,
+                 time_range: DayTimeRange):
+
         self.__date = date
         self.__benchmark_pricetime = benchmark_pricetime
         self.__time_range_start_pricetime = time_range_start_pricetime
@@ -54,19 +57,22 @@ class _DayPipMovmentToPrice:
         self.__price_at_max_pip_down = self._initialize_prices_for_max_min()
 
     def _initialize_max_pips(self):
-        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+        if (self.__time_range.is_datetime_in_range(
+                self.__benchmark_pricetime.datetime)):
             return 0
         else:
             return None
 
     def _initialize_datetime_for_max_min(self):
-        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+        if (self.__time_range.is_datetime_in_range(
+                self.__benchmark_pricetime.datetime)):
             return self.__benchmark_pricetime.datetime
         else:
             return self.__time_range_start_pricetime.datetime
 
     def _initialize_prices_for_max_min(self):
-        if (self.__time_range.is_datetime_in_range(self.__benchmark_pricetime.datetime)):
+        if (self.__time_range.is_datetime_in_range(
+                self.__benchmark_pricetime.datetime)):
             return self.__benchmark_pricetime.price
         else:
             return self.__time_range_start_pricetime.price
@@ -81,14 +87,16 @@ class _DayPipMovmentToPrice:
 
     def _update_max_pip_up(self, current_price):
         new_pip = current_price.pip_movement_from(self.__benchmark_pricetime)
-        if self._is_in_benchmark_period(current_price) and self._is_new_pip_greater(new_pip):
+        if self._is_in_benchmark_period(current_price) \
+                and self._is_new_pip_greater(new_pip):
             self.__max_pip_up = new_pip
             self.__max_pip_up_time = current_price.datetime
             self.__price_at_max_pip_up = current_price.price
 
     def _update_max_pip_down(self, current_price):
         new_pip = current_price.pip_movement_from(self.__benchmark_pricetime)
-        if self._is_in_benchmark_period(current_price) and self._is_new_pip_lower(new_pip):
+        if self._is_in_benchmark_period(current_price) \
+                and self._is_new_pip_lower(new_pip):
             self.__max_pip_down = new_pip
             self.__max_pip_down_time = current_price.datetime
             self.__price_at_max_pip_down = current_price.price
@@ -217,8 +225,9 @@ class MaxPriceMovements(Metric):
 
             if datetime.now().microsecond - time_tracker.microsecond >= 10000:
                 sys.stdout.write('\r')
-                sys.stdout.write("\t[%-20s] %d%%" % ('='*(int(20 * progress_ctr / data_size)),
-                                                     (int(100 * progress_ctr / data_size))))
+                sys.stdout.write("\t[%-20s] %d%%" % (
+                    '='*(int(20 * progress_ctr / data_size)),
+                    (int(100 * progress_ctr / data_size))))
                 sys.stdout.flush()
                 time_tracker = datetime.now()
 
@@ -248,10 +257,11 @@ class MaxPriceMovements(Metric):
 
         if benchmark_pricetime is not None and initial_pricetime is not None:
 
-            return _DayPipMovmentToPrice(date=current_date,
-                                        benchmark_pricetime=benchmark_pricetime,
-                                        time_range_start_pricetime=initial_pricetime,
-                                        time_range=self.time_range)
+            return _DayPipMovmentToPrice(
+                date=current_date,
+                benchmark_pricetime=benchmark_pricetime,
+                time_range_start_pricetime=initial_pricetime,
+                time_range=self.time_range)
 
         else:
             return None
@@ -269,7 +279,8 @@ class MaxPriceMovements(Metric):
             benchmark_pricetime = self._get_prior_fix_recursive(
                 prior_day, self.__price_data)
             initial_pricetime = self._get_benchmark_price(
-                date=time_index.date(), benchmark_time=self.time_range.start_time)
+                date=time_index.date(),
+                benchmark_time=self.time_range.start_time)
 
         return benchmark_pricetime, initial_pricetime
 
