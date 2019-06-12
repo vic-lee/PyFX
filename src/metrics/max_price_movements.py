@@ -36,23 +36,17 @@ class MaxPriceMovements(Metric):
 
         self.__prices = price_data
         self.__benchmark_times = config.benchmark_times
-        self.__max_price_movements = self._make_price_movements_obj()
-        self.__benchmark_prices_matrix = self._make_benchmark_prices_matrix()
+        
+        self.__max_price_movements = {
+            bt: None for bt in self.__benchmark_times
+        }
+        self.__benchmark_prices_matrix = {
+            bt: self.__prices.minute_price_df.between_time(
+                start_time=bt, end_time=bt)
+            for bt in self.__benchmark_times
+        }
 
         print("Analyzing maximum price movements...")
-
-    def _make_price_movements_obj(self):
-        ret = {}
-        for btime in self.__benchmark_times:
-            ret[btime] = {}
-        return ret
-
-    def _make_benchmark_prices_matrix(self):
-        ret = {}
-        for btime in self.__benchmark_times:
-            ret[btime] = self.__prices.minute_price_df.between_time(
-                start_time=btime, end_time=btime)
-        return ret
 
     def find_max_price_movements(self):
         """
