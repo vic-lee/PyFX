@@ -204,6 +204,26 @@ class MaxPriceMovements(Metric):
         self.__max_price_movements["PDFX"] = self._find_max_price_movement(
             benchmark_time=None, pdfx_benchmark=True)
 
+    def to_benchmarked_results(self):
+        benchmarked_dfs = {}
+
+        for benchmarked_time, data in self.__max_price_movements.items():
+            df_list = []
+
+            for _, daily_analysis in data.items():
+                exported_df = daily_analysis.to_df()
+                df_list.append(exported_df)
+
+            df_at_benchmark = pd.concat(df_list, sort=False)
+
+            if (str(benchmarked_time) == 'PDFX'):
+                df_at_benchmark = self._merge_pdfx_with_cdfx(df_at_benchmark)
+
+            benchmarked_dfs[str(benchmarked_time)] = df_at_benchmark
+
+        return benchmarked_dfs
+
+
     def _find_max_price_movement(self, benchmark_time: time,
                                  pdfx_benchmark=False):
 
@@ -310,25 +330,6 @@ class MaxPriceMovements(Metric):
         except:
             logger.error("Could not locate price for " + str(index))
             return None
-
-    def to_benchmarked_results(self):
-        benchmarked_dfs = {}
-
-        for benchmarked_time, data in self.__max_price_movements.items():
-            df_list = []
-
-            for _, daily_analysis in data.items():
-                exported_df = daily_analysis.to_df()
-                df_list.append(exported_df)
-
-            df_at_benchmark = pd.concat(df_list, sort=False)
-
-            if (str(benchmarked_time) == 'PDFX'):
-                df_at_benchmark = self._merge_pdfx_with_cdfx(df_at_benchmark)
-
-            benchmarked_dfs[str(benchmarked_time)] = df_at_benchmark
-
-        return benchmarked_dfs
 
     def _merge_pdfx_with_cdfx(self, df_for_benchmark):
 
