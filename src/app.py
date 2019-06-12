@@ -13,7 +13,7 @@ from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
 from dataio.dfbundler import DataFrameBundler
 
-from metrics.max_price_movements import MaxPriceMovements
+from metrics.price_movements import MaxPriceMovements
 from metrics.period_price_avg import PeriodPriceAvg
 from metrics.minutely_data import MinutelyData
 
