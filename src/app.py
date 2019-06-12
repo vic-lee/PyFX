@@ -12,6 +12,8 @@ from analysis.metrics import PeriodPriceAvg, MinuteData
 from analysis.pricemvmts import MaxPriceMovements
 
 from common.config import Config
+from common.decorators import timer
+
 from dataio.datareader import DataReader
 from dataio.datawriter import DataWriter
 from dataio.dfbundler import DataFrameBundler
@@ -37,14 +39,13 @@ stream_handler.setFormatter(formatter)
 
 logger.addHandler(stream_handler)
 
-
+@timer
 def main():
     """
     This function houses the application logic. At the highest level, the
     program performs the same analysis for each currency pair, stored in
     the array.
     """
-    start_time = datetime.now()
 
     config = Config('config.json')
     print(config.dst_hour_ahead_periods)
@@ -53,9 +54,6 @@ def main():
 
     for currency_pair in config.currency_pairs:
         analyze_currency_pair(currency_pair, fname_suffix, config)
-
-    end_time = datetime.now()
-    logger.info("\nProgram runtime: {}".format((end_time - start_time)))
 
 
 def analyze_currency_pair(currency_pair_name: str,
