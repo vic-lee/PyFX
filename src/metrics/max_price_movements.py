@@ -122,8 +122,9 @@ class MaxPriceMovements(Metric):
 
         return day_objs, current_date
 
-    def _init_new_day_obj(self, pdfx_benchmark: bool, time_index,
-                          current_date: datetime.date, benchmark_time) -> DayPipMovmentToPrice:
+    def _init_new_day_obj(self, pdfx_benchmark: bool,
+                          time_index: datetime, current_date: datetime.date,
+                          benchmark_time: time) -> DayPipMovmentToPrice:
 
         benchmark_pricetime, initial_pricetime = self._init_pricetimes(
             pdfx_benchmark, time_index, current_date, benchmark_time)
@@ -138,8 +139,8 @@ class MaxPriceMovements(Metric):
         else:
             return None
 
-    def _init_pricetimes(self, pdfx_benchmark: bool,
-                         time_index, current_date, benchmark_time):
+    def _init_pricetimes(self, pdfx_benchmark: bool, time_index: datetime,
+                         current_date: datetime.date, benchmark_time: time):
 
         if pdfx_benchmark == False:
             benchmark_pricetime = self._get_benchmark_price(
