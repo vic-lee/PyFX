@@ -7,5 +7,5 @@
 __pycache__/
 dataout/
 cache/
-src/app.log
+app.log
 src/app.legacy.py
