@@ -1,6 +1,8 @@
 # FX Strategy Research
 
-Please see [config.doc.md](doc/config.doc.md) for documentation on the [configuration file](src/config.json).
+Please see 
+- [config.doc.md](doc/config.doc.md) for documentation on the [configuration file](config.json).
+- [TODO](TODO.md) for known issues and future roadmap.
 
 ## About this project
 
