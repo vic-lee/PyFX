@@ -3,13 +3,14 @@ import json
 import logging
 import os.path
 
+from common.decorators import singleton
 from datastructure.daytimerange import DayTimeRange
 from datastructure.daterange import DateRange
 
 
 logger = logging.getLogger(__name__)
 
-
+@singleton
 class Config:
 
     class Decorators:
