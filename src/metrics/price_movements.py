@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class DayPipMovmentToPrice:
+class _DayPipMovmentToPrice:
     """For a given day, this object encapsulates the maximum 
     upward and downward pip movements to a given price. 
 
@@ -231,7 +231,7 @@ class MaxPriceMovements(Metric):
 
         return day_objs
 
-    def _incr_one_day(self, prior_day_obj: DayPipMovmentToPrice,
+    def _incr_one_day(self, prior_day_obj: _DayPipMovmentToPrice,
                       day_objs, time_index: datetime):
 
         day_objs = self._save_prior_day_obj(prior_day_obj, day_objs)
@@ -241,14 +241,14 @@ class MaxPriceMovements(Metric):
 
     def _init_new_day_obj(self, pdfx_benchmark: bool,
                           time_index: datetime, current_date: datetime.date,
-                          benchmark_time: time) -> DayPipMovmentToPrice:
+                          benchmark_time: time) -> _DayPipMovmentToPrice:
 
         benchmark_pricetime, initial_pricetime = self._init_pricetimes(
             pdfx_benchmark, time_index, current_date, benchmark_time)
 
         if benchmark_pricetime is not None and initial_pricetime is not None:
 
-            return DayPipMovmentToPrice(date=current_date,
+            return _DayPipMovmentToPrice(date=current_date,
                                         benchmark_pricetime=benchmark_pricetime,
                                         time_range_start_pricetime=initial_pricetime,
                                         time_range=self.time_range)
@@ -289,7 +289,7 @@ class MaxPriceMovements(Metric):
             return None
 
     @staticmethod
-    def _save_prior_day_obj(prior_day_obj: DayPipMovmentToPrice, day_objs):
+    def _save_prior_day_obj(prior_day_obj: _DayPipMovmentToPrice, day_objs):
         if prior_day_obj != None:
             day_objs[prior_day_obj.date] = prior_day_obj
         return day_objs
