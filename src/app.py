@@ -42,7 +42,7 @@ logger.addHandler(stream_handler)
 DEFAULT_CONFIG_FPATH = 'config.json'
 
 
-@timer
+@timer(in_seconds=True)
 def main():
     """
     This function houses the application logic. At the highest level, the
