@@ -4,6 +4,7 @@
 .env
 .vscode/
 *.numbers
+*.pyc
 __pycache__/
 dataout/
 cache/
