@@ -6,12 +6,11 @@ import xlrd
 def timer(func):
     """A decorator that times and prints execution time."""
     def wrapper(*args, **kwargs):
-        print("Starting execution...")
         start_time = datetime.now()
         resp = func(*args, **kwargs)
         end_time = datetime.now()
         duration = end_time - start_time
-        print("Program runtime: {}.{} secs".format(
+        print("{:<20} runtime: {}.{} secs".format(func.__name__,
             duration.seconds, duration.microseconds))
         return resp
     return wrapper
