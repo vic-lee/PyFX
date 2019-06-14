@@ -3,23 +3,18 @@ import functools
 import xlrd
 
 
-def timer(in_seconds=True):
+def timer(func):
     """A decorator that times and prints execution time."""
-    def _timer(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            print("Starting execution...")
-            start_time = datetime.now()
-            func(*args, **kwargs)
-            end_time = datetime.now()
-            duration = end_time - start_time
-            if in_seconds:
-                print("Program runtime: {}.{} secs".format(
-                    duration.seconds, duration.microseconds))
-            else:
-                print("Program runtime: {}".format(duration))
-        return wrapper
-    return _timer
+    def wrapper(*args, **kwargs):
+        print("Starting execution...")
+        start_time = datetime.now()
+        resp = func(*args, **kwargs)
+        end_time = datetime.now()
+        duration = end_time - start_time
+        print("Program runtime: {}.{} secs".format(
+            duration.seconds, duration.microseconds))
+        return resp
+    return wrapper
 
 
 def singleton(cls, *args, **kwargs):
