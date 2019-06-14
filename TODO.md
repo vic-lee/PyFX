@@ -3,7 +3,7 @@
 ## Short-term changes
 
 - [ ] Streamline read methods
-- [ ] Implement an `Analyzer` class that encapsulates analysis logic currently in `main()`
+- [x] Implement an `Analyzer` class that encapsulates analysis logic currently in `main()`
   - *Purpose*: to simplify `main`
 - [x] Make a test that compares 2 excel files
 - [x] Implement [singleton decorator](https://stackoverflow.com/questions/42237752/single-instance-of-class-in-python) for data classes
