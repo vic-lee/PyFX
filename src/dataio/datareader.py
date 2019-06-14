@@ -51,7 +51,7 @@ class DataReader:
 
         df['datetime'] = df['datetime'].apply(
             lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
-
+        df.datetime = pd.to_datetime(df.datetime)
         df = df.set_index('datetime')
         return df
 
