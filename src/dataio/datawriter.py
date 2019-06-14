@@ -27,9 +27,10 @@ class DataWriter:
                     is_consistent = comp_xlsx(original_fname=benchmark_file_fname,
                                               new_fname=self._default_fname_xlsx)
                     if not is_consistent:
+                        print("Consistency check: False")
                         raise XlsxOutputInconsistentError
                     else:
-                        print("Consistency check: new output is consistent.")
+                        print("Consistency check: True")
                 return wrapper
             return _test
 
