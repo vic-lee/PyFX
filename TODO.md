@@ -2,6 +2,7 @@
 
 ## Short-term changes
 
+- [ ] Streamline read methods
 - [ ] Implement an `Analyzer` class that encapsulates analysis logic currently in `main()`
   - *Purpose*: to simplify `main`
 - [x] Make a test that compares 2 excel files
