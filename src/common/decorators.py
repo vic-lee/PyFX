@@ -7,10 +7,10 @@ def timer(in_seconds=True):
     """A decorator that times and prints execution time."""
     def _timer(func):
         @functools.wraps(func)
-        def wrapper():
+        def wrapper(*args, **kwargs):
             print("Starting execution...")
             start_time = datetime.now()
-            func()
+            func(*args, **kwargs)
             end_time = datetime.now()
             duration = end_time - start_time
             if in_seconds:
