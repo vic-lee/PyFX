@@ -5,6 +5,8 @@ import pandas as pd
 
 from common.utils import comp_xlsx
 
+__all__ = ['df_to_xlsx']
+
 
 def check_xlsx_consistency(benchmark_fname: str):
     """
@@ -26,7 +28,7 @@ def check_xlsx_consistency(benchmark_fname: str):
 
 
 @check_xlsx_consistency("data/dataout/dataout__20190606_230751/dataout_GBPUSD.xlsx")
-def df_to_xslx(df: pd.DataFrame, fname: str, dir: str = '',
+def df_to_xlsx(df: pd.DataFrame, fname: str, dir: str = '',
                folder_name: str = '', folder_unique_id: str = '',
                fname_unique_id: str = '', sheet_name: str = 'sheet1',
                col_width: int = 15) -> str:
