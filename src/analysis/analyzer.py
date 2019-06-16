@@ -10,11 +10,10 @@ from analysis.metrics import MinuteData, PeriodPriceAvg
 from common.config import Config
 
 from dataio.dfbundler import DataFrameBundler
-from dataio.datareader import DataReader
-from dataio.datawriter import DataWriter
 
 from datastructure.datacontainer import DataContainer
 
+import pyfx.read as read
 import pyfx.write as write
 
 
@@ -35,12 +34,19 @@ class Analyzer():
         dataframes = {}
 
         # 1. Read data
-        price_data = self._read_price_data(cp_name)
+        fpaths = {
+            read.FIX: abspath("data/datasrc/fix1819.csv"),
+            read.MINUTE: abspath("data/datasrc/GBPUSD_Candlestick.csv"),
+            read.DAILY: abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
+        }
+
+        price_data = read.read_and_process_data(fpaths, cp_name)
         data_container = DataContainer(price_dfs=price_data, config=self.__config,
                                        currency_pair_name=cp_name)
 
         # 2. Include OHLC data
-        dataframes['OHLC'] = price_data[DataReader.DAILY]
+        dataframes['OHLC'] = price_data[read.DAILY]
+        print(dataframes['OHLC'])
 
         # 3. Include Max Pip Movements
         price_movements = MaxPriceMovements(price_data=data_container,
@@ -76,19 +82,6 @@ class Analyzer():
                          fname=('dataout_{}'.format(cp_name)),
                          folder_unique_id=self.__FOLDER_TIMESTAMP,
                          sheet_name='max_pip_mvmts', col_width=20)
-
-    def _read_price_data(self, currency_pair_name) -> dict:
-        in_fpaths = {
-            DataReader.FIX: abspath("data/datasrc/fix1819.csv"),
-            # DataReader.MINUTELY: abspath("data/datasrc/{}_Minute.csv".format(currency_pair_name)),
-            DataReader.MINUTELY: abspath("data/datasrc/GBPUSD_Candlestick.csv"),
-            DataReader.DAILY: abspath(
-                "data/datasrc/{}_Daily.xlsx".format(currency_pair_name))
-        }
-
-        fx_reader = DataReader(in_fpaths, currency_pair_name)
-        package = fx_reader.read_data()
-        return package
 
     def _generate_folder_timestamp(self) -> str:
         now = datetime.now()

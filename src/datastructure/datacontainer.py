@@ -5,8 +5,9 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import singleton
-from dataio.datareader import DataReader
 from datastructure.daterange import DateRange
+
+import pyfx.read as read
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -19,9 +20,9 @@ class DataContainer:
 
     def __init__(self, price_dfs, currency_pair_name: str, config: Config):
 
-        self.__fix_price_df = price_dfs[DataReader.FIX]
-        self.__daily_price_df = price_dfs[DataReader.DAILY]
-        self.__full_minute_price_df = price_dfs[DataReader.MINUTELY]
+        self.__fix_price_df = price_dfs[read.FIX]
+        self.__daily_price_df = price_dfs[read.DAILY]
+        self.__full_minute_price_df = price_dfs[read.MINUTE]
         self._adjust_for_time_shift(config=config)
         self.__minute_price_df = self._adjust_for_dst(config=config)
 

@@ -5,7 +5,6 @@ import pandas as pd
 from datetime import datetime, timedelta, time
 
 from common.config import Config
-from dataio.datareader import DataReader
 
 from datastructure.datacontainer import DataContainer
 from datastructure.daterange import DateRange
