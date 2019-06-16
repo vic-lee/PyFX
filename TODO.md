@@ -2,7 +2,7 @@
 
 ## Short-term changes
 
-- [ ] Streamline read methods
+- [x] Streamline read methods
 - [x] Implement an `Analyzer` class that encapsulates analysis logic currently in `main()`
   - *Purpose*: to simplify `main`
   - *Implemented*: See commit [a1e26](https://github.com/vic-lee/PyFX/commit/a1e2638f64358f23f217f13d0eabbfd96ff63630)
