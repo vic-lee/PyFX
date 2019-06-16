@@ -10,7 +10,7 @@ def timer(func):
         resp = func(*args, **kwargs)
         end_time = datetime.now()
         duration = end_time - start_time
-        print("{:<20} runtime: {}.{} secs".format(
+        print("{:<40} runtime: {}.{} secs".format(
             func.__name__, duration.seconds, duration.microseconds))
         return resp
     return wrapper
