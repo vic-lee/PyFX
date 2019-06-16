@@ -45,7 +45,6 @@ class Analyzer():
 
         # 2. Include OHLC data
         dataframes['OHLC'] = price_data[read.DAILY]
-        print(dataframes['OHLC'])
 
         # 3. Include Max Pip Movements
         price_movements = MaxPriceMovements(price_data=data_container,
