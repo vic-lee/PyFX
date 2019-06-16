@@ -15,7 +15,7 @@ from dataio.datawriter import DataWriter
 
 from datastructure.datacontainer import DataContainer
 
-import write
+import pyfx.write as write
 
 
 logger = logging.getLogger(__name__)

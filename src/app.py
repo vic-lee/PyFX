@@ -11,7 +11,7 @@ from analysis.analyzer import Analyzer
 from common.config import Config
 from common.decorators import timer
 
-import read
+import pyfx.read as read
 
 
 logger = logging.getLogger(__name__)
