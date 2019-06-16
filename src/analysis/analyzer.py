@@ -23,30 +23,6 @@ logger = logging.getLogger(__name__)
 
 class Analyzer():
 
-    class _Decorators():
-
-        @staticmethod
-        def output_to_excel(cp_name: str):
-            def _outputter(df_generating_func):
-                @functools.wraps(df_generating_func)
-                def wrapper(*args, **kwargs):
-                    df = df_generating_func(*args, **kwargs)
-                    try:
-                        assert isinstance(df, pd.DataFrame)
-                        output_writer = DataWriter(df=df,
-                                                   currency_pair_name=cp_name,
-                                                   timestamp=None)
-                        output_writer.df_to_xlsx()
-                    except:
-                        logger.error("Decorator `output_to_excel` used in "
-                                     + "non df-generating functions")
-                return wrapper
-            return _outputter
-
-        @staticmethod
-        def consolidate_dataframes():
-            pass
-
     def __init__(self, config: Config):
         self.__config = config
         self.__FOLDER_TIMESTAMP = self._generate_folder_timestamp()
@@ -54,8 +30,6 @@ class Analyzer():
     def execute(self):
         pass
 
-    # @_Decorators.output_to_excel
-    # @_Decorators.consolidate_dataframes
     def analyze_currency_pair(self, cp_name: str):
         logger.info("Initialize analysis for {}".format(cp_name))
         dataframes = {}
