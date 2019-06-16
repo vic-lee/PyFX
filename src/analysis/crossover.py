@@ -44,3 +44,8 @@ def count_crossovers(data: DataContainer, thresholds=thresholds):
         msk_l = ct_low(t)
         minute_df.at[trading_above & msk_h, 'a_{}'.format(t)] = True
         minute_df.at[trading_below & msk_l, 'a_n{}'.format(t)] = True
+
+    raw_ans = minute_df.loc[:, minute_df.columns.str.startswith('a_')]
+    days = raw_ans.groupby(minute_df.index.date)
+    ans = days.agg(['sum'])
+    return ans
