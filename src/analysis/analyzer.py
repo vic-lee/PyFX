@@ -97,7 +97,7 @@ class Analyzer():
         dfbundler = DataFrameBundler(dataframes)
         master_df = dfbundler.output()
 
-        write.df_to_xslx(df=master_df,
+        write.df_to_xlsx(df=master_df,
                          dir='data/dataout/', folder_name='dataout_',
                          fname=('dataout_{}'.format(cp_name)),
                          folder_unique_id=self.__FOLDER_TIMESTAMP,
