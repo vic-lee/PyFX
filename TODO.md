@@ -2,6 +2,7 @@
 
 ## Short-term changes
 
+- [ ] Add column validator in `DataContainer` initialization
 - [x] Streamline read methods
 - [x] Implement an `Analyzer` class that encapsulates analysis logic currently in `main()`
   - *Purpose*: to simplify `main`
