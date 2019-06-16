@@ -15,6 +15,8 @@ from dataio.datawriter import DataWriter
 
 from datastructure.datacontainer import DataContainer
 
+import write
+
 
 logger = logging.getLogger(__name__)
 
@@ -95,8 +97,11 @@ class Analyzer():
         dfbundler = DataFrameBundler(dataframes)
         master_df = dfbundler.output()
 
-        DataWriter(df=master_df, currency_pair_name=cp_name,
-                   timestamp=self.__FOLDER_TIMESTAMP).df_to_xlsx()
+        write.df_to_xslx(df=master_df,
+                         dir='data/dataout/', folder_name='dataout_',
+                         fname=('dataout_{}'.format(cp_name)),
+                         folder_unique_id=self.__FOLDER_TIMESTAMP,
+                         sheet_name='max_pip_mvmts', col_width=20)
 
     def _read_price_data(self, currency_pair_name) -> dict:
         in_fpaths = {
