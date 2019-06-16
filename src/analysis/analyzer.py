@@ -72,8 +72,7 @@ class Analyzer():
                                           str(avg_data_section.end_time))
                 dataframes[col_name] = price_avg_data
 
-        dfbundler = DataFrameBundler(dataframes)
-        master_df = dfbundler.output()
+        master_df = write.merge_dfs(dataframes)
 
         write.df_to_xlsx(df=master_df,
                          dir='data/dataout/', folder_name='dataout_',

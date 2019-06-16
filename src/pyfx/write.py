@@ -2,10 +2,11 @@ import functools
 import os
 from pathlib import Path
 import pandas as pd
+from typing import List
 
 from common.utils import comp_xlsx
 
-__all__ = ['df_to_xlsx']
+__all__ = ['df_to_xlsx', 'merge_dfs']
 
 
 def check_xlsx_consistency(benchmark_fname: str):
@@ -72,3 +73,15 @@ def _build_path(dir: str, folder_name: str, folder_uid: str) -> str:
     if not os.path.exists(path):
         os.makedirs(path)
     return path
+
+
+def merge_dfs(dfs: dict) -> pd.DataFrame:
+    target = pd.DataFrame()
+    target.columns = pd.MultiIndex.from_product([[""], target.columns])
+
+    for header_name, df in dfs.items():
+        df.columns = pd.MultiIndex.from_product([[header_name], df.columns])
+        target = target.join(df, how="right")
+
+    target.index = target.index.strftime('%Y-%m-%d')
+    return target
