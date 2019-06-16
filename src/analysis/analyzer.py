@@ -9,8 +9,6 @@ from analysis.metrics import MinuteData, PeriodPriceAvg
 
 from common.config import Config
 
-from dataio.dfbundler import DataFrameBundler
-
 from datastructure.datacontainer import DataContainer
 
 from pyfx import read, write
