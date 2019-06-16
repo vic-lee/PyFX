@@ -4,6 +4,9 @@ from typing import Callable, List
 
 from common.decorators import timer
 
+__all__ = ['MINUTE', 'FIX', 'DAILY', 'read_and_process_data']
+
+
 MINUTE = 0,
 FIX = 1,
 DAILY = 2
