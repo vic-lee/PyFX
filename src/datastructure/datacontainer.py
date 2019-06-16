@@ -7,7 +7,7 @@ from common.config import Config
 from common.decorators import singleton
 from datastructure.daterange import DateRange
 
-import pyfx.read as read
+from pyfx import read
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

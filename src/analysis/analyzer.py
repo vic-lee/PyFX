@@ -13,8 +13,7 @@ from dataio.dfbundler import DataFrameBundler
 
 from datastructure.datacontainer import DataContainer
 
-import pyfx.read as read
-import pyfx.write as write
+from pyfx import read, write
 
 
 logger = logging.getLogger(__name__)
