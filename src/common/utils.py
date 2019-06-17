@@ -67,7 +67,8 @@ def xlsx_diff(original_fname: str, new_fname: str, sheet_idx=0) -> bool:
     print("Err count: {}".format(err_count))
     return err_count == 0
 
-    def run(func, *args, **kwargs):
-        def wrapper():
-            return func(*args, **kwargs)
-        return wrapper
+
+def run(func, *args, **kwargs):
+    def wrapper():
+        return func(*args, **kwargs)
+    return wrapper
