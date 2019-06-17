@@ -105,6 +105,21 @@ def count_crossovers(data: DataContainer, thresholds=thresholds):
 @timer
 def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
                   pdfx: bool = False, cp_name: str = None):
+    """
+    For each day, find the MIN and MAX of in the time period.
+
+    Algorithm
+    ---------
+    MaxPipUp = pip(MAX((MAX(TP) - BT), 0))
+    MaxPipDn = pip(MAX((MIN(TP) - BT), 0))
+
+    Required Columns
+    ----------------
+        BenchmarkPrice
+        MaxPipUp            MaxPipDown
+        PriceAtMaxPipUp     PriceAtMaxPipDown
+        TimeAtMaxPipUp      TimeAtMaxPipDown
+    """
 
     def validate_args():
         if benchmark_times is None and pdfx is False:
@@ -144,7 +159,7 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
     df_maxpip = pip_extrema(pip_mask(max), 'Up')()
     df_minpip = pip_extrema(pip_mask(min), 'Down')()
 
-    def fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
+    def fix_benchmark() -> pd.DataFrame:
         df = pd.DataFrame()
         f_cpname = '{}-{}'.format(cp_name[:3], cp_name[3:])
 
@@ -159,34 +174,13 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
 
         return df
 
-    def finder(bt: time):
-        """
-        For each day, find the MIN and MAX of in the time period.
+    def normal_benchmark(bt: time):
+        benchmark_data = df_min.at_time(bt)['Close'].to_frame()
+        benchmark_data.columns = ['BenchmarkPrice']
+        benchmark_data.index = benchmark_data.index.date
+        return benchmark_data
 
-        Algorithm
-        ---------
-        MaxPipUp = pip(MAX((MAX(TP) - BT), 0))
-        MaxPipDn = pip(MAX((MIN(TP) - BT), 0))
-
-        Required Columns
-        ----------------
-            BenchmarkPrice
-            MaxPipUp            MaxPipDown
-            PriceAtMaxPipUp     PriceAtMaxPipDown
-            TimeAtMaxPipUp      TimeAtMaxPipDown
-        """
-
-        df = pd.concat([df_maxpip, df_minpip], axis=1)
-
-        if pdfx:
-            benchmark_data = fix_benchmark(data, cp_name)
-        else:
-            benchmark_data = df_min.at_time(bt)['Close'].to_frame()
-            benchmark_data.columns = ['BenchmarkPrice']
-            benchmark_data.index = benchmark_data.index.date
-
-        df = benchmark_data.join(df)
-
+    def append_max_pips(df: pd.DataFrame) -> pd.DataFrame:
         mpipup = (10000 * (
             df['PriceAtMaxPipUp'] - df['BenchmarkPrice'])).round(2)
         mpipup[mpipup < 0] = 0
@@ -196,15 +190,30 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
 
         df.insert(loc=1, column='MaxPipUp', value=mpipup)
         df.insert(loc=4, column='MaxPipDown', value=mpipdn)
-
-        df.columns = pd.MultiIndex.from_product([[str(bt)], df.columns])
         return df
 
-    if not pdfx:
-        maxpips = map(finder, benchmark_times)
-        df_master = pd.concat(maxpips, axis=1)
+    def finder_strategy(bt=None):
+        def inner(bt=None):
+            bt_str = str(bt)
+            df = pd.concat([df_maxpip, df_minpip], axis=1)
+            if isinstance(bt, time):
+                benchmark_data = normal_benchmark(bt)
+            else:
+                benchmark_data = fix_benchmark()
+            df = benchmark_data.join(df)
+            df = append_max_pips(df)
+            df.columns = pd.MultiIndex.from_product([[bt_str], df.columns])
+            return df
+        return inner
+
+    finder_normal = finder_strategy()
+    finder_pdfx = finder_strategy('PDFX')
+
+    if pdfx:
+        df_master = finder_pdfx()
     else:
-        df_master = finder(None)
+        maxpips = map(finder_normal, benchmark_times)
+        df_master = pd.concat(maxpips, axis=1)
 
     print(df_master.head())
     return df_master

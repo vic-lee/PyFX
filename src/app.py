@@ -58,33 +58,36 @@ def main():
 
     outputs = []
 
-    ohlc = data.daily_price_df
-    ohlc.columns = pd.MultiIndex.from_product([['OHLC'], ohlc.columns])
-    outputs.append(ohlc)
+    # analysis.find_max_pips(data, pdfx=True, cp_name='GBPUSD')
+    analysis.find_max_pips(data, config.benchmark_times)
 
-    maxpips = analysis.find_max_pips(data, config.benchmark_times)
-    outputs.append(maxpips)
+    # ohlc = data.daily_price_df
+    # ohlc.columns = pd.MultiIndex.from_product([['OHLC'], ohlc.columns])
+    # outputs.append(ohlc)
 
-    if config.should_include_minutely_data:
+    # maxpips = analysis.find_max_pips(data, config.benchmark_times)
+    # outputs.append(maxpips)
 
-        minute_data = analysis.include_minute_data(
-            data, config.minutely_data_sections)
-        outputs.append(minute_data)
+    # if config.should_include_minutely_data:
 
-    if config.should_include_period_average_data:
+    #     minute_data = analysis.include_minute_data(
+    #         data, config.minutely_data_sections)
+    #     outputs.append(minute_data)
 
-        avg_data = analysis.include_avg(
-            data, config.period_average_data_sections)
-        outputs.append(avg_data)
+    # if config.should_include_period_average_data:
 
-    df_master = pd.concat(outputs, axis=1)
-    df_master.index = df_master.index.date
+    #     avg_data = analysis.include_avg(
+    #         data, config.period_average_data_sections)
+    #     outputs.append(avg_data)
 
-    write.df_to_xlsx(df=df_master,
-                     dir='data/dataout/', folder_name='dataout_',
-                     fname=('dataout_{}'.format("GBPUSD")),
-                     folder_unique_id=datetime.now().strftime("_%Y%m%d_%H%M%S"),
-                     sheet_name='max_pip_mvmts', col_width=20)
+    # df_master = pd.concat(outputs, axis=1)
+    # df_master.index = df_master.index.date
+
+    # write.df_to_xlsx(df=df_master,
+    #                  dir='data/dataout/', folder_name='dataout_',
+    #                  fname=('dataout_{}'.format("GBPUSD")),
+    #                  folder_unique_id=datetime.now().strftime("_%Y%m%d_%H%M%S"),
+    #                  sheet_name='max_pip_mvmts', col_width=20)
 
 
 if __name__ == '__main__':
