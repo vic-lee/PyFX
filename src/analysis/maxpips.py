@@ -69,8 +69,10 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time]):
         df['MaxPipDown'] = 10000 * (
             df['PriceAtMaxPipDown'] - df['BenchmarkPrice'])
 
+        df.columns = pd.MultiIndex.from_product([[str(bt)], df.columns])
         return df
 
     maxpips = map(finder, benchmark_times)
     df_master = pd.concat(maxpips, axis=1)
+    print(df_master.head())
     return df_master
