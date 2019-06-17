@@ -3,8 +3,8 @@ import pandas as pd
 from typing import List
 
 from common.decorators import timer
-from datastructure.datacontainer import DataContainer
-from datastructure.daytimerange import DayTimeRange
+from ds.datacontainer import DataContainer
+from ds.daytimerange import DayTimeRange
 
 
 @timer

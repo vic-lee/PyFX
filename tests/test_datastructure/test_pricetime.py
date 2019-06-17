@@ -1,6 +1,6 @@
 import unittest
 from datetime import time, datetime
-from datastructure.pricetime import PriceTime
+from ds.pricetime import PriceTime
 
 
 class TestPriceTime(unittest.TestCase):

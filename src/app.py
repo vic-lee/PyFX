@@ -11,7 +11,7 @@ import pandas as pd
 from analysis.analyzer import Analyzer
 from common.config import Config
 from common.decorators import timer
-from datastructure.datacontainer import DataContainer
+from ds.datacontainer import DataContainer
 from pyfx import read, write, analysis
 
 

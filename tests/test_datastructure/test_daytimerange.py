@@ -1,6 +1,6 @@
 import unittest
 from datetime import time, datetime
-from datastructure.daytimerange import DayTimeRange
+from ds.daytimerange import DayTimeRange
 
 
 class TestDayTimeRange(unittest.TestCase):

@@ -4,8 +4,8 @@ import logging
 import os.path
 
 from common.decorators import singleton
-from datastructure.daytimerange import DayTimeRange
-from datastructure.daterange import DateRange
+from ds.daytimerange import DayTimeRange
+from ds.daterange import DateRange
 
 
 logger = logging.getLogger(__name__)

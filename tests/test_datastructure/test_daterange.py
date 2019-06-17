@@ -1,6 +1,6 @@
 import unittest
 from datetime import date
-from datastructure.daterange import DateRange
+from ds.daterange import DateRange
 
 class TestDateRange(unittest.TestCase):
 

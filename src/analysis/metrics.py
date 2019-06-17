@@ -6,10 +6,10 @@ from datetime import datetime, timedelta, time
 
 from common.config import Config
 
-from datastructure.datacontainer import DataContainer
-from datastructure.daterange import DateRange
-from datastructure.daytimerange import DayTimeRange
-from datastructure.pricetime import PriceTime
+from ds.datacontainer import DataContainer
+from ds.daterange import DateRange
+from ds.daytimerange import DayTimeRange
+from ds.pricetime import PriceTime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

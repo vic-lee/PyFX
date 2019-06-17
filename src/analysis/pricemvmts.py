@@ -9,9 +9,9 @@ from typing import List
 
 from analysis.metrics import Metric
 
-from datastructure.datacontainer import DataContainer
-from datastructure.daytimerange import DayTimeRange
-from datastructure.pricetime import PriceTime
+from ds.datacontainer import DataContainer
+from ds.daytimerange import DayTimeRange
+from ds.pricetime import PriceTime
 
 from common.config import Config
 

@@ -9,7 +9,7 @@ from analysis.metrics import MinuteData, PeriodPriceAvg
 
 from common.config import Config
 
-from datastructure.datacontainer import DataContainer
+from ds.datacontainer import DataContainer
 
 from pyfx import read, write
 
