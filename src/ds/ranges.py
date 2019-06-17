@@ -1,4 +1,31 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime, date, time, timedelta
+
+
+class DateRange:
+    """
+    This class denotes the range within which the algorithm performs
+    its analysis. It has two attributes: starting date, ending date. 
+
+    Args: both start_date and end_date are Date objects
+    """
+
+    def __init__(self, start_date: date, end_date: date):
+        self.__start_date = start_date
+        self.__end_date = end_date
+
+    @property
+    def start_date(self):
+        return self.__start_date
+
+    @property
+    def end_date(self):
+        return self.__end_date
+
+    def is_datetime_in_range(self, date):
+        return date >= self.__start_date and date <= self.__end_date
+
+    def __repr__(self):
+        return "start date: {} \tend date: {}\n".format(self.__start_date, self.__end_date)
 
 
 class DayTimeRange:
@@ -23,8 +50,10 @@ class DayTimeRange:
 
     def __next__(self):
         if self.__idx_time <= self.__end_time:
-            conv = lambda t : datetime(1970, 1, 1, t.hour, t.minute, t.second)
-            self.__idx_time = (conv(self.__idx_time) + timedelta(minutes=1)).time()
+            def conv(t): return datetime(
+                1970, 1, 1, t.hour, t.minute, t.second)
+            self.__idx_time = (conv(self.__idx_time) +
+                               timedelta(minutes=1)).time()
             return self.__idx_time
         else:
             raise StopIteration
@@ -32,7 +61,7 @@ class DayTimeRange:
     @property
     def start_time(self):
         return self.__start_time
-    
+
     @property
     def end_time(self):
         return self.__end_time
