@@ -8,11 +8,18 @@ from ds.daytimerange import DayTimeRange
 
 
 __all__ = [
+    'include_ohlc',
     'include_period_avgs',
     'include_crossovers',
     'include_minute_data',
     'include_period_avgs'
 ]
+
+
+def include_ohlc(data: DataContainer):
+    ohlc = data.daily_price_df.copy()
+    ohlc.columns = pd.MultiIndex([['OHLC'], ohlc.columns])
+    return ohlc
 
 
 @timer
