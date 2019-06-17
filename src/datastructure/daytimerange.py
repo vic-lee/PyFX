@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 
 class DayTimeRange:
@@ -13,9 +13,21 @@ class DayTimeRange:
     def __init__(self, start_time: time, end_time: time):
         self.__start_time = start_time
         self.__end_time = end_time
+        self.__idx_time = self.__start_time
 
         if start_time > end_time:
             raise ValueError("End time cannot be earlier than start time.")
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.__idx_time <= self.__end_time:
+            conv = lambda t : datetime(1970, 1, 1, t.hour, t.minute, t.second)
+            self.__idx_time = (conv(self.__idx_time) + timedelta(minutes=1)).time()
+            return self.__idx_time
+        else:
+            raise StopIteration
 
     @property
     def start_time(self):
