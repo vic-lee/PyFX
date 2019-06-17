@@ -120,7 +120,7 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
         .copy()                     \
         .drop(columns=['date', 'Open', 'High', 'Low'])
 
-    def sel_pip_extrema(mask, state: str):
+    def pip_extrema(mask, state: str):
         assert state == 'Up' or state == 'Down' or state == 'Dn'
 
         def inner():
@@ -141,10 +141,10 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
             df_min.Close.groupby(df_min.index.date).transform(func)
         )
 
-    df_maxpip = sel_pip_extrema(pip_mask(max), 'Up')()
-    df_minpip = sel_pip_extrema(pip_mask(min), 'Down')()
+    df_maxpip = pip_extrema(pip_mask(max), 'Up')()
+    df_minpip = pip_extrema(pip_mask(min), 'Down')()
 
-    def get_fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
+    def fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
         df = pd.DataFrame()
         f_cpname = '{}-{}'.format(cp_name[:3], cp_name[3:])
 
@@ -179,7 +179,7 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
         df = pd.concat([df_maxpip, df_minpip], axis=1)
 
         if pdfx:
-            benchmark_data = get_fix_benchmark(data, cp_name)
+            benchmark_data = fix_benchmark(data, cp_name)
         else:
             benchmark_data = df_min.at_time(bt)['Close'].to_frame()
             benchmark_data.columns = ['BenchmarkPrice']
