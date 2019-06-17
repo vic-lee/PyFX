@@ -10,6 +10,7 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import timer
+from common.utils import run
 from ds.datacontainer import DataContainer
 from pyfx import read, write, analysis
 
@@ -34,52 +35,50 @@ logger.addHandler(stream_handler)
 DEFAULT_CONFIG_FPATH = 'config.json'
 
 
-@timer
-def main():
 
-    config = Config(DEFAULT_CONFIG_FPATH)
-
+def exec(cp_name: str, config: Config):
     fpaths = {
         read.MINUTE:    abspath("data/datasrc/GBPUSD_Candlestick.csv"),
         read.FIX:       abspath("data/datasrc/fix1819.csv"),
-        read.DAILY:     abspath("data/datasrc/GBPUSD_Daily.xlsx")
+        read.DAILY:     abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
     }
 
-    dfs = read.read_and_process_data(fpaths, cp_name="GBPUSD")
-    data = DataContainer(dfs, "GBPUSD", config)
+    dfs = read.read_and_process_data(fpaths, cp_name=cp_name)
+    data = DataContainer(dfs, cp_name, config)
 
-    outputs = []
+    output_funcs = [
+        run(analysis.include_ohlc, data=data),
 
-    ohlc = data.daily_price_df
-    ohlc.columns = pd.MultiIndex.from_product([['OHLC'], ohlc.columns])
-    outputs.append(ohlc)
+        run(analysis.include_max_pip_movements,
+            data, config.benchmark_times),
 
-    maxpips = analysis.include_max_pip_movements(data, config.benchmark_times)
-    outputs.append(maxpips)
+        run(analysis.include_max_pip_movements,
+            data, pdfx=True, cp_name=cp_name),
 
-    maxpips_pdfx = analysis.include_max_pip_movements(data, pdfx=True, cp_name='GBPUSD')
-    outputs.append(maxpips_pdfx)
+        run(analysis.include_minute_data, data,
+            config.minutely_data_sections),
 
-    if config.should_include_minutely_data:
+        run(analysis.include_period_avgs, data,
+            config.period_average_data_sections)
+    ]
 
-        minute_data = analysis.include_minute_data(
-            data, config.minutely_data_sections)
-        outputs.append(minute_data)
-
-    if config.should_include_period_average_data:
-
-        avg_data = analysis.include_period_avgs(
-            data, config.period_average_data_sections)
-        outputs.append(avg_data)
+    outputs = map(lambda f: f(), output_funcs)
 
     df_master = pd.concat(outputs, axis=1)
     df_master.index = df_master.index.date
 
     write.df_to_xlsx(df=df_master,
                      dir='data/dataout/', folder_name='dataout_',
-                     fname=('dataout_{}'.format("GBPUSD")),
+                     fname=('dataout_{}'.format(cp_name)),
                      folder_unique_id=datetime.now().strftime("_%Y%m%d_%H%M%S"),
                      sheet_name='max_pip_mvmts', col_width=20)
+
+
+@timer
+def main():
+    config = Config(DEFAULT_CONFIG_FPATH)
+    for cp in config.currency_pairs:
+        exec(cp, config)
 
 
 if __name__ == '__main__':
