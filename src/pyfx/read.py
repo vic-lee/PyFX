@@ -1,4 +1,5 @@
 from datetime import datetime
+import functools
 import os
 import pandas as pd
 from typing import Callable, List
@@ -24,32 +25,50 @@ def read_and_process_data(fpaths: dict, cp_name: str) -> dict:
     return None if resp == {} else resp
 
 
+def cache(cache_fname: str):
+    """Decorator for df-reading functions.
+    Speeds up data-reading process by attempting to access a cached version
+    before opening csv / xlsx.
+
+    Parameter
+    ---------
+        cache_fname:
+            Deserializes this file into a dataframe if the file exists.
+            Otherwise, creates a file w/ this fname and cache the dataframe
+            to this location.
+    """
+    def _cache(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            if os.path.isfile(cache_fname):
+                return pd.read_pickle(cache_fname)
+            else:
+                df = func(*args, **kwargs)
+                df.to_pickle(cache_fname)
+                return df
+        return wrapper
+    return _cache
+
+
 @timer
 def _read_and_process_minute_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
+    @cache('cache/min')
     def _process_minute_data(min_df: pd.DataFrame) -> pd.DataFrame:
 
-        CACHE_FNAME = 'cache/min'
+        min_df.drop(columns=['Volume'], inplace=True)
+        min_df.rename({"Local time": "datetime"},
+                      inplace=True, axis='columns')
+        min_df['date'] = min_df['datetime'].str.slice(0, 10)
+        min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
+        min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
+        min_df['datetime'] = pd.to_datetime(
+            min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
+        min_df.set_index('datetime', inplace=True)
 
-        if os.path.isfile(CACHE_FNAME):
-            return pd.read_pickle(CACHE_FNAME)
-
-        else:
-            min_df.drop(columns=['Volume'], inplace=True)
-            min_df.rename({"Local time": "datetime"},
-                          inplace=True, axis='columns')
-            min_df['date'] = min_df['datetime'].str.slice(0, 10)
-            min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
-            min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
-            min_df['datetime'] = pd.to_datetime(
-                min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
-            min_df.set_index('datetime', inplace=True)
-
-            min_df.to_pickle(CACHE_FNAME)
-
-            return min_df
+        return min_df
 
     if not os.path.isfile(fpath):
         raise FileNotFoundError
@@ -62,18 +81,12 @@ def _read_and_process_fix_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
+    @cache('cache/fix')
     def _process_fix_data(fix_df: pd.DataFrame) -> pd.DataFrame:
-
-        CACHE_FNAME = 'cache/fix'
-
-        if os.path.isfile(CACHE_FNAME):
-            return pd.read_pickle(CACHE_FNAME)
-        else:
-            fix_df['datetime'] = pd.to_datetime(
-                fix_df['datetime'], format="%Y-%m-%d")
-            fix_df.set_index('datetime', inplace=True)
-            fix_df.to_pickle(CACHE_FNAME)
-            return fix_df
+        fix_df['datetime'] = pd.to_datetime(
+            fix_df['datetime'], format="%Y-%m-%d")
+        fix_df.set_index('datetime', inplace=True)
+        return fix_df
 
     if not os.path.isfile(fpath):
         raise FileNotFoundError
@@ -87,34 +100,26 @@ def _read_and_process_daily_data(
     processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
+    @cache('cache/day')
     def process_daily_data(day_df: pd.DataFrame,
                            cp_name: str) -> pd.DataFrame:
 
-        CACHE_FNAME = 'cache/day'
+        f_cpname = reformat_cpname(cp_name)
+        assert validate_day_df(day_df, f_cpname)
+        day_df.rename(columns={'Date': 'datetime'}, inplace=True)
 
-        if os.path.isfile(CACHE_FNAME):
-            return pd.read_pickle(CACHE_FNAME)
+        day_df = drop_cols(day_df, f_cpname)
+        day_df = rename_cols(day_df, f_cpname)
 
-        else:
+        day_df = day_df.loc[(day_df['datetime'] > "2018-01-02")
+                            & (day_df['datetime'] <= "2019-01-01")]
 
-            f_cpname = reformat_cpname(cp_name)
-            assert validate_day_df(day_df, f_cpname)
-            day_df.rename(columns={'Date': 'datetime'}, inplace=True)
+        day_df['datetime'] = day_df['datetime'].apply(
+            lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
+        day_df.datetime = pd.to_datetime(day_df.datetime)
+        day_df = day_df.set_index('datetime')
 
-            day_df = drop_cols(day_df, f_cpname)
-            day_df = rename_cols(day_df, f_cpname)
-
-            day_df = day_df.loc[(day_df['datetime'] > "2018-01-02")
-                                & (day_df['datetime'] <= "2019-01-01")]
-
-            day_df['datetime'] = day_df['datetime'].apply(
-                lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
-            day_df.datetime = pd.to_datetime(day_df.datetime)
-            day_df = day_df.set_index('datetime')
-
-            day_df.to_pickle(CACHE_FNAME)
-
-            return day_df
+        return day_df
 
     def drop_cols(df: pd.DataFrame, f_cpname: str) -> pd.DataFrame:
         return df.drop(columns=[
