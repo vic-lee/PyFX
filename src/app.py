@@ -12,7 +12,7 @@ from common.config import Config
 from common.decorators import timer
 from common.utils import run
 from ds.datacontainer import DataContainer
-from pyfx import read, write, analysis
+from pyfx import read, write, analytics
 
 
 logger = logging.getLogger(__name__)
@@ -68,11 +68,11 @@ def exec(cp_name: str, config: Config, **kwargs):
     data = kwargs.get('data')
 
     output_funcs = [
-        run(analysis.include_ohlc, data),
-        run(analysis.include_max_pips, data, config.benchmark_times),
-        run(analysis.include_max_pips, data, pdfx=True, cp_name=cp_name),
-        run(analysis.include_minute_data, data, config.minutely_data_sections),
-        run(analysis.include_avgs, data, config.period_average_data_sections)
+        run(analytics.include_ohlc, data),
+        run(analytics.include_max_pips, data, config.benchmark_times),
+        run(analytics.include_max_pips, data, pdfx=True, cp_name=cp_name),
+        run(analytics.include_minute_data, data, config.minutely_data_sections),
+        run(analytics.include_avgs, data, config.period_average_data_sections)
     ]
 
     outputs = map(lambda f: f(), output_funcs)
