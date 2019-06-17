@@ -120,16 +120,6 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
         .copy()                     \
         .drop(columns=['date', 'Open', 'High', 'Low'])
 
-    sel_max = (
-        df_min['Close'] ==
-        df_min.Close.groupby(df_min.index.date).transform(max)
-    )
-
-    sel_min = (
-        df_min['Close'] ==
-        df_min.Close.groupby(df_min.index.date).transform(min)
-    )
-
     def sel_pip_extrema(mask, state: str):
         assert state == 'Up' or state == 'Down' or state == 'Dn'
 
@@ -145,8 +135,14 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
 
         return inner
 
-    df_maxpip = sel_pip_extrema(sel_max, 'Up')()
-    df_minpip = sel_pip_extrema(sel_min, 'Down')()
+    def pip_mask(func):
+        return (
+            df_min['Close'] ==
+            df_min.Close.groupby(df_min.index.date).transform(func)
+        )
+
+    df_maxpip = sel_pip_extrema(pip_mask(max), 'Up')()
+    df_minpip = sel_pip_extrema(pip_mask(min), 'Down')()
 
     def get_fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
         df = pd.DataFrame()
