@@ -206,16 +206,15 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
             return df
         return inner
 
-    finder_normal = finder_strategy()
+    finder = finder_strategy()
     finder_pdfx = finder_strategy('PDFX')
 
     if pdfx:
         df_master = finder_pdfx()
     else:
-        maxpips = map(finder_normal, benchmark_times)
+        maxpips = map(finder, benchmark_times)
         df_master = pd.concat(maxpips, axis=1)
 
-    print(df_master.head())
     return df_master
 
 
