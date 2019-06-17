@@ -40,7 +40,7 @@ def comp_xlsx(original_fname: str, new_fname: str, sheet_idx=0) -> bool:
 
     Return: `True` if the 2 sheets are the same, else `False`
     """
-    is_the_same = True
+    err_count = 0
 
     new = xlrd.open_workbook(new_fname)
     original = xlrd.open_workbook(original_fname)
@@ -59,9 +59,10 @@ def comp_xlsx(original_fname: str, new_fname: str, sheet_idx=0) -> bool:
                 if newcell != oldcell:
                     print("Row {} Col {} - {} != {}".format(
                         rownum + 1, colnum + 1, newcell, oldcell))
-                    is_the_same = False
+                    err_count += 1
         else:
             print("Row {} missing".format(rownum + 1))
-            is_the_same = False
+            err_count += 1
 
-    return is_the_same
+    print("Err count: {}".format(err_count))
+    return err_count == 0
