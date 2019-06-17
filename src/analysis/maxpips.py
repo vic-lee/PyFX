@@ -64,10 +64,10 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time]):
 
         df.insert(loc=1, column='BenchmarkPrice', value=benchmark_prices)
 
-        df['MaxPipUp'] = 10000 * (
-            df['PriceAtMaxPipUp'] - df['BenchmarkPrice'])
-        df['MaxPipDown'] = 10000 * (
-            df['PriceAtMaxPipDown'] - df['BenchmarkPrice'])
+        df['MaxPipUp'] = (10000 * (
+            df['PriceAtMaxPipUp'] - df['BenchmarkPrice'])).round(2)
+        df['MaxPipDown'] = (10000 * (
+            df['PriceAtMaxPipDown'] - df['BenchmarkPrice'])).round(2)
 
         df = df[['BenchmarkPrice',
                  'MaxPipUp', 'PriceAtMaxPipUp', 'TimeAtMaxPipUp',
