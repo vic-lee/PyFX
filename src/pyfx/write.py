@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from typing import List
 
-from common.utils import comp_xlsx
+from common.utils import xlsx_diff
 
 __all__ = ['df_to_xlsx', 'merge_dfs']
 
@@ -21,7 +21,7 @@ def check_xlsx_consistency(benchmark_fname: str):
         @functools.wraps(xlsx_writing_func)
         def wrapper(*args, **kwargs):
             fpath = xlsx_writing_func(*args, **kwargs)
-            is_consistent = comp_xlsx(
+            is_consistent = xlsx_diff(
                 original_fname=benchmark_fname, new_fname=fpath)
             print("Consistency check: {}".format(is_consistent))
         return wrapper

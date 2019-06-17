@@ -32,7 +32,7 @@ def _open_sheet(workbook, index: int):
     return workbook.sheet_by_index(index)
 
 
-def comp_xlsx(original_fname: str, new_fname: str, sheet_idx=0) -> bool:
+def xlsx_diff(original_fname: str, new_fname: str, sheet_idx=0) -> bool:
     """Checks if 2 excel files are identical in content.
 
     By default, the function checks the first sheet. Override `sheet_idx` to 
