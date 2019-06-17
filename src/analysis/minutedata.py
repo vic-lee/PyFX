@@ -3,6 +3,7 @@ from typing import List
 
 from common.decorators import timer
 from datastructure.datacontainer import DataContainer
+from datastructure.daytimerange import DayTimeRange
 
 
 @timer
@@ -11,22 +12,19 @@ def include_minute_data(data: DataContainer, sections: List) -> pd.DataFrame:
     def include(section):
         start_time = section['range_start']
         end_time = section['range_end']
+        timerange = DayTimeRange(start_time, end_time)
 
-        df = data.full_minute_price_df              \
-            .between_time(start_time, end_time)     \
-            .Close                                  \
-            .to_frame()
+        def process(t):
+            df = data.full_minute_price_df.at_time(t).Close
+            df.index = df.index.date
+            return df
 
-        df.insert(loc=1, column='Time', value=df.index.time)
-        df.insert(loc=1, column='Date', value=df.index.date)
-
-        df = df.groupby(df.index.date).apply(
-            lambda series: series.pivot(index='Date', columns='Time',
-                                        values='Close')
-        )
+        outs = map(process, timerange)
+        df = pd.concat(outs, axis=1)
         return df
+
 
     outputs = map(include, sections)
     master = pd.concat(outputs, axis=1)
-
+# print(master)
     return master
