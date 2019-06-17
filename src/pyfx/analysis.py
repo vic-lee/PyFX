@@ -103,7 +103,19 @@ def count_crossovers(data: DataContainer, thresholds=thresholds):
 
 
 @timer
-def find_max_pips(data: DataContainer, benchmark_times: List[time]):
+def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
+                  pdfx: bool = False, cp_name: str = None):
+
+    def validate_args():
+        if benchmark_times is None and pdfx is False:
+            return False
+        elif pdfx is True and cp_name is None:
+            return False
+        else:
+            return True
+
+    assert validate_args()
+
     df_min = data.minute_price_df   \
         .copy()                     \
         .drop(columns=['date', 'Open', 'High', 'Low'])
@@ -117,6 +129,37 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time]):
         df_min['Close'] ==
         df_min.Close.groupby(df_min.index.date).transform(min)
     )
+
+    df_maxpip = df_min[sel_max]
+    df_maxpip.columns = ['PriceAtMaxPipUp']
+    df_maxpip.insert(loc=1, column='TimeAtMaxPipUp',
+                     value=df_maxpip.index.time)
+    df_maxpip.insert(loc=1, column='date', value=df_maxpip.index.date)
+    df_maxpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
+    df_maxpip.set_index('date', inplace=True)
+
+    df_minpip = df_min[sel_min]
+    df_minpip.columns = ['PriceAtMaxPipDown']
+    df_minpip.insert(loc=1, column='TimeAtMaxPipDown',
+                     value=df_minpip.index.time)
+    df_minpip.insert(loc=1, column='date', value=df_minpip.index.date)
+    df_minpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
+    df_minpip.set_index('date', inplace=True)
+
+    def get_fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
+        df = pd.DataFrame()
+        f_cpname = '{}-{}'.format(cp_name[:3], cp_name[3:])
+
+        # load data
+        df['CDFX'] = data.fix_price_df[f_cpname]
+        df['BenchmarkPrice'] = df.CDFX.shift(1)
+
+        # fill NaNs and drop weekends
+        df.dropna(how='all', inplace=True)
+        df.BenchmarkPrice.fillna(method='ffill', inplace=True)
+        df.dropna(subset=['CDFX'], inplace=True)
+
+        return df
 
     def finder(bt: time):
         """
@@ -135,43 +178,36 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time]):
             TimeAtMaxPipUp      TimeAtMaxPipDown
         """
 
-        df_maxpip = df_min[sel_max]
-        df_maxpip.columns = ['PriceAtMaxPipUp']
-        df_maxpip.insert(loc=1, column='TimeAtMaxPipUp',
-                         value=df_maxpip.index.time)
-        df_maxpip.insert(loc=1, column='date', value=df_maxpip.index.date)
-        df_maxpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
-        df_maxpip.set_index('date', inplace=True)
-
-        df_minpip = df_min[sel_min]
-        df_minpip.columns = ['PriceAtMaxPipDown']
-        df_minpip.insert(loc=1, column='TimeAtMaxPipDown',
-                         value=df_minpip.index.time)
-        df_minpip.insert(loc=1, column='date', value=df_minpip.index.date)
-        df_minpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
-        df_minpip.set_index('date', inplace=True)
-
         df = pd.concat([df_maxpip, df_minpip], axis=1)
 
-        benchmark_prices = df_min.at_time(bt)['Close']
-        benchmark_prices.index = benchmark_prices.index.date
+        if pdfx:
+            benchmark_data = get_fix_benchmark(data, cp_name)
+        else:
+            benchmark_data = df_min.at_time(bt)['Close'].to_frame()
+            benchmark_data.columns = ['BenchmarkPrice']
+            benchmark_data.index = benchmark_data.index.date
 
-        df.insert(loc=1, column='BenchmarkPrice', value=benchmark_prices)
+        df = benchmark_data.join(df)
 
-        df['MaxPipUp'] = (10000 * (
+        mpipup = (10000 * (
             df['PriceAtMaxPipUp'] - df['BenchmarkPrice'])).round(2)
-        df['MaxPipDown'] = (10000 * (
+        mpipup[mpipup < 0] = 0
+        mpipdn = (10000 * (
             df['PriceAtMaxPipDown'] - df['BenchmarkPrice'])).round(2)
+        mpipdn[mpipdn > 0] = 0
 
-        df = df[['BenchmarkPrice',
-                 'MaxPipUp', 'PriceAtMaxPipUp', 'TimeAtMaxPipUp',
-                 'MaxPipDown', 'PriceAtMaxPipDown', 'TimeAtMaxPipDown']]
+        df.insert(loc=1, column='MaxPipUp', value=mpipup)
+        df.insert(loc=4, column='MaxPipDown', value=mpipdn)
 
         df.columns = pd.MultiIndex.from_product([[str(bt)], df.columns])
         return df
 
-    maxpips = map(finder, benchmark_times)
-    df_master = pd.concat(maxpips, axis=1)
+    if not pdfx:
+        maxpips = map(finder, benchmark_times)
+        df_master = pd.concat(maxpips, axis=1)
+    else:
+        df_master = finder(None)
+
     print(df_master.head())
     return df_master
 
