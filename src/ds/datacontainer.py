@@ -15,6 +15,7 @@ logger.setLevel(logging.INFO)
 
 DSTConfig = namedtuple('DSTConfig', 'mask timerange')
 
+
 @singleton
 class DataContainer:
 
@@ -45,17 +46,20 @@ class DataContainer:
     def _adjust_for_time_shift(self, config: Config) -> pd.DataFrame:
         if config.should_time_shift:
             hourdelta = config.time_shift
-            self.__full_minute_price_df.index = (self.__full_minute_price_df.index
-                                                 + pd.DateOffset(hours=hourdelta))
+            self.__full_minute_price_df.index = (
+                self.__full_minute_price_df.index
+                + pd.DateOffset(hours=hourdelta))
 
     def _filter_minute_data(self, config: Config):
-        return self.full_minute_price_df.between_time(config.time_range.start_time,
-                                                      config.time_range.end_time)
+        return self.full_minute_price_df\
+            .between_time(config.time_range.start_time,
+                          config.time_range.end_time)
 
     def _adjust_for_dst(self, config: Config) -> pd.DataFrame:
 
-        filtered_df = self.full_minute_price_df.between_time(config.time_range.start_time,
-                                                             config.time_range.end_time)
+        filtered_df = self.full_minute_price_df\
+            .between_time(config.time_range.start_time,
+                          config.time_range.end_time)
 
         if config.should_enable_daylight_saving_mode:
 
@@ -69,12 +73,17 @@ class DataContainer:
                                  ahead_period: DateRange,
                                  config: Config) -> pd.DataFrame:
 
-        mask = ((self.full_minute_price_df['date'] >= self._to_datetime(ahead_period.start_date))
-                & (self.full_minute_price_df['date'] <= self._to_datetime(ahead_period.end_date)))
+        mask = (
+            (self.full_minute_price_df['date'] >=
+                self._to_datetime(ahead_period.start_date))
+            & (self.full_minute_price_df['date'] <=
+                self._to_datetime(ahead_period.end_date))
+        )
 
         df_segment = self.full_minute_price_df.loc[mask].copy()
-        df_segment = df_segment.between_time(config.dst_hour_ahead_time_range.start_time,
-                                             config.dst_hour_ahead_time_range.end_time)
+        df_segment = df_segment\
+            .between_time(config.dst_hour_ahead_time_range.start_time,
+                          config.dst_hour_ahead_time_range.end_time)
 
         df_segment.index = (df_segment.index + pd.DateOffset(hours=-1))
 
