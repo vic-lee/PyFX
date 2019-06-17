@@ -15,6 +15,8 @@ __all__ = [
     'include_minute_data',
 ]
 
+pd.options.mode.chained_assignment = None
+
 
 def include_ohlc(data: DataContainer):
     ohlc = data.daily_price_df.copy()
