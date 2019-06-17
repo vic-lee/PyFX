@@ -86,11 +86,13 @@ def include_crossovers(data: DataContainer, thresholds=thresholds):
     trading_above = minute_df['Open'] > minute_df['Open_d']
     trading_below = ~trading_above
 
-    def ct_high(pip): return ((minute_df['High'] > minute_df['t_{}'.format(pip)]) &
-                              (minute_df['High_bf'] < minute_df['t_{}'.format(pip)]))
+    def ct_high(pip):
+        return ((minute_df['High'] > minute_df['t_{}'.format(pip)]) &
+                (minute_df['High_bf'] < minute_df['t_{}'.format(pip)]))
 
-    def ct_low(pip): return ((minute_df['Low'] < minute_df['t_n{}'.format(pip)]) &
-                             (minute_df['Low_bf'] > minute_df['t_n{}'.format(pip)]))
+    def ct_low(pip):
+        return ((minute_df['Low'] < minute_df['t_n{}'.format(pip)]) &
+                (minute_df['Low_bf'] > minute_df['t_n{}'.format(pip)]))
 
     for t in thresholds:
         t_pr = t / 10000
