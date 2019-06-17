@@ -73,4 +73,4 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time]):
 
     maxpips = map(finder, benchmark_times)
     df_master = pd.concat(maxpips, axis=1)
-    print(df_master)
+    return df_master
