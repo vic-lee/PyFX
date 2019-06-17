@@ -130,21 +130,23 @@ def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
         df_min.Close.groupby(df_min.index.date).transform(min)
     )
 
-    df_maxpip = df_min[sel_max]
-    df_maxpip.columns = ['PriceAtMaxPipUp']
-    df_maxpip.insert(loc=1, column='TimeAtMaxPipUp',
-                     value=df_maxpip.index.time)
-    df_maxpip.insert(loc=1, column='date', value=df_maxpip.index.date)
-    df_maxpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
-    df_maxpip.set_index('date', inplace=True)
+    def sel_pip_extrema(mask, state: str):
+        assert state == 'Up' or state == 'Down' or state == 'Dn'
 
-    df_minpip = df_min[sel_min]
-    df_minpip.columns = ['PriceAtMaxPipDown']
-    df_minpip.insert(loc=1, column='TimeAtMaxPipDown',
-                     value=df_minpip.index.time)
-    df_minpip.insert(loc=1, column='date', value=df_minpip.index.date)
-    df_minpip.drop_duplicates(subset=['date'], keep='last', inplace=True)
-    df_minpip.set_index('date', inplace=True)
+        def inner():
+            df = df_min[mask]
+            df.columns = ['PriceAtMaxPip{}'.format(state)]
+            df.insert(loc=1, column='TimeAtMaxPip{}'.format(state),
+                      value=df.index.time)
+            df.insert(loc=1, column='date', value=df.index.date)
+            df.drop_duplicates(subset=['date'], keep='last', inplace=True)
+            df.set_index('date', inplace=True)
+            return df
+
+        return inner
+
+    df_maxpip = sel_pip_extrema(sel_max, 'Up')()
+    df_minpip = sel_pip_extrema(sel_min, 'Down')()
 
     def get_fix_benchmark(data: DataContainer, cp_name: str) -> pd.DataFrame:
         df = pd.DataFrame()
