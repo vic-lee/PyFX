@@ -23,8 +23,11 @@ def include_minute_data(data: DataContainer, sections: List) -> pd.DataFrame:
         df = pd.concat(outs, axis=1)
         return df
 
-
     outputs = map(include, sections)
-    master = pd.concat(outputs, axis=1)
-# print(master)
-    return master
+    df_master = pd.concat(outputs, axis=1)
+
+    df_master.columns = pd.MultiIndex.from_product([
+        ['Selected Minute Data'], df_master.columns
+    ])
+
+    return df_master
