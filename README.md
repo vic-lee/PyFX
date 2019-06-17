@@ -14,18 +14,18 @@ This is the bird's eye view of the project. Specifically, `dataio` handles the i
 
 ```
 .
-├── app.py                # execution file
+├── app.py                      # execution file
 ├── common
-│   ├── config.py          # read-only project configuration
-│   ├── decorators.py     # shared decorators
-│   └── utils.py          # shared utilities
+│   ├── config.py               # read-only project configuration
+│   ├── decorators.py           # shared decorators
+│   └── utils.py                # shared utilities
 ├── ds
 │   ├── __init__.py
-│   ├── datacontainer.py  # read-only data container
-│   └── timeranges.py     # intra- and inter-day ranges
+│   ├── datacontainer.py        # read-only data container
+│   └── timeranges.py           # intra- and inter-day ranges
 └── pyfx
     ├── __init__.py
-    ├── analysis.py       # analysis functions
-    ├── read.py           # import-related functionalities
-    └── write.py          # export-related functionalities
+    ├── analysis.py             # analysis functions
+    ├── read.py                 # import-related functionalities
+    └── write.py                # export-related functionalities
 ```
