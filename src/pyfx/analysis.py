@@ -9,10 +9,10 @@ from ds.daytimerange import DayTimeRange
 
 __all__ = [
     'include_ohlc',
-    'include_period_avgs',
+    'include_avgs',
     'include_crossovers',
+    'include_max_pips',
     'include_minute_data',
-    'include_period_avgs'
 ]
 
 
@@ -23,12 +23,12 @@ def include_ohlc(data: DataContainer):
 
 
 @timer
-def include_period_avgs(data: DataContainer, sections: List):
+def include_avgs(data: DataContainer, periods: List):
 
-    def include(section):
+    def include(period):
         df = pd.DataFrame()
-        start_time = section.start_time
-        end_time = section.end_time
+        start_time = period.start_time
+        end_time = period.end_time
         filtered = data.full_minute_price_df.between_time(start_time, end_time)
         filtered.insert(loc=1, column='Time', value=filtered.index.time)
         filtered.insert(loc=1, column='Date', value=filtered.index.date)
@@ -63,7 +63,7 @@ def include_period_avgs(data: DataContainer, sections: List):
 
         return df
 
-    outputs = map(include, sections)
+    outputs = map(include, periods)
     df_master = pd.concat(outputs, axis=1)
 
     return df_master
@@ -120,9 +120,9 @@ def include_crossovers(data: DataContainer, thresholds=thresholds):
 
 
 @timer
-def include_max_pip_movements(data: DataContainer,
-                              benchmark_times: List[time] = None,
-                              pdfx: bool = False, cp_name: str = None):
+def include_max_pips(data: DataContainer,
+                     benchmark_times: List[time] = None,
+                     pdfx: bool = False, cp_name: str = None):
     """
     For each day, find the MIN and MAX of in the time period.
 
