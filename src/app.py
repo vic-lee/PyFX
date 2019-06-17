@@ -66,14 +66,15 @@ def main():
     outputs.append(maxpips)
 
     if config.should_include_minutely_data:
+
         minute_data = analysis.include_minute_data(
             data, config.minutely_data_sections)
         outputs.append(minute_data)
 
     if config.should_include_period_average_data:
+
         avg_data = analysis.include_avg(
             data, config.period_average_data_sections)
-        assert avg_data is not None
         outputs.append(avg_data)
 
     df_master = pd.concat(outputs, axis=1)
