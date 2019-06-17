@@ -18,7 +18,7 @@ __all__ = [
 
 def include_ohlc(data: DataContainer):
     ohlc = data.daily_price_df.copy()
-    ohlc.columns = pd.MultiIndex([['OHLC'], ohlc.columns])
+    ohlc.columns = pd.MultiIndex.from_product([['OHLC'], ohlc.columns])
     return ohlc
 
 
