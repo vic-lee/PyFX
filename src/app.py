@@ -54,10 +54,10 @@ def main():
     ohlc.columns = pd.MultiIndex.from_product([['OHLC'], ohlc.columns])
     outputs.append(ohlc)
 
-    maxpips = analysis.find_max_pips(data, config.benchmark_times)
+    maxpips = analysis.include_max_pip_movements(data, config.benchmark_times)
     outputs.append(maxpips)
 
-    maxpips_pdfx = analysis.find_max_pips(data, pdfx=True, cp_name='GBPUSD')
+    maxpips_pdfx = analysis.include_max_pip_movements(data, pdfx=True, cp_name='GBPUSD')
     outputs.append(maxpips_pdfx)
 
     if config.should_include_minutely_data:
@@ -68,7 +68,7 @@ def main():
 
     if config.should_include_period_average_data:
 
-        avg_data = analysis.include_avg(
+        avg_data = analysis.include_period_avgs(
             data, config.period_average_data_sections)
         outputs.append(avg_data)
 

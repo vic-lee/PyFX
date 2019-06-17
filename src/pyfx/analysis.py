@@ -7,8 +7,16 @@ from ds.datacontainer import DataContainer
 from ds.daytimerange import DayTimeRange
 
 
+__all__ = [
+    'include_period_avgs',
+    'include_crossovers',
+    'include_minute_data',
+    'include_period_avgs'
+]
+
+
 @timer
-def include_avg(data: DataContainer, sections: List):
+def include_period_avgs(data: DataContainer, sections: List):
 
     def include(section):
         df = pd.DataFrame()
@@ -58,7 +66,7 @@ thresholds = [10, 15, 20, 25, 30, 35, 40]
 
 
 @timer
-def count_crossovers(data: DataContainer, thresholds=thresholds):
+def include_crossovers(data: DataContainer, thresholds=thresholds):
     """
     crossover: v < threshold at `t` and v > threshold at `t-1`
     for each crossover in day: ctr += 1
@@ -103,8 +111,9 @@ def count_crossovers(data: DataContainer, thresholds=thresholds):
 
 
 @timer
-def find_max_pips(data: DataContainer, benchmark_times: List[time] = None,
-                  pdfx: bool = False, cp_name: str = None):
+def include_max_pip_movements(data: DataContainer,
+                              benchmark_times: List[time] = None,
+                              pdfx: bool = False, cp_name: str = None):
     """
     For each day, find the MIN and MAX of in the time period.
 
