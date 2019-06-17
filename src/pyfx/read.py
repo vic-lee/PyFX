@@ -59,13 +59,16 @@ def _read_and_process_minute_data(
     def _process_minute_data(min_df: pd.DataFrame) -> pd.DataFrame:
 
         min_df.drop(columns=['Volume'], inplace=True)
+
         min_df.rename({"Local time": "datetime"},
                       inplace=True, axis='columns')
+
         min_df['date'] = min_df['datetime'].str.slice(0, 10)
         min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
         min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
         min_df['datetime'] = pd.to_datetime(
             min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
+
         min_df.set_index('datetime', inplace=True)
 
         return min_df
@@ -83,9 +86,11 @@ def _read_and_process_fix_data(
 
     @cache('cache/fix')
     def _process_fix_data(fix_df: pd.DataFrame) -> pd.DataFrame:
+
         fix_df['datetime'] = pd.to_datetime(
             fix_df['datetime'], format="%Y-%m-%d")
         fix_df.set_index('datetime', inplace=True)
+        
         return fix_df
 
     if not os.path.isfile(fpath):
@@ -111,11 +116,12 @@ def _read_and_process_daily_data(
         day_df = drop_cols(day_df, f_cpname)
         day_df = rename_cols(day_df, f_cpname)
 
-        day_df = day_df.loc[(day_df['datetime'] > "2018-01-02")
-                            & (day_df['datetime'] <= "2019-01-01")]
+        day_df = day_df.loc[(day_df['datetime'] > "2018-01-02") &
+                            (day_df['datetime'] <= "2019-01-01")]
 
         day_df['datetime'] = day_df['datetime'].apply(
             lambda dt: datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S").date())
+
         day_df.datetime = pd.to_datetime(day_df.datetime)
         day_df = day_df.set_index('datetime')
 
@@ -123,19 +129,19 @@ def _read_and_process_daily_data(
 
     def drop_cols(df: pd.DataFrame, f_cpname: str) -> pd.DataFrame:
         return df.drop(columns=[
-            '{}(Open, Ask)'.format(f_cpname),
-            '{}(High, Ask)'.format(f_cpname),
-            '{}(Low, Ask)'.format(f_cpname),
-            '{}(Close, Ask)'.format(f_cpname),
-            'Tick Volume({})'.format(f_cpname)
+            '{}(Open, Ask)'     .format(f_cpname),
+            '{}(High, Ask)'     .format(f_cpname),
+            '{}(Low, Ask)'      .format(f_cpname),
+            '{}(Close, Ask)'    .format(f_cpname),
+            'Tick Volume({})'   .format(f_cpname)
         ])
 
     def rename_cols(df: pd.DataFrame, f_cpname: str) -> pd.DataFrame:
         return df.rename(columns={
-            '{}(Open, Bid)*'.format(f_cpname): 'Open',
-            '{}(High, Bid)*'.format(f_cpname): 'High',
-            '{}(Low, Bid)*'.format(f_cpname): 'Low',
-            '{}(Close, Bid)*'.format(f_cpname): 'Close',
+            '{}(Open, Bid)*'    .format(f_cpname): 'Open',
+            '{}(High, Bid)*'    .format(f_cpname): 'High',
+            '{}(Low, Bid)*'     .format(f_cpname): 'Low',
+            '{}(Close, Bid)*'   .format(f_cpname): 'Close',
         })
 
     def reformat_cpname(cp_name: str) -> str:
@@ -146,15 +152,15 @@ def _read_and_process_daily_data(
     def validate_day_df(day_df: pd.DataFrame, f_cpname: str) -> bool:
         assert len(f_cpname) == 7 and '/' in f_cpname
         required = set([
-            '{}(Open, Ask)'.format(f_cpname),
-            '{}(High, Ask)'.format(f_cpname),
-            '{}(Low, Ask)'.format(f_cpname),
-            '{}(Close, Ask)'.format(f_cpname),
-            '{}(Open, Bid)*'.format(f_cpname),
-            '{}(High, Bid)*'.format(f_cpname),
-            '{}(Low, Bid)*'.format(f_cpname),
-            '{}(Close, Bid)*'.format(f_cpname),
-            'Tick Volume({})'.format(f_cpname),
+            '{}(Open, Ask)'     .format(f_cpname),
+            '{}(High, Ask)'     .format(f_cpname),
+            '{}(Low, Ask)'      .format(f_cpname),
+            '{}(Close, Ask)'    .format(f_cpname),
+            '{}(Open, Bid)*'    .format(f_cpname),
+            '{}(High, Bid)*'    .format(f_cpname),
+            '{}(Low, Bid)*'     .format(f_cpname),
+            '{}(Close, Bid)*'   .format(f_cpname),
+            'Tick Volume({})'   .format(f_cpname),
         ])
         return (required.issubset(set(day_df.columns)))
 
