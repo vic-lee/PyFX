@@ -5,7 +5,7 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import singleton
-from ds.ranges import DateRange
+from ds.timeranges import DateRange
 
 from pyfx import read
 

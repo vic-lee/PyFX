@@ -4,7 +4,7 @@ from typing import List
 
 from common.decorators import timer
 from ds.datacontainer import DataContainer
-from ds.ranges import DayTimeRange
+from ds.timeranges import DayTimeRange
 
 
 __all__ = [

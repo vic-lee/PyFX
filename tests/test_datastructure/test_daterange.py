@@ -1,6 +1,6 @@
 import unittest
 from datetime import date
-from ds.ranges import DateRange
+from ds.timeranges import DateRange
 
 class TestDateRange(unittest.TestCase):
 
