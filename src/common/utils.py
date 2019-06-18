@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import zip_longest
 import xlrd
 
@@ -72,3 +73,7 @@ def run(func, *args, **kwargs):
     def wrapper():
         return func(*args, **kwargs)
     return wrapper
+
+
+def folder_timestamp_suffix() -> str:
+    return datetime.now().strftime("_%Y%m%d_%H%M%S")
