@@ -1,5 +1,5 @@
 {
-    "currency_pairs_temp": [
+    "currency_pairs": [
         "AUDUSD",
         "EURUSD",
         "GBPUSD",
@@ -11,9 +11,11 @@
         "USDTRY",
         "USDZAR"
     ],
-    "currency_pairs": [
-        "GBPUSD"
-    ],
+    "overridden_filepaths": {
+        "GBPUSD": {
+            "Minute": "data/datasrc/GBPUSD_Candlestick.csv"
+        }
+    },
     "time_range": {
         "start_time": "10:30",
         "end_time": "11:02"

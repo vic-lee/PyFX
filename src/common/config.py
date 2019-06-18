@@ -2,12 +2,15 @@ from datetime import datetime, time, timedelta
 import json
 import logging
 import os.path
+from os.path import abspath
 
 from common.decorators import singleton
 from ds.timeranges import DayTimeRange, DateRange
+from pyfx import read
 
 
 logger = logging.getLogger(__name__)
+
 
 @singleton
 class Config:
@@ -179,6 +182,29 @@ class Config:
 
         return avg_data_sections
 
+    def fpath(self, cp_name: str) -> dict:
+        fpaths = {
+            read.MINUTE:
+                abspath("data/datasrc/{}_Minute.csv").format(cp_name),
+            read.FIX:
+                abspath("data/datasrc/fix1819.csv"),
+            read.DAILY:
+                abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
+        }
+
+        if self._should_override_fpath(cp_name):
+            custom_fpaths = self._access_overridden_filepaths(cp_name)
+
+            def use_custom_fpath(json_key, fpath_key):
+                return custom_fpaths[json_key] \
+                    if json_key in custom_fpaths else fpaths[fpath_key]
+
+            fpaths[read.MINUTE] = use_custom_fpath('Minute', read.MINUTE)
+            fpaths[read.FIX] = use_custom_fpath('Fix', read.FIX)
+            fpaths[read.DAILY] = use_custom_fpath('Daily', read.DAILY)
+
+        return fpaths
+
     @staticmethod
     def _str_to_time(timestr: str) -> time:
         return datetime.strptime(timestr, "%H:%M").time()
@@ -233,3 +259,16 @@ class Config:
         except KeyError:
             logger.error(("Attempting to read time range",
                           "from a non-date-range object."))
+
+    def _should_override_fpath(self, cp_name: str):
+        if 'overridden_filepaths' in self.__config \
+                and len(self.__config['overridden_filepaths']) > 0:
+            if cp_name in self.__config['overridden_filepaths']:
+                return True
+        return False
+
+    def _access_overridden_filepaths(self, cp_name: str):
+        try:
+            return self.__config['overridden_filepaths'][cp_name]
+        except KeyError:
+            pass
