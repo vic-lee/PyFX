@@ -1,6 +1,6 @@
 """
-This file is the starting point of the program. It provides a bird's eye view 
-of the operations carried out to generate key metrics and to export to excel. 
+This file is the starting point of the program. It provides a bird's eye view
+of the operations carried out to generate key metrics and to export to excel.
 """
 
 from datetime import datetime
@@ -10,7 +10,7 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import timer
-from common.utils import run
+from common.utils import run, folder_timestamp_suffix
 from ds.datacontainer import DataContainer
 from pyfx import read, write, analytics
 
@@ -39,15 +39,9 @@ def io(func):
     def wrapper(*args, **kwargs):
         cp_name = kwargs.get('cp_name')
         config = kwargs.get('config')
+        suffix = kwargs.get('folder_suffix')
 
-        fpaths = {
-            read.MINUTE:
-                abspath("data/datasrc/GBPUSD_Candlestick.csv"),
-            read.FIX:
-                abspath("data/datasrc/fix1819.csv"),
-            read.DAILY:
-                abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
-        }
+        fpaths = config.fpath(cp_name)
 
         dfs = read.read_and_process_data(fpaths, cp_name=cp_name)
         data = DataContainer(dfs, cp_name, config)
@@ -57,13 +51,13 @@ def io(func):
         write.df_to_xlsx(df=df_master,
                          dir='data/dataout/', folder_name='dataout_',
                          fname=('dataout_{}'.format(cp_name)),
-                         folder_unique_id=datetime.now().strftime("_%Y%m%d_%H%M%S"),
+                         folder_unique_id=suffix,
                          sheet_name='max_pip_mvmts', col_width=20)
     return wrapper
 
 
 @io
-def exec(cp_name: str, config: Config, **kwargs):
+def exec(cp_name: str, config: Config, folder_suffix: str, **kwargs):
 
     data = kwargs.get('data')
 
@@ -86,9 +80,10 @@ def exec(cp_name: str, config: Config, **kwargs):
 @timer
 def main():
     config = Config(DEFAULT_CONFIG_FPATH)
+    folder_suffix = folder_timestamp_suffix()
 
     for cp in config.currency_pairs:
-        exec(cp_name=cp, config=config)
+        exec(cp_name=cp, config=config, folder_suffix=folder_suffix)
 
 
 if __name__ == '__main__':
