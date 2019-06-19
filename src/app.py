@@ -40,10 +40,11 @@ def io(func):
         cp_name = kwargs.get('cp_name')
         config = kwargs.get('config')
         suffix = kwargs.get('folder_suffix')
+        print(cp_name)
 
         fpaths = config.fpath(cp_name)
 
-        dfs = read.read_and_process_data(fpaths, cp_name=cp_name)
+        dfs = read.read_data(fpaths, cp_name=cp_name)
         data = DataContainer(dfs, cp_name, config)
 
         df_master = func(*args, **kwargs, data=data)
