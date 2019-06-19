@@ -3,17 +3,17 @@ This file is the starting point of the program. It provides a bird's eye view
 of the operations carried out to generate key metrics and to export to excel.
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from os.path import abspath
+
 import pandas as pd
 
 from common.config import Config
 from common.decorators import timer
-from common.utils import run, folder_timestamp_suffix
+from common.utils import folder_timestamp_suffix, run
 from ds.datacontainer import DataContainer
-from pyfx import read, write, analytics
-
+from pyfx import analytics, read, write
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

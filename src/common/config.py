@@ -1,13 +1,12 @@
-from datetime import datetime, time, timedelta
 import json
 import logging
 import os.path
+from datetime import datetime, time, timedelta
 from os.path import abspath
 
 from common.decorators import singleton
-from ds.timeranges import DayTimeRange, DateRange
+from ds.timeranges import DateRange, DayTimeRange
 from pyfx import read
-
 
 logger = logging.getLogger(__name__)
 

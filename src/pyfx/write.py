@@ -1,8 +1,9 @@
 import functools
 import os
 from pathlib import Path
-import pandas as pd
 from typing import List
+
+import pandas as pd
 
 from common.utils import xlsx_diff
 

@@ -1,12 +1,12 @@
-from collections import namedtuple
-from datetime import datetime, timedelta, time
 import logging
+from collections import namedtuple
+from datetime import datetime, time, timedelta
+
 import pandas as pd
 
 from common.config import Config
 from common.decorators import singleton
 from ds.timeranges import DateRange
-
 from pyfx import read
 
 logger = logging.getLogger(__name__)

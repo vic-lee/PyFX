@@ -1,11 +1,11 @@
 from datetime import time
-import pandas as pd
 from typing import List
+
+import pandas as pd
 
 from common.decorators import timer
 from ds.datacontainer import DataContainer
 from ds.timeranges import DayTimeRange
-
 
 __all__ = [
     'include_ohlc',
