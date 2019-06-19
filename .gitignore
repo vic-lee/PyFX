@@ -10,3 +10,4 @@ dataout/
 cache/
 app.log
 src/app.legacy.py
+config.json
