@@ -16,14 +16,18 @@ logger.setLevel(logging.INFO)
 DSTConfig = namedtuple('DSTConfig', 'mask timerange')
 
 
-@singleton
 class DataContainer:
 
     def __init__(self, price_dfs, currency_pair_name: str, config: Config):
 
-        self.__fix_price_df = price_dfs[read.FIX]
+        self.__fix_price_df = price_dfs[read.FIX]\
+            .loc[config.date_range.start_date:config.date_range.end_date]
+            
         self.__daily_price_df = price_dfs[read.DAILY]
-        self.__full_minute_price_df = price_dfs[read.MINUTE]
+
+        self.__full_minute_price_df = price_dfs[read.MINUTE]\
+            .loc[config.date_range.start_date:config.date_range.end_date]
+
         self._adjust_for_time_shift(config=config)
         self.__minute_price_df = self._adjust_for_dst(config=config)
 
