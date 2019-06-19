@@ -19,7 +19,7 @@ DAILY = 2
 def read_data(fpaths: dict, cp_name: str) -> dict:
     resp = {}
     if MINUTE in fpaths:
-        resp[MINUTE] = _read_and_process_minute_data(fpaths[MINUTE])
+        resp[MINUTE] = _read_and_process_minute_data(fpaths[MINUTE], cp_name)
     if FIX in fpaths:
         resp[FIX] = _read_and_process_fix_data(fpaths[FIX])
     if DAILY in fpaths:
@@ -54,10 +54,11 @@ def cache(cache_fname: str):
 
 @timer
 def _read_and_process_minute_data(
-    fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
+    fpath: str, cp_name: str,
+    processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    # @cache('cache/min')
+    @cache('cache/min_{}'.format(cp_name))
     def _process_minute_data(min_df: pd.DataFrame) -> pd.DataFrame:
 
         if 'Volume' in min_df.columns:
@@ -88,7 +89,7 @@ def _read_and_process_fix_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    # @cache('cache/fix')
+    @cache('cache/fix')
     def _process_fix_data(fix_df: pd.DataFrame) -> pd.DataFrame:
 
         fix_df['datetime'] = pd.to_datetime(
@@ -109,7 +110,7 @@ def _read_and_process_daily_data(
     processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    # @cache('cache/day')
+    @cache('cache/day_{}'.format(cp_name))
     def process_daily_data(day_df: pd.DataFrame,
                            cp_name: str) -> pd.DataFrame:
 
