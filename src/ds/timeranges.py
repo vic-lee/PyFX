@@ -14,12 +14,29 @@ class DateRange:
         self.__end_date = end_date
 
     @property
-    def start_date(self):
+    def start_date(self) -> date:
+        """The starting date for this DateRange object."""
         return self.__start_date
 
     @property
-    def end_date(self):
+    def end_date(self) -> date:
+        """The ending date for this DateRange object."""
         return self.__end_date
+
+    @property
+    def start_date_dt(self) -> datetime: 
+        return datetime(
+            year=self.__start_date.year, month=self.__start_date.month,
+            day=self.__start_date.day, hour=0, minute=0, second=0
+        )
+
+    @property
+    def end_date_dt(self) -> datetime: 
+        return datetime(
+            year=self.__end_date.year, month=self.__end_date.month,
+            day=self.__end_date.day, hour=0, minute=0, second=0
+        )
+
 
     def is_datetime_in_range(self, date):
         return date >= self.__start_date and date <= self.__end_date
