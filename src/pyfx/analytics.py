@@ -213,7 +213,7 @@ def include_max_pips(data: DataContainer,
         return df
 
     def finder_strategy(bt=None):
-        def inner(bt=None):
+        def inner(bt):
             bt_str = str(bt)
             df = pd.concat([df_maxpip, df_minpip], axis=1)
             if isinstance(bt, time):
@@ -230,7 +230,7 @@ def include_max_pips(data: DataContainer,
     finder_pdfx = finder_strategy('PDFX')
 
     if pdfx:
-        df_master = finder_pdfx()
+        df_master = finder_pdfx('PDFX')
     else:
         maxpips = map(finder, benchmark_times)
         df_master = pd.concat(maxpips, axis=1)
