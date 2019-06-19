@@ -5,7 +5,7 @@ import xlrd
 
 def timer(func):
     """A decorator that times and prints execution time."""
-    def wrapper(*args, **kwargs):
+    def timer_wrapper(*args, **kwargs):
         start_time = datetime.now()
         resp = func(*args, **kwargs)
         end_time = datetime.now()
@@ -13,7 +13,7 @@ def timer(func):
         print("{:<40} runtime: {}.{} secs".format(
             func.__name__, duration.seconds, duration.microseconds))
         return resp
-    return wrapper
+    return timer_wrapper
 
 
 def singleton(cls, *args, **kwargs):
@@ -21,9 +21,9 @@ def singleton(cls, *args, **kwargs):
 
     instances = {}
 
-    def wrapper(*args, **kwargs):
+    def singleton_wrapper(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
 
-    return wrapper
+    return singleton_wrapper
