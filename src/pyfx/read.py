@@ -1,10 +1,12 @@
-from datetime import datetime
 import functools
 import os
-import pandas as pd
+from datetime import datetime
 from typing import Callable, List
 
+import pandas as pd
+
 from common.decorators import timer
+from ds.timeranges import DateRange
 
 __all__ = ['MINUTE', 'FIX', 'DAILY', 'read_data']
 
@@ -61,26 +63,15 @@ def _read_and_process_minute_data(
         if 'Volume' in min_df.columns:
             min_df.drop(columns=['Volume'], inplace=True)
 
-        if 'Local time' in min_df.columns:
-            min_df.rename({"Local time": "datetime"},
-                          inplace=True, axis='columns')
+        min_df.rename({"Local time": "datetime"},
+                        inplace=True, axis='columns')
 
-            min_df['date'] = min_df['datetime'].str.slice(0, 10)
-            min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
-            min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
-            min_df['datetime'] = pd.to_datetime(
-                min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
+        min_df['date'] = min_df['datetime'].str.slice(0, 10)
+        min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
+        min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
 
-        if 'Date Time' in min_df.columns:
-            min_df.rename({"Date Time": "datetime"},
-                          inplace=True, axis='columns')
-
-            min_df['date'] = min_df['datetime'].str.slice(25, 35)
-            min_df['datetime'] = min_df['date'] + \
-                min_df['datetime'].str.slice(6, 14)
-            min_df['date'] = pd.to_datetime(min_df['date'], format='%Y-%m-%d')
-            min_df['datetime'] = pd.to_datetime(
-                min_df['datetime'], format='%Y-%m-%d%H:%M:%S')
+        min_df['datetime'] = pd.to_datetime(
+            min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
 
         min_df.set_index('datetime', inplace=True)
 
