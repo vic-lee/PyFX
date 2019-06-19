@@ -6,7 +6,7 @@ from typing import Callable, List
 
 from common.decorators import timer
 
-__all__ = ['MINUTE', 'FIX', 'DAILY', 'read_and_process_data']
+__all__ = ['MINUTE', 'FIX', 'DAILY', 'read_data']
 
 
 MINUTE = 0,
@@ -14,7 +14,7 @@ FIX = 1,
 DAILY = 2
 
 
-def read_and_process_data(fpaths: dict, cp_name: str) -> dict:
+def read_data(fpaths: dict, cp_name: str) -> dict:
     resp = {}
     if MINUTE in fpaths:
         resp[MINUTE] = _read_and_process_minute_data(fpaths[MINUTE])
@@ -55,19 +55,32 @@ def _read_and_process_minute_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/min')
+    # @cache('cache/min')
     def _process_minute_data(min_df: pd.DataFrame) -> pd.DataFrame:
 
-        min_df.drop(columns=['Volume'], inplace=True)
+        if 'Volume' in min_df.columns:
+            min_df.drop(columns=['Volume'], inplace=True)
 
-        min_df.rename({"Local time": "datetime"},
-                      inplace=True, axis='columns')
+        if 'Local time' in min_df.columns:
+            min_df.rename({"Local time": "datetime"},
+                          inplace=True, axis='columns')
 
-        min_df['date'] = min_df['datetime'].str.slice(0, 10)
-        min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
-        min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
-        min_df['datetime'] = pd.to_datetime(
-            min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
+            min_df['date'] = min_df['datetime'].str.slice(0, 10)
+            min_df['date'] = pd.to_datetime(min_df['date'], format='%d.%m.%Y')
+            min_df['datetime'] = min_df['datetime'].str.slice(0, 19)
+            min_df['datetime'] = pd.to_datetime(
+                min_df['datetime'], format="%d.%m.%Y %H:%M:%S")
+
+        if 'Date Time' in min_df.columns:
+            min_df.rename({"Date Time": "datetime"},
+                          inplace=True, axis='columns')
+
+            min_df['date'] = min_df['datetime'].str.slice(25, 35)
+            min_df['datetime'] = min_df['date'] + \
+                min_df['datetime'].str.slice(6, 14)
+            min_df['date'] = pd.to_datetime(min_df['date'], format='%Y-%m-%d')
+            min_df['datetime'] = pd.to_datetime(
+                min_df['datetime'], format='%Y-%m-%d%H:%M:%S')
 
         min_df.set_index('datetime', inplace=True)
 
@@ -84,13 +97,13 @@ def _read_and_process_fix_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/fix')
+    # @cache('cache/fix')
     def _process_fix_data(fix_df: pd.DataFrame) -> pd.DataFrame:
 
         fix_df['datetime'] = pd.to_datetime(
             fix_df['datetime'], format="%Y-%m-%d")
         fix_df.set_index('datetime', inplace=True)
-        
+
         return fix_df
 
     if not os.path.isfile(fpath):
@@ -105,7 +118,7 @@ def _read_and_process_daily_data(
     processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/day')
+    # @cache('cache/day')
     def process_daily_data(day_df: pd.DataFrame,
                            cp_name: str) -> pd.DataFrame:
 
