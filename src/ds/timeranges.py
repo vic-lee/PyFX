@@ -24,7 +24,8 @@ class DateRange:
         return self.__end_date
 
     @property
-    def start_date_dt(self) -> datetime: 
+    def start_date_dt(self) -> datetime:
+        """The starting date, in datetime, for this DateRange object.""" 
         return datetime(
             year=self.__start_date.year, month=self.__start_date.month,
             day=self.__start_date.day, hour=0, minute=0, second=0
@@ -32,6 +33,7 @@ class DateRange:
 
     @property
     def end_date_dt(self) -> datetime: 
+        """The ending date, in datetime, for this DateRange object.""" 
         return datetime(
             year=self.__end_date.year, month=self.__end_date.month,
             day=self.__end_date.day, hour=0, minute=0, second=0
