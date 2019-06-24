@@ -251,8 +251,9 @@ def include_minute_data(data: DataContainer, sections: List) -> pd.DataFrame:
         timerange = DayTimeRange(start_time, end_time)
 
         def get_min_data(t: time):
-            df = data.full_minute_price_df.at_time(t).Close
+            df = data.full_minute_price_df.at_time(t).Close.to_frame()
             df.index = df.index.date
+            df.columns = ['{}_Close'.format(t)]
             return df
 
         outs = map(get_min_data, timerange)
