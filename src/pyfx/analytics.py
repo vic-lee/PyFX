@@ -155,6 +155,10 @@ def include_max_pips(data: DataContainer,
         .copy()                     \
         .drop(columns=['date', 'Open', 'High', 'Low'])
 
+    df_full_min = data.full_minute_price_df   \
+        .copy()                               \
+        .drop(columns=['date', 'Open', 'High', 'Low'])
+
     def pip_extrema(mask, state: str):
         assert state == 'Up' or state == 'Down' or state == 'Dn'
 
@@ -195,7 +199,7 @@ def include_max_pips(data: DataContainer,
         return df
 
     def normal_benchmark(bt: time):
-        benchmark_data = df_min.at_time(bt)['Close'].to_frame()
+        benchmark_data = df_full_min.at_time(bt)['Close'].to_frame()
         benchmark_data.columns = ['BenchmarkPrice']
         benchmark_data.index = benchmark_data.index.date
         return benchmark_data
