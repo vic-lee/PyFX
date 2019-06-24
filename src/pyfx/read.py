@@ -121,7 +121,7 @@ def _read_and_process_daily_data(
         day_df = drop_cols(day_df, f_cpname)
         day_df = rename_cols(day_df, f_cpname)
 
-        day_df = day_df.loc[(day_df['datetime'] > "2018-01-02") &
+        day_df = day_df.loc[(day_df['datetime'] > "2018-01-01") &
                             (day_df['datetime'] <= "2019-01-01")]
 
         day_df['datetime'] = day_df['datetime'].apply(
