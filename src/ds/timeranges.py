@@ -131,7 +131,9 @@ class DayTimeRange:
 
 
 class DateRangeDateTypeError(TypeError):
-    """Raised when `start_date` and `end_date` for DateRange are not of date type"""
+    """Raised when `start_date` and `end_date` for DateRange are not 
+    of date type
+    """
     pass
 
 
