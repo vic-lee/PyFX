@@ -25,26 +25,24 @@ class DateRange:
 
     @property
     def start_date_dt(self) -> datetime:
-        """The starting date, in datetime, for this DateRange object.""" 
+        """The starting date, in datetime, for this DateRange object."""
         return datetime(
             year=self.__start_date.year, month=self.__start_date.month,
-            day=self.__start_date.day, hour=0, minute=0, second=0
-        )
+            day=self.__start_date.day, hour=0, minute=0, second=0)
 
     @property
-    def end_date_dt(self) -> datetime: 
-        """The ending date, in datetime, for this DateRange object.""" 
+    def end_date_dt(self) -> datetime:
+        """The ending date, in datetime, for this DateRange object."""
         return datetime(
             year=self.__end_date.year, month=self.__end_date.month,
-            day=self.__end_date.day, hour=0, minute=0, second=0
-        )
-
+            day=self.__end_date.day, hour=0, minute=0, second=0)
 
     def is_datetime_in_range(self, date):
         return date >= self.__start_date and date <= self.__end_date
 
     def __repr__(self):
-        return "start date: {} \tend date: {}\n".format(self.__start_date, self.__end_date)
+        return (f"start date: {self.__start_date} "
+                f"\tend date: {self.__end_date}\n")
 
 
 class DayTimeRange:
@@ -86,17 +84,14 @@ class DayTimeRange:
         return self.__end_time
 
     def is_datetime_in_range(self, datetime: datetime):
-        return datetime.time() >= self.__start_time and datetime.time() <= self.__end_time
+        return (datetime.time() >= self.__start_time and
+                datetime.time() <= self.__end_time)
 
     def to_string_simp(self):
-        return "{}{}_{}{}".format(
-            self.__start_time.hour,
-            self.__start_time.minute,
-            self.__end_time.hour,
-            self.__end_time.minute)
+        return (f"{self.__start_time.hour}{self.__start_time.minute}"
+                f"_{self.__end_time.hour}{ self.__end_time.minute}")
 
     def __str__(self):
-        return "start time: {}:{} \tend time: {}:{}".format(self.__start_time.hour,
-                                                            self.__start_time.minute,
-                                                            self.__end_time.hour,
-                                                            self.__end_time.minute)
+        return (
+            f"start time: {self.__start_time.hour}:{self.__start_time.minute}"
+            f" \tend time: {self.__end_time.hour}:{self.__end_time.minute}")
