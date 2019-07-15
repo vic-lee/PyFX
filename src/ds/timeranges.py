@@ -1,4 +1,5 @@
 from datetime import datetime, date, time, timedelta
+from typing import Union
 
 
 class DateRange:
@@ -38,7 +39,7 @@ class DateRange:
             year=self.__end_date.year, month=self.__end_date.month,
             day=self.__end_date.day, hour=0, minute=0, second=0)
 
-    def is_datetime_in_range(self, date):
+    def is_datetime_in_range(self, date: Union[date, datetime]):
         return date >= self.__start_date and date <= self.__end_date
 
     @staticmethod
