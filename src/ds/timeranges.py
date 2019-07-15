@@ -10,6 +10,7 @@ class DateRange:
     """
 
     def __init__(self, start_date: date, end_date: date):
+        self._validate_args(start_date, end_date)
         self.__start_date = start_date
         self.__end_date = end_date
 
@@ -39,6 +40,37 @@ class DateRange:
 
     def is_datetime_in_range(self, date):
         return date >= self.__start_date and date <= self.__end_date
+
+    @staticmethod
+    def _validate_args(start_date: date, end_date: date):
+        """Performs validation for start and end date. 
+        
+        Raises
+        ------
+        `DateRangeDateTypeError`
+            if `start_date` and `end_date` are not of `date` type
+
+        `DateRangeDateValueError`
+            if `start_date` is later than `end_date`
+        """
+
+        def make_date_type_err_msg(date_type: str) -> str:
+            return (f"{date_type} must be of type `date`. \n"
+                    "Note that type `datetime` is not accepted. "
+                    "To convert `datetime` to `date`, do `dt.date()`.")
+
+        try:
+            assert type(start_date) == date
+        except AssertionError:
+            raise DateRangeDateTypeError(make_date_type_err_msg('start_date'))
+        try:
+            assert type(end_date) == date
+        except AssertionError:
+            raise DateRangeDateTypeError(make_date_type_err_msg('end_date'))
+
+        if start_date > end_date:
+            raise DateRangeValueError(
+                "End date cannot be earlier than start date.")
 
     def __repr__(self):
         return (f"start date: {self.__start_date} "
@@ -95,3 +127,13 @@ class DayTimeRange:
         return (
             f"start time: {self.__start_time.hour}:{self.__start_time.minute}"
             f" \tend time: {self.__end_time.hour}:{self.__end_time.minute}")
+
+
+class DateRangeDateTypeError(TypeError):
+    """Raised when `start_date` and `end_date` for DateRange are not of date type"""
+    pass
+
+
+class DateRangeValueError(ValueError):
+    """Raised when `start_date` is a date later than `end_date`"""
+    pass
