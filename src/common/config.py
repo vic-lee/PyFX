@@ -1,13 +1,20 @@
 import json
 import logging
-import os.path
+import logging.config
+import os
+from pathlib import Path
+import yaml
 from datetime import datetime, time, timedelta
-from os.path import abspath
 
 from common.decorators import singleton
+from common.utils import get_logger_config_fpath
 from ds.timeranges import DateRange, DayTimeRange
 from pyfx import read
 
+try:
+    logging.config.fileConfig(get_logger_config_fpath())
+except FileNotFoundError as e:
+    print(e)
 logger = logging.getLogger(__name__)
 
 
@@ -25,16 +32,23 @@ class Config:
 
             return wrapper
 
-    def __init__(self, config_path: str):
-        if os.path.isfile(config_path):
+    def __init__(self, config_path: Path):
+        if not os.path.isfile(config_path):
+            logger.error("Failure reading config")
+            raise ConfigFileNotFoundError(config_path)
 
+        if config_path.suffix not in ['yaml', 'yml']:
+            logger.error("Config file is not yaml")
+            raise ConfigFileTypeError(config_path)
+
+        try:
             with open(config_path) as conf:
-                self.__config = json.load(conf)
+                self.__config = yaml.safe_load(conf)
+        except yaml.YAMLError as e:
+            logger.error("Failure loading config")
+            raise ConfigFileTypeError(config_path)
 
-            self._process_data()
-
-        else:
-            logger.error("Read config failure")
+        self._process_data()
 
     def _process_data(self):
         self._process_benchmark_times()
@@ -271,3 +285,23 @@ class Config:
             return self.__config['overridden_filepaths'][cp_name]
         except KeyError:
             pass
+
+
+class ConfigFileNotFoundError(FileNotFoundError):
+    """Raised when there is no project configuration file, or configuration
+    file does not exist at the fpath being requested.
+    """
+
+    def __init__(self, config_path):
+        super(ConfigFileNotFoundError, self).__init__(
+            f"Configuration file cannot be found at `{config_path}`")
+
+
+class ConfigFileTypeError(ValueError):
+    """Raised when the configuration file is not of `yaml` type."""
+
+    def __init__(self, config_path):
+        super(ValueError, self).__init__((
+            f"An error has occured processing `{config_path}`. It is "
+            "possible the file is not of `yaml` type, or the yaml file "
+            "is corrupted or misconfigured."))
