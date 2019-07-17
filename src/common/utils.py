@@ -1,5 +1,6 @@
 from datetime import datetime
 from itertools import zip_longest
+from pathlib import Path
 
 import xlrd
 
@@ -78,3 +79,11 @@ def run(func, *args, **kwargs):
 
 def folder_timestamp_suffix() -> str:
     return datetime.now().strftime("_%Y%m%d_%H%M%S")
+
+
+def get_logger_config_fpath() -> Path:
+    """Returns fpath to the project's logger configuration file.
+    
+    Config fpath hard-coded and should not be modified frequently.
+    """
+    return Path.cwd() / 'cfg' / 'logger_cfg.ini'
