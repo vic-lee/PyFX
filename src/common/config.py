@@ -48,34 +48,35 @@ class Config:
             logger.error("Failure loading config")
             raise ConfigFileTypeError(config_path)
 
-        self._process_data()
+        self._setup()
 
-    def _process_data(self):
-        self._process_benchmark_times()
-        self._process_time_range()
-        self._process_dst_hour_ahead_periods()
+    def _setup(self):
+        self._setup_benchmark_times()
+        self._setup_time_range()
+        self._setup_dst_hour_ahead_periods()
 
-    def _process_benchmark_times(self):
+    def _setup_benchmark_times(self):
         benchmark_times = []
 
-        for benchmark_time_str in self.__config["benchmark_times"]:
+        for benchmark_time_str in self.__config['setup']['benchmark_times']:
             new_benchmark = self._str_to_time(benchmark_time_str)
             benchmark_times.append(new_benchmark)
 
-        self.__config["benchmark_times"] = benchmark_times
+        self.__config['setup']['benchmark_times'] = benchmark_times
 
-    def _process_time_range(self):
-        timerange = self.__config["time_range"]
-        self.__config["time_range"] = self._read_time_range_obj(timerange)
+    def _setup_time_range(self):
+        timerange = self.__config['setup']['time_range']
+        self.__config['setup']['time_range'] = \
+            self._read_time_range_obj(timerange)
 
-    def _process_dst_hour_ahead_periods(self):
+    def _setup_dst_hour_ahead_periods(self):
         hour_ahead_periods = []
 
-        for period in self.__config["daylight_saving_mode"]["hour_ahead_periods"]:
+        for period in self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods']:
             date_range = self._read_date_range_obj(period)
             hour_ahead_periods.append(date_range)
 
-        self.__config["daylight_saving_mode"]["hour_ahead_periods"] = hour_ahead_periods
+        self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods'] = hour_ahead_periods
 
     @property
     def currency_pairs(self) -> list:
@@ -97,7 +98,7 @@ class Config:
 
     @property
     def benchmark_times(self) -> list:
-        return self.__config["benchmark_times"]
+        return self.__config['setup']['benchmark_times']
 
     @property
     def should_enable_daylight_saving_mode(self) -> bool:
@@ -153,14 +154,12 @@ class Config:
             new_section = {}
 
             if "start_time" in section and "end_time" in section:
-
                 start_time_str = section["start_time"]
                 end_time_str = section["end_time"]
                 start_time = self._str_to_time(start_time_str)
                 end_time = self._str_to_time(end_time_str)
 
             else:
-
                 time_str = section["time"]
                 start_time = self._str_to_time(time_str)
                 end_time = start_time
@@ -198,11 +197,11 @@ class Config:
     def fpath(self, cp_name: str) -> dict:
         fpaths = {
             read.MINUTE:
-                abspath("data/datasrc/{}_Minute.csv").format(cp_name),
+                os.path.abspath("data/datasrc/{}_Minute.csv").format(cp_name),
             read.FIX:
-                abspath("data/datasrc/fix1819.csv"),
+                os.path.abspath("data/datasrc/fix1819.csv"),
             read.DAILY:
-                abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
+                os.path.abspath("data/datasrc/{}_Daily.xlsx".format(cp_name))
         }
 
         if self._should_override_fpath(cp_name):
