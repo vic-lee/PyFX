@@ -37,7 +37,7 @@ class Config:
             logger.error("Failure reading config")
             raise ConfigFileNotFoundError(config_path)
 
-        if config_path.suffix not in ['yaml', 'yml']:
+        if config_path.suffix not in ['.yaml', '.yml']:
             logger.error("Config file is not yaml")
             raise ConfigFileTypeError(config_path)
 
