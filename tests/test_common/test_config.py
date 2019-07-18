@@ -1,8 +1,9 @@
 import pytest
 
-import yaml
-
 from pathlib import Path
+from typing import Iterator
+
+import yaml
 
 from tests.context import common
 from common import config
@@ -33,12 +34,25 @@ def test_config_handles_file_type_error():
         tf.unlink()
 
 
-def test_config_property_benchmark_time():
+@pytest.fixture
+def config_test_paths() -> Iterator[Path]:
+    """Paths to config test files
+
+    Returns
+    -------
+    An iterator that iterates through all `yml` files in the
+    config testdata directory.
+    """
+    cfg_test_dir = Path.cwd() / 'tests' / 'testdata' / 'config'
+    return cfg_test_dir.glob('**/*.yml')
+
+
+def test_config_property_benchmark_time(config_test_paths):
     """Tests Config loads benchmark time correctly"""
-    cfgpath = Path.cwd() / 'tests' / 'testdata' / 'config' / 'cfg1.yml'
-    with open(cfgpath) as cfg:
-        expected_cfg = yaml.safe_load(cfg)
-        test_cfg = Config(cfgpath)
-        for i, bt in enumerate(test_cfg.benchmark_times):
-            expected = expected_cfg['setup']['benchmark_times'][i]
-            assert bt.strftime('%H:%M') == expected
+    for cfgpath in config_test_paths:
+        with open(cfgpath) as cfg:
+            expected_cfg = yaml.safe_load(cfg)
+            test_cfg = Config(cfgpath)
+            for i, bt in enumerate(test_cfg.benchmark_times):
+                expected = expected_cfg['setup']['benchmark_times'][i]
+                assert bt.strftime('%H:%M') == expected
