@@ -1,0 +1,49 @@
+setup:
+  currency_pairs:
+    - AUDUSD
+    - EURUSD
+    - GBPUSD
+    - NZDUSD
+    - USDCAD
+    - USDCHF
+    - USDJPY
+    - USDMXN
+    - USDTRY
+    - USDZAR
+  time_range:
+    start_time: '10:50'
+    end_time: '11:02'
+  date_range:
+    start_date: '2018/01/01'
+    end_date: '2018/12/31'
+  benchmark_times:
+    - '10:30'
+    - '10:45'
+    - '10:50'
+
+data_adjustments:
+  daylight_saving_mode:
+    enabled: True
+    hour_delay_period:
+      start_date: "2018/10/28"
+      end_date: "2018/11/03"
+    hour_ahead_period:
+      start_date: "2018/03/11"
+      end_date: "2018/03/24"
+
+metrics:
+  minutely_data:
+    enabled: True
+    sections:
+      - start_time: '10:49'
+        end_time: '11:02'
+        metric: Close
+      - time: '10:30'
+        metric: Close
+      - time: '10:45'
+        metric: Close
+  period_avg_data:
+    enabled: True
+    sections:
+      - start_time: '10:58'
+      - end_time: '11:02'
