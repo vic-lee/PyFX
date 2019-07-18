@@ -39,6 +39,6 @@ def test_config_property_benchmark_time():
     with open(cfgpath) as cfg:
         expected_cfg = yaml.safe_load(cfg)
         test_cfg = Config(cfgpath)
-        for bt in test_cfg.benchmark_times:
-            assert bt.strftime('%H:%M') in \
-                expected_cfg['setup']['benchmark_times']
+        for i, bt in enumerate(test_cfg.benchmark_times):
+            expected = expected_cfg['setup']['benchmark_times'][i]
+            assert bt.strftime('%H:%M') == expected
