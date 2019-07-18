@@ -84,7 +84,7 @@ class Config:
 
     @property
     def time_range(self) -> DayTimeRange:
-        return self.__config['time_range']
+        return self.__config['setup']['time_range']
 
     @property
     def date_range(self) -> DateRange:

@@ -56,3 +56,19 @@ def test_config_property_benchmark_time(config_test_paths):
             for i, bt in enumerate(test_cfg.benchmark_times):
                 expected = expected_cfg['setup']['benchmark_times'][i]
                 assert bt.strftime('%H:%M') == expected
+
+
+def test_config_property_time_range(config_test_paths):
+    """Tests Config loads time ranges correctly"""
+    for cfgpath in config_test_paths:
+        with open(cfgpath) as cfg:
+            expected_cfg = yaml.safe_load(cfg)
+            test_cfg = Config(cfgpath)
+
+            expected_start = expected_cfg['setup']['time_range']['start_time']
+            expected_end = expected_cfg['setup']['time_range']['end_time']
+            got_start_str = test_cfg.time_range.start_time.strftime('%H:%M')
+            got_end_str = test_cfg.time_range.end_time.strftime('%H:%M')
+            
+            assert got_start_str == expected_start
+            assert got_end_str == expected_end
