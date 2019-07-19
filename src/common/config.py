@@ -154,7 +154,7 @@ class Config:
     def minutely_data_sections(self) -> list:
         minute_sections = []
 
-        for section in self.__config["minutely_data"]["included_sections"]:
+        for section in self.__config['metrics']['minutely_data']['sections']:
             new_section = {}
 
             if "start_time" in section and "end_time" in section:
@@ -178,7 +178,10 @@ class Config:
 
     @property
     def should_time_shift(self) -> bool:
-        return self.__config["time_shift"]["should_shift_time"]
+        if ('time_shift' in self.__config and
+                'should_shift_time' in self.__config['time_shift']):
+            return self.__config["time_shift"]["should_shift_time"]
+        return False
 
     @property
     def time_shift(self) -> bool:
@@ -192,7 +195,7 @@ class Config:
     def period_average_data_sections(self) -> list:
         avg_data_sections = []
 
-        for avg_obj in self.__config["period_avg_data"]["included_sections"]:
+        for avg_obj in self.__config['metrics']['period_avg_data']['sections']:
             new_section = self._read_time_range_obj(avg_obj)
             avg_data_sections.append(new_section)
 
