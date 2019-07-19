@@ -53,6 +53,7 @@ class Config:
     def _setup(self):
         self._setup_benchmark_times()
         self._setup_time_range()
+        self._setup_date_range()
         self._setup_dst_hour_ahead_periods()
 
     def _setup_benchmark_times(self):
@@ -68,6 +69,16 @@ class Config:
         timerange = self.__config['setup']['time_range']
         self.__config['setup']['time_range'] = \
             self._read_time_range_obj(timerange)
+
+    def _setup_date_range(self):
+        start_date_str = self.__config['setup']['date_range']['start_date']
+        end_date_str = self.__config['setup']['date_range']['end_date']
+
+        start_date = self._str_to_date(start_date_str)
+        end_date = self._str_to_date(end_date_str)
+
+        self.__config['setup']['date_range'] = \
+            DateRange(start_date=start_date, end_date=end_date)
 
     def _setup_dst_hour_ahead_periods(self):
         hour_ahead_periods = []
@@ -88,13 +99,8 @@ class Config:
 
     @property
     def date_range(self) -> DateRange:
-        start_date_str = self.__config['date_range']['start_date']
-        end_date_str = self.__config['date_range']['end_date']
-
-        start_date = self._str_to_date(start_date_str)
-        end_date = self._str_to_date(end_date_str)
-
-        return DateRange(start_date=start_date, end_date=end_date)
+        """The start and end date for the analysis."""
+        return self.__config['setup']['date_range']
 
     @property
     def benchmark_times(self) -> list:

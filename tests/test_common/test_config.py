@@ -72,3 +72,19 @@ def test_config_property_time_range(config_test_paths):
             
             assert got_start_str == expected_start
             assert got_end_str == expected_end
+
+
+def test_config_property_date_range(config_test_paths):
+    """Tests Config loads date ranges correctly"""
+    for cfgpath in config_test_paths:
+        with open(cfgpath) as cfg:
+            expected_cfg = yaml.safe_load(cfg)
+            test_cfg = Config(cfgpath)
+
+            expected_start = expected_cfg['setup']['date_range']['start_date']
+            expected_end = expected_cfg['setup']['date_range']['end_date']
+            got_start = test_cfg.date_range.start_date.strftime('%Y/%m/%d')
+            got_end = test_cfg.date_range.end_date.strftime('%Y/%m/%d')
+            
+            assert got_start == expected_start
+            assert got_end == expected_end
