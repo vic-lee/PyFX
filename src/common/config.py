@@ -117,10 +117,10 @@ class Config:
     def dst_hour_ahead_time_range(self) -> DayTimeRange:
         original_time_range = self.time_range
 
-        new_start_time = self._timedelta_by_hour(time=original_time_range.start_time,
-                                                 hourdelta=1)
-        new_end_time = self._timedelta_by_hour(time=original_time_range.end_time,
-                                               hourdelta=1)
+        new_start_time = self._timedelta_by_hour(
+            time=original_time_range.start_time, hourdelta=1)
+        new_end_time = self._timedelta_by_hour(
+            time=original_time_range.end_time, hourdelta=1)
 
         return DayTimeRange(new_start_time, new_end_time)
 
@@ -133,12 +133,10 @@ class Config:
     def dst_hour_behind_time_range(self) -> DayTimeRange:
         original_time_range = self.time_range
 
-        new_start_time = self._timedelta_by_hour(time=original_time_range.start_time,
-                                                 hourdelta=1,
-                                                 decr=True)
-        new_end_time = self._timedelta_by_hour(time=original_time_range.end_time,
-                                               hourdelta=1,
-                                               decr=True)
+        new_start_time = self._timedelta_by_hour(
+            time=original_time_range.start_time, hourdelta=1, decr=True)
+        new_end_time = self._timedelta_by_hour(
+            time=original_time_range.end_time, hourdelta=1, decr=True)
 
         return DayTimeRange(new_start_time, new_end_time)
 
@@ -227,7 +225,7 @@ class Config:
             return datetime.strptime(datestr, "%Y/%m/%d").date()
         except ValueError:
             logger.error(
-                "date string {} does not follow the %Y/%m/%d format.".format(datestr))
+                f"date string {datestr} does not follow the %Y/%m/%d format.")
 
     @staticmethod
     def _timedelta_by_hour(time: time, hourdelta: int, decr=False) -> time:
