@@ -91,7 +91,7 @@ class Config:
 
     @property
     def currency_pairs(self) -> list:
-        return self.__config["currency_pairs"]
+        return self.__config['setup']['currency_pairs']
 
     @property
     def time_range(self) -> DayTimeRange:
@@ -108,16 +108,16 @@ class Config:
 
     @property
     def should_enable_daylight_saving_mode(self) -> bool:
-        return self.__config["daylight_saving_mode"]["daylight_saving_time"]
+        return self.__config['data_adjustments']['daylight_saving_mode']['enabled']
 
     @property
     def dst_hour_ahead_period(self) -> DateRange:
-        time_period_def = self.__config['daylight_saving_mode']['hour_ahead_period']
+        time_period_def = self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_period']
         return self._read_date_range_obj(time_period_def)
 
     @property
     def dst_hour_ahead_periods(self) -> [DateRange]:
-        return self.__config["daylight_saving_mode"]["hour_ahead_periods"]
+        return self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods']
 
     @property
     def dst_hour_ahead_time_range(self) -> DayTimeRange:
@@ -132,7 +132,7 @@ class Config:
 
     @property
     def dst_hour_delay_period(self) -> DateRange:
-        time_period_def = self.__config['daylight_saving_mode']['hour_delay_period']
+        time_period_def = self.__config['data_adjustments']['daylight_saving_mode']['hour_delay_period']
         return self._read_date_range_obj(time_period_def)
 
     @property
