@@ -46,4 +46,4 @@ metrics:
     enabled: True
     sections:
       - start_time: '10:58'
-      - end_time: '11:02'
+        end_time: '11:02'
