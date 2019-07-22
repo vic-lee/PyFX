@@ -1,8 +1,20 @@
+import logging
+import os
+
 from datetime import datetime
 from itertools import zip_longest
 from pathlib import Path
 
 import xlrd
+from dotenv import load_dotenv
+
+load_dotenv()
+
+try:
+    logging.config.fileConfig(os.getenv('LOGGER_CFG_PATH'))
+except FileNotFoundError as e:
+    print(e)
+logger = logging.getLogger(__name__)
 
 
 class SheetNotFoundException(BaseException):
@@ -83,7 +95,15 @@ def folder_timestamp_suffix() -> str:
 
 def get_logger_config_fpath() -> Path:
     """Returns fpath to the project's logger configuration file.
-    
+
     Config fpath hard-coded and should not be modified frequently.
     """
     return Path.cwd() / 'cfg' / 'logger_cfg.ini'
+
+
+def get_app_config_fpath() -> Path:
+    """Returns fpath to the project's configuration file.
+
+    Config fpath hard-coded and should not be modified frequently.
+    """
+    return Path.cwd() / 'cfg' / 'app_cfg.yml'

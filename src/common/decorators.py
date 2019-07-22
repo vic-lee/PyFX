@@ -1,8 +1,18 @@
+import logging
 import functools
+import os
 from datetime import datetime
 
 import xlrd
+from dotenv import load_dotenv
 
+load_dotenv()
+
+try:
+    logging.config.fileConfig(os.getenv('LOGGER_CFG_PATH'))
+except FileNotFoundError as e:
+    print(e)
+logger = logging.getLogger(__name__)
 
 def timer(func):
     """A decorator that times and prints execution time."""
@@ -11,7 +21,7 @@ def timer(func):
         resp = func(*args, **kwargs)
         end_time = datetime.now()
         duration = end_time - start_time
-        print("{:<40} runtime: {}.{} secs".format(
+        logger.info("{:<40} runtime: {}.{} secs".format(
             func.__name__, duration.seconds, duration.microseconds))
         return resp
     return timer_wrapper

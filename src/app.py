@@ -11,28 +11,16 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import timer
-from common.utils import folder_timestamp_suffix, run
+from common.utils import (folder_timestamp_suffix, get_app_config_fpath,
+                          get_logger_config_fpath, run)
 from ds.datacontainer import DataContainer
 from pyfx import analytics, read, write
 
+try:
+    logging.config.fileConfig(get_logger_config_fpath())
+except FileNotFoundError as e:
+    print(e)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-handler = logging.FileHandler('app.log')
-
-handler.setLevel(logging.INFO)
-
-fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-formatter = logging.Formatter(fmt)
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(formatter)
-
-logger.addHandler(stream_handler)
-
-DEFAULT_CONFIG_FPATH = 'config.json'
 
 
 def io(func):
@@ -40,7 +28,7 @@ def io(func):
         cp_name = kwargs.get('cp_name')
         config = kwargs.get('config')
         suffix = kwargs.get('folder_suffix')
-        print(cp_name)
+        logger.info(f"Processing currency pair {cp_name}")
 
         fpaths = config.fpath(cp_name)
 
@@ -80,7 +68,7 @@ def exec(cp_name: str, config: Config, folder_suffix: str, **kwargs):
 
 @timer
 def main():
-    config = Config(DEFAULT_CONFIG_FPATH)
+    config = Config(get_app_config_fpath())
     folder_suffix = folder_timestamp_suffix()
 
     for cp in config.currency_pairs:
