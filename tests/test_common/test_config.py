@@ -44,7 +44,7 @@ def config_test_paths() -> Iterator[Path]:
     config testdata directory.
     """
     cfg_test_dir = Path.cwd() / 'tests' / 'testdata' / 'config'
-    return cfg_test_dir.glob('**/*.yml')
+    return cfg_test_dir.glob('**/cfg_default*.yml')
 
 
 def test_config_property_benchmark_time(config_test_paths):
@@ -116,3 +116,14 @@ def test_config_average_time_range(config_test_paths):
                     assert d.end_time.strftime('%H:%M') == expected['end_time']
                 else:
                     assert d == None
+
+
+def test_config_src_metric_validation():
+    """Tests Config raises error when source metric does not conform to the 
+    types allowed (e.g. 'Close', 'Open').
+    """
+    testpath = (Path.cwd() / 'tests' / 'testdata'
+                / 'config' / 'cfg_src_metric_err1.yml')
+    cfg = Config(testpath)
+    with pytest.raises(config.ConfigSrcMetricTypeError):
+        minute_data_cfg = cfg.minutely_data_sections

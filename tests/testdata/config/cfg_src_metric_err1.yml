@@ -1,0 +1,34 @@
+setup:
+  currency_pairs:
+    - AUDUSD
+    - EURUSD
+    - GBPUSD
+    - NZDUSD
+    - USDCAD
+    - USDCHF
+    - USDJPY
+    - USDMXN
+    - USDTRY
+    - USDZAR
+  time_range:
+    start_time: '10:50'
+    end_time: '11:02'
+  date_range:
+    start_date: '2018/01/01'
+    end_date: '2018/12/31'
+  benchmark_times:
+    - '10:30'
+    - '10:45'
+    - '10:50'
+
+metrics:
+  minutely_data:
+    enabled: True
+    sections:
+      - start_time: '10:19'
+        end_time: '11:02'
+        metric: Close
+      - time: '10:30'
+        metric: close
+      - time: '10:45'
+        metric: Close

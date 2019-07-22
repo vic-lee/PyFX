@@ -18,7 +18,9 @@ except FileNotFoundError as e:
 logger = logging.getLogger(__name__)
 
 
-@singleton
+METRIC_TYPES_ALLOWED = ['OHLC', 'Open', 'High', 'Low', 'Close']
+
+
 class Config:
 
     class Decorators:
@@ -81,13 +83,15 @@ class Config:
             DateRange(start_date=start_date, end_date=end_date)
 
     def _setup_dst_hour_ahead_periods(self):
-        hour_ahead_periods = []
+        if ('data_adjustments' in self.__config and
+                'daylight_saving_mode' in self.__config['data_adjustments']):
 
-        for period in self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods']:
-            date_range = self._read_date_range_obj(period)
-            hour_ahead_periods.append(date_range)
+            hour_ahead_periods = []
+            for period in self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods']:
+                date_range = self._read_date_range_obj(period)
+                hour_ahead_periods.append(date_range)
 
-        self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods'] = hour_ahead_periods
+            self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods'] = hour_ahead_periods
 
     @property
     def currency_pairs(self) -> list:
@@ -170,6 +174,14 @@ class Config:
 
             new_section["range_start"] = start_time
             new_section["range_end"] = end_time
+
+            if (isinstance(section['metric'], list) and
+                    any(k not in METRIC_TYPES_ALLOWED
+                        for k in section['metric'])):
+                raise ConfigSrcMetricTypeError(section['metric'])
+            elif section['metric'] not in METRIC_TYPES_ALLOWED:
+                raise ConfigSrcMetricTypeError(section['metric'])
+
             new_section["include"] = section["metric"]
 
             minute_sections.append(new_section)
@@ -311,3 +323,13 @@ class ConfigFileTypeError(ValueError):
             f"An error has occured processing `{config_path}`. It is "
             "possible the file is not of `yaml` type, or the yaml file "
             "is corrupted or misconfigured."))
+
+
+class ConfigSrcMetricTypeError(ValueError):
+    """Raised when the configuration file is not of `yaml` type."""
+
+    def __init__(self, metrics_requested):
+        super(ValueError, self).__init__((
+            "An error has occured processing your metrics requested.\n\n"
+            f"\tRequested: \t{metrics_requested}\n"
+            f"\tAllowed: \t{METRIC_TYPES_ALLOWED}"))
