@@ -24,10 +24,30 @@ logger = logging.getLogger(__name__)
 
 
 def io(func):
+    """Decorator that abstracts the currency data input-output logic.
+
+    Performs data files input (loading from csv and xlsx files) for the 
+    decorated function to consume, and writes a xlsx file containing the 
+    decorated function's output.
+
+    Raises
+    ------
+
+    """
+
     def wrapper(*args, **kwargs):
+        REQUIRED_ARGS = ['cp_name', 'config', 'folder_suffix']
+        if any(k not in kwargs for k in REQUIRED_ARGS):
+            raise IOParamParsingError((
+                "@io argument parsing error.\n\nSome of the following required "
+                f"keyword arguments are missing: \n\t{REQUIRED_ARGS}.\n"
+                "Note that these arguments must be passed in as kwargs.\n"
+            ))
+
         cp_name = kwargs.get('cp_name')
         config = kwargs.get('config')
         suffix = kwargs.get('folder_suffix')
+
         logger.info(f"Processing currency pair {cp_name}")
 
         fpaths = config.fpath(cp_name)
@@ -43,6 +63,12 @@ def io(func):
                          folder_unique_id=suffix,
                          sheet_name='max_pip_mvmts', col_width=20)
     return wrapper
+
+
+class IOParamParsingError(Exception):
+    """Raised when not all params required by the @io decorator can be located.
+    """
+    pass
 
 
 @io
