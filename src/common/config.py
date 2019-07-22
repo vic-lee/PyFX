@@ -192,7 +192,7 @@ class Config:
 
     def _parse_src_metric_type(self, metrics):
         """Translate src metric string to OHLC enums.
-        
+
         Raises
         ------
         ConfigSrcMetricTypeError:
@@ -284,37 +284,6 @@ class Config:
             return self.__config['metrics']['minutely_data']['sections']
         else:
             return None
-        # minute_sections = []
-
-        # for section in self.__config['metrics']['minutely_data']['sections']:
-        #     new_section = {}
-
-        #     if "start_time" in section and "end_time" in section:
-        #         start_time_str = section["start_time"]
-        #         end_time_str = section["end_time"]
-        #         start_time = self._str_to_time(start_time_str)
-        #         end_time = self._str_to_time(end_time_str)
-
-        #     else:
-        #         time_str = section["time"]
-        #         start_time = self._str_to_time(time_str)
-        #         end_time = start_time
-
-        #     new_section["range_start"] = start_time
-        #     new_section["range_end"] = end_time
-
-        #     if (isinstance(section['metric'], list) and
-        #             any(k not in METRIC_TYPES_ALLOWED
-        #                 for k in section['metric'])):
-        #         raise ConfigSrcMetricTypeError(section['metric'])
-        #     elif section['metric'] not in METRIC_TYPES_ALLOWED:
-        #         raise ConfigSrcMetricTypeError(section['metric'])
-
-        #     new_section["include"] = section["metric"]
-
-        #     minute_sections.append(new_section)
-
-        # return minute_sections
 
     @property
     def should_time_shift(self) -> bool:
