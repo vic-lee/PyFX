@@ -11,13 +11,13 @@ import pandas as pd
 
 from common.config import Config
 from common.decorators import timer
-from common.utils import (folder_timestamp_suffix, get_app_config_fpath,
-                          get_logger_config_fpath, run)
+from common import utils
+from common.utils import run
 from ds.datacontainer import DataContainer
 from pyfx import analytics, read, write
 
 try:
-    logging.config.fileConfig(get_logger_config_fpath())
+    logging.config.fileConfig(utils.get_logger_config_fpath())
 except FileNotFoundError as e:
     print(e)
 logger = logging.getLogger(__name__)
@@ -68,8 +68,8 @@ def exec(cp_name: str, config: Config, folder_suffix: str, **kwargs):
 
 @timer
 def main():
-    config = Config(get_app_config_fpath())
-    folder_suffix = folder_timestamp_suffix()
+    config = Config(utils.get_app_config_fpath())
+    folder_suffix = utils.folder_timestamp_suffix()
 
     for cp in config.currency_pairs:
         exec(cp_name=cp, config=config, folder_suffix=folder_suffix)
