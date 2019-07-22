@@ -58,7 +58,7 @@ def _read_and_process_minute_data(
     processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/min_{}'.format(cp_name))
+    # @cache('cache/min_{}'.format(cp_name))
     def _process_minute_data(min_df: pd.DataFrame) -> pd.DataFrame:
 
         if 'Volume' in min_df.columns:
@@ -89,7 +89,7 @@ def _read_and_process_fix_data(
     fpath: str, processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/fix')
+    # @cache('cache/fix')
     def _process_fix_data(fix_df: pd.DataFrame) -> pd.DataFrame:
 
         fix_df['datetime'] = pd.to_datetime(
@@ -110,7 +110,7 @@ def _read_and_process_daily_data(
     processor: Callable[[pd.DataFrame], pd.DataFrame] = None
 ) -> pd.DataFrame:
 
-    @cache('cache/day_{}'.format(cp_name))
+    # @cache('cache/day_{}'.format(cp_name))
     def process_daily_data(day_df: pd.DataFrame,
                            cp_name: str) -> pd.DataFrame:
 
