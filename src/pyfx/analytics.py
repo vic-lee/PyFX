@@ -26,8 +26,32 @@ def include_ohlc(data: DataContainer):
 
 @timer
 def include_avgs(data: DataContainer, periods: List):
+    """Include the price averages for each time period provided.
 
-    def include(period):
+    Returns
+    -------
+    A dataframe following the format below, concatenated sequentially in the 
+    order of the time periods requested in arg:
+
+    |...|        {start_time}_{end_time}		|...|
+    |---|---------------------------------------|---|
+    |...| Mean	| TimeForMin	| TimeForMax    |...|
+    |---| ----- | ------------- | ------------- |---|
+
+    Defaults configurations
+    -----------------------
+    - Use 'Close' for average calculations
+
+    - If two prices within the specified time period has the same price extrema
+        (minima and maxima), use the latter timestamp.
+        
+        (e.g. if for range 8:30AM - 9:00AM, 8:30AM and 8:42AM both strike the
+         price minima 1.3884, the system records 8:42AM as the minima 
+         timestamp, not 8:30AM.)
+    """
+
+    def avg_includer(period) -> pd.DataFrame:
+        """Internal logic for including average prices."""
         df = pd.DataFrame()
         start_time = period.start_time
         end_time = period.end_time
@@ -65,9 +89,8 @@ def include_avgs(data: DataContainer, periods: List):
 
         return df
 
-    outputs = map(include, periods)
+    outputs = map(avg_includer, periods)
     df_master = pd.concat(outputs, axis=1)
-
     return df_master
 
 
