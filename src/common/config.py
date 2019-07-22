@@ -173,7 +173,6 @@ class Config:
         if 'sections' not in conf:
             raise MinutelyDataConfigurationError("key 'sections' required")
         for section in conf['sections']:
-            # assert any(k not in section for k in ['start_time', 'end_time'])
             if not (all(k in section for k in ['start_time', 'end_time']) or
                     ('time' in section)):
                 raise MinutelyDataConfigurationError(
