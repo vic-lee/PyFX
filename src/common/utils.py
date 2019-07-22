@@ -8,7 +8,7 @@ from pathlib import Path
 import xlrd
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=(Path.cwd()/'.env'))
 
 try:
     logging.config.fileConfig(os.getenv('LOGGER_CFG_PATH'))
