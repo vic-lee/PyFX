@@ -6,10 +6,10 @@ from datetime import datetime
 import xlrd
 from dotenv import load_dotenv
 
-load_dotenv()
+from common import utils
 
 try:
-    logging.config.fileConfig(os.getenv('LOGGER_CFG_PATH'))
+    logging.config.fileConfig(utils.get_logger_config_fpath())
 except FileNotFoundError as e:
     print(e)
 logger = logging.getLogger(__name__)
