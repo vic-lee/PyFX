@@ -124,6 +124,5 @@ def test_config_src_metric_validation():
     """
     testpath = (Path.cwd() / 'tests' / 'testdata'
                 / 'config' / 'cfg_src_metric_err1.yml')
-    cfg = Config(testpath)
     with pytest.raises(config.ConfigSrcMetricTypeError):
-        minute_data_cfg = cfg.minutely_data_sections
+        cfg = Config(testpath)

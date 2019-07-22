@@ -6,6 +6,7 @@ from pathlib import Path
 import yaml
 from datetime import datetime, time, timedelta
 
+from common import const
 from common.decorators import singleton
 from common.utils import get_logger_config_fpath
 from ds.timeranges import DateRange, DayTimeRange
@@ -57,6 +58,7 @@ class Config:
         self._setup_time_range()
         self._setup_date_range()
         self._setup_dst_hour_ahead_periods()
+        self._setup_minutely_sections()
 
     def _setup_benchmark_times(self):
         benchmark_times = []
@@ -92,6 +94,128 @@ class Config:
                 hour_ahead_periods.append(date_range)
 
             self.__config['data_adjustments']['daylight_saving_mode']['hour_ahead_periods'] = hour_ahead_periods
+
+    def _setup_minutely_sections(self):
+        """Validate and initialize settings regarding minutely sections, if any.
+        """
+        if self._is_minutely_section_defined():
+            self._validate_minutely_sections()
+            minute_sections = []
+
+            for section in self.__config['metrics']['minutely_data']['sections']:
+                new_section = {}
+
+                if "start_time" in section and "end_time" in section:
+                    start_time_str = section["start_time"]
+                    end_time_str = section["end_time"]
+                    start_time = self._str_to_time(start_time_str)
+                    end_time = self._str_to_time(end_time_str)
+
+                else:
+                    time_str = section["time"]
+                    start_time = self._str_to_time(time_str)
+                    end_time = start_time
+
+                new_section["range_start"] = start_time
+                new_section["range_end"] = end_time
+
+                new_section["include"] = \
+                    self._parse_src_metric_type(section["metric"])
+
+                minute_sections.append(new_section)
+
+            self.__config['metrics']['minutely_data']['sections'] = minute_sections
+
+    def _is_minutely_section_defined(self) -> bool:
+        """Returns whether minute section is defined in config.
+
+        Minutely section should be defined at:
+        ```
+        metrics:
+            minutely_data:
+                ...
+        ```
+        """
+        return (
+            'metrics' in self.__config and
+            'minutely_data' in self.__config['metrics']
+        )
+
+    def _validate_minutely_sections(self):
+        """Checks minutely sections has all required fields.
+
+        Minutely data configuration format
+        ----------------------------------
+        ```
+        metrics:
+            minutely_data:
+                # time option one: specify start and end time
+                start_time: 'HH:MM'
+                end_time:   'HH:MM'
+
+                # OR, time option two: specify time (i.e. start_time=end_time)
+                time:       'HH:MM'
+
+                # metric option one: single metric                
+                metric:     any[
+                                    'Open', 'High', 'Low', 'Close', 
+                                    'OHLC'  # use all metrics
+                                ]
+
+                # OR, metric option two: a list of metrics
+                metric:
+                    - 'Open'
+                    - 'High'
+                    - ...
+        ```
+        """
+        conf = self.__config['metrics']['minutely_data']
+        if 'sections' not in conf:
+            raise MinutelyDataConfigurationError("key 'sections' required")
+        for section in conf['sections']:
+            # assert any(k not in section for k in ['start_time', 'end_time'])
+            if not (all(k in section for k in ['start_time', 'end_time']) or
+                    ('time' in section)):
+                raise MinutelyDataConfigurationError(
+                    "key 'start_time' and 'end_time' OR 'time' required")
+
+            if 'metric' not in section:
+                raise MinutelyDataConfigurationError(
+                    "key 'metric' required")
+
+            if (isinstance(section['metric'], list) and
+                    any(k not in METRIC_TYPES_ALLOWED
+                        for k in section['metric'])):
+                raise ConfigSrcMetricTypeError(section['metric'])
+            elif section['metric'] not in METRIC_TYPES_ALLOWED:
+                raise ConfigSrcMetricTypeError(section['metric'])
+
+    def _parse_src_metric_type(self, metrics):
+        """Translate src metric string to OHLC enums.
+        
+        Raises
+        ------
+        ConfigSrcMetricTypeError:
+            if metric does not conform to allowed metric strings.
+        """
+
+        def _parse(metric):
+            if metric.lower() == 'close':
+                return const.CLOSE
+            elif metric.lower() == 'open':
+                return const.OPEN
+            elif metric.lower() == 'high':
+                return const.HIGH
+            elif metric.lower() == 'low':
+                return const.LOW
+            elif metric.lower() == 'ohlc':
+                return const.OHLC
+            else:
+                raise ConfigSrcMetricTypeError(metric)
+
+        if isinstance(metrics, list):
+            return list(map(_parse, metrics))
+        return _parse(metrics)
 
     @property
     def currency_pairs(self) -> list:
@@ -156,37 +280,41 @@ class Config:
 
     @property
     def minutely_data_sections(self) -> list:
-        minute_sections = []
+        if self._is_minutely_section_defined():
+            return self.__config['metrics']['minutely_data']['sections']
+        else:
+            return None
+        # minute_sections = []
 
-        for section in self.__config['metrics']['minutely_data']['sections']:
-            new_section = {}
+        # for section in self.__config['metrics']['minutely_data']['sections']:
+        #     new_section = {}
 
-            if "start_time" in section and "end_time" in section:
-                start_time_str = section["start_time"]
-                end_time_str = section["end_time"]
-                start_time = self._str_to_time(start_time_str)
-                end_time = self._str_to_time(end_time_str)
+        #     if "start_time" in section and "end_time" in section:
+        #         start_time_str = section["start_time"]
+        #         end_time_str = section["end_time"]
+        #         start_time = self._str_to_time(start_time_str)
+        #         end_time = self._str_to_time(end_time_str)
 
-            else:
-                time_str = section["time"]
-                start_time = self._str_to_time(time_str)
-                end_time = start_time
+        #     else:
+        #         time_str = section["time"]
+        #         start_time = self._str_to_time(time_str)
+        #         end_time = start_time
 
-            new_section["range_start"] = start_time
-            new_section["range_end"] = end_time
+        #     new_section["range_start"] = start_time
+        #     new_section["range_end"] = end_time
 
-            if (isinstance(section['metric'], list) and
-                    any(k not in METRIC_TYPES_ALLOWED
-                        for k in section['metric'])):
-                raise ConfigSrcMetricTypeError(section['metric'])
-            elif section['metric'] not in METRIC_TYPES_ALLOWED:
-                raise ConfigSrcMetricTypeError(section['metric'])
+        #     if (isinstance(section['metric'], list) and
+        #             any(k not in METRIC_TYPES_ALLOWED
+        #                 for k in section['metric'])):
+        #         raise ConfigSrcMetricTypeError(section['metric'])
+        #     elif section['metric'] not in METRIC_TYPES_ALLOWED:
+        #         raise ConfigSrcMetricTypeError(section['metric'])
 
-            new_section["include"] = section["metric"]
+        #     new_section["include"] = section["metric"]
 
-            minute_sections.append(new_section)
+        #     minute_sections.append(new_section)
 
-        return minute_sections
+        # return minute_sections
 
     @property
     def should_time_shift(self) -> bool:
@@ -333,3 +461,8 @@ class ConfigSrcMetricTypeError(ValueError):
             "An error has occured processing your metrics requested.\n\n"
             f"\tRequested: \t{metrics_requested}\n"
             f"\tAllowed: \t{METRIC_TYPES_ALLOWED}"))
+
+
+class MinutelyDataConfigurationError(ValueError):
+    """Raised when Minutely data is not configured properly."""
+    pass
