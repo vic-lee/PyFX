@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from common import const
 from common.decorators import timer
 from ds.datacontainer import DataContainer
 from ds.timeranges import DayTimeRange
@@ -44,7 +45,7 @@ def include_avgs(data: DataContainer, periods: List):
 
     - If two prices within the specified time period has the same price extrema
         (minima and maxima), use the latter timestamp.
-        
+
         (e.g. if for range 8:30AM - 9:00AM, 8:30AM and 8:42AM both strike the
          price minima 1.3884, the system records 8:42AM as the minima 
          timestamp, not 8:30AM.)
@@ -273,13 +274,23 @@ def include_minute_data(data: DataContainer, sections: List) -> pd.DataFrame:
         end_time = section['range_end']
         timerange = DayTimeRange(start_time, end_time)
 
-        def get_min_data(t: time):
-            df = data.full_minute_price_df.at_time(t).Close.to_frame()
+        def get_min_data(t: time, metric_type):
+            df = data.full_minute_price_df.at_time(t)[metric_type].to_frame()
             df.index = df.index.date
-            df.columns = ['{}_Close'.format(t)]
+            df.columns = [f'{t}_{metric_type}']
             return df
 
-        outs = map(get_min_data, timerange)
+        outs = []
+        for minute in timerange:
+            if isinstance(section['include'], list):
+                for metric_type in section['include']:
+                    outs.append(get_min_data(minute, metric_type))
+            elif section['include'] == const.OHLC:
+                for metric_type in ['Open', 'High', 'Low', 'Close']:
+                    outs.append(get_min_data(minute, metric_type))
+            else:
+                outs.append(get_min_data(minute, section['include']))
+
         df = pd.concat(outs, axis=1)
         return df
 
